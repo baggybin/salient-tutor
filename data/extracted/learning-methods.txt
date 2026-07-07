@@ -1,0 +1,796 @@
+=== Method of Loci ===
+Aliases: Memory Palace, Journey Method, Roman Room.
+Associate items with ordered locations along a well-known spatial route, then recall by mentally walking the route.
+
+How to apply:
+1. Choose a familiar route with 10–20 visually distinct loci and fix a traversal order.
+2. Convert each item into a concrete, vivid image.
+3. Place each image *interacting* with its locus (not floating beside it).
+4. Recall by walking the route; note dropped loci and re-encode them harder.
+5. Keep dedicated palaces per list, or let a palace decay before reuse.
+
+Use when: ordered lists; speech or talk outlines; exam fact dumps; foreign vocabulary batches.
+Avoid when: abstract relational concepts; skills acquired by doing; material needing fast random access.
+
+Common failure modes:
+- Locus reuse causes interference (ghost images from prior lists).
+- Weak images at low-salience loci silently drop out.
+- Retrieval is route-serial: reaching item *k* means traversal unless loci are numbered.
+
+Worked example (procedure-syntax): TLS 1.3 handshake around your house: front door = **ClientHello** (a client hollering through the letterbox, waving cipher suites), hallway = **ServerHello + key_share** (butler hands over half a key), kitchen = **Certificate + CertificateVerify** (a framed diploma being notarized), living room = **Finished** (two people shaking hands in MAC raincoats), back door = application data flowing out.
+
+=== Why Method of Loci works ===
+Exploits highly developed spatial/navigational memory as a pre-built ordered scaffold. Each locus is a distinctive, low-interference retrieval cue, so recall inherits the route's order for free; imagery at each locus does the item binding.
+
+Evidence grade: established (confidence 0.9, primarily cogpsych).
+Caveats: Evidence is strongest for ordered, discrete, imageable items. Direct evidence for conceptual/relational understanding is weak; setup and image-generation costs are nontrivial.
+
+Key studies:
+- Bower (1970): Loci instructions produced 2–3x serial recall vs. controls on word lists
+- Maguire, Valentine, Wilding & Kapur (2003): Memory champions rely on loci with spatial-memory brain activation; no structural brain differences
+- Dresler et al. (2017): 6 weeks of loci training in novices doubled word recall and reorganized memory networks; gains held at 4 months
+
+=== Link / Story Method ===
+Aliases: Chain Method, Story Method, Linking.
+Chain items pairwise into interacting images or a running absurd narrative so each item cues the next.
+
+How to apply:
+1. Convert each item to a concrete image.
+2. Form an exaggerated *interaction* between item 1 and item 2; then 2 and 3; continue pairwise.
+3. Story variant: weave the images into one causal narrative.
+4. Recall by replaying the chain/story from the start.
+
+Use when: short lists (≤15 items); one-off encodings with no prepared palace or pegs.
+Avoid when: long lists; random positional access; material with its own meaningful structure.
+
+Common failure modes:
+- One broken link loses the entire downstream tail.
+- Similar stories across lists blur together (interference).
+- Accessing item *k* requires traversal from the start.
+
+Worked example (historical-sequence): Irish state milestones: a **rising phoenix (1916)** signs a **birth cert labelled 'Free State' (1922)**; the cert unfolds into a **constitution scroll (1937)**; the scroll flings a **crown off a cliff (1949, Republic)**. Each image hands off to the next.
+
+=== Why Link / Story Method works ===
+Each association is a direct cue→target pair; the story variant adds causal glue and the imagery adds distinctiveness, converting free recall into cued serial recall with zero setup.
+
+Evidence grade: established (confidence 0.8, primarily cogpsych).
+Caveats: Almost all evidence is serial word lists; little on complex material. Chain integrity is the known weak point.
+
+Key studies:
+- Bower & Clark (1969): Narrative chaining yielded ~93% vs ~13% recall across twelve 10-word lists (~7x)
+- Roediger (1980): Link method beat rehearsal but gave poorer positional access than loci/pegs
+
+=== Major System ===
+Aliases: Phonetic Number System, Major Method, 00–99 Peg Lexicon.
+Encode digits as consonant sounds (0=s/z, 1=t/d, 2=n, 3=m, 4=r, 5=l, 6=j/sh/ch, 7=k/g, 8=f/v, 9=p/b), inserting vowels freely to form concrete, imageable words.
+
+How to apply:
+1. Drill the consonant table to automaticity (sound-based, not spelling-based).
+2. Build and memorize a fixed word for every pair 00–99.
+3. Chunk target numbers into digit pairs; pull the peg word for each.
+4. Bind the peg images together (link) or deposit along loci.
+5. Decode at recall by reversing sounds → digits.
+
+Use when: long digit strings; constants, dates, ports, IDs; any recurring heavy numeric load.
+Avoid when: occasional short numbers (overhead exceeds benefit); learners unwilling to invest setup time.
+
+Common failure modes:
+- Slow, error-prone decoding if the consonant table isn't automatic.
+- Applying the code to spelling instead of sound produces ambiguous pegs.
+
+Worked example (numeric-constants): e ≈ 2.718: pairs 27 / 18 → 27 = n,k = 'NecK'; 18 = d,v = 'DoVe'. Image: a dove balancing on a giraffe's neck. Decode: reversed sound-by-sound gives 2–7–1–8.
+
+=== Why Major System works ===
+Numbers are abstract and non-imageable; a fixed phonetic code maps them into the word/image system where elaborative and spatial mnemonics apply. A pre-memorized 00–99 word list ('100-peg build-out') amortizes encoding cost and chunks two digits per image.
+
+Evidence grade: promising (confidence 0.65, primarily memory-sport).
+Caveats: Lab literature is thin and old; the overwhelming evidence is practitioner adoption by self-selected experts. Weeks of up-front cost before break-even.
+
+Key studies:
+- Slak (1970): Phonemic recoding of digits improved digit learning and retention in trained subjects
+- Foer (2011): Major-derived 2/3-digit systems documented as standard among elite digit-event competitors
+
+=== PAO (Person–Action–Object) ===
+Aliases: Person-Action-Object System.
+Assign each 00–99 pair a Person performing an Action on an Object; any 6 digits compress into one composite scene (Person of pair 1 + Action of pair 2 + Object of pair 3).
+
+How to apply:
+1. Build a 00–99 PAO table (often seeded from Major or Dominic codes).
+2. Drill each component (P, A, O separately) to instant recall.
+3. Chunk digits in sixes; compose the scene P(pair1)+A(pair2)+O(pair3).
+4. Place composite scenes at loci; decode by unpacking each role.
+
+Use when: heavy digit/card memorization; memory sport; long constants where Major pegs consume too many loci.
+Avoid when: casual learners; non-numeric material; anyone unwilling to maintain a 300-component table.
+
+Common failure modes:
+- Role confusion under speed (whose action was it?).
+- Table decays without maintenance drills.
+- Setup measured in weeks to months.
+
+Worked example (numeric-constants): π digits 141592 → 14/15/92: Person(14)= a **Tsar**, Action(15)= **towelling off**, Object(92)= a **frying pan**. One scene — a Tsar towelling off a frying pan — stores all six digits at a single locus.
+
+=== Why PAO (Person–Action–Object) works ===
+Triples the compression of a plain 2-digit peg system (6 digits per image), consuming fewer loci, and exploits how easily memory binds agent–action–patient scenes.
+
+Evidence grade: promising (confidence 0.6, primarily memory-sport).
+Caveats: No controlled trials of PAO itself; justification is theoretical (chunking + imagery) plus expert practice consensus.
+
+Key studies:
+- Foer (2011): PAO documented as the dominant intermediate system in competitive memory for digits and cards
+- Ericsson, Chase & Faloon (1980): Theoretical basis only: skilled memory arises from meaningful hierarchical chunking (not a PAO trial)
+
+=== Dominic System ===
+Aliases: DOMINIC, Person-Action Number System.
+Digit pairs map to letter pairs (1=A, 2=B, 3=C, 4=D, 5=E, 6=S, 7=G, 8=H, 9=N, 0=O) which become a memorable person's initials, each with a signature action; 4 digits = Person(pair1) + Action(pair2).
+
+How to apply:
+1. Learn the digit→letter code.
+2. Assign a person to each 00–99 pair by initials, plus a signature action per person.
+3. Encode 4-digit chunks as Person + (other person's) Action.
+4. Place scenes at loci for longer numbers.
+
+Use when: learners who find people easier to image than objects; dates and 4-digit codes.
+Avoid when: learners without a rich stock of vivid public/personal figures; non-numeric material.
+
+Common failure modes:
+- Initial collisions force awkward person choices.
+- People you feel nothing about make weak pegs.
+
+Worked example (numeric-constants): 1815 (Waterloo): 18 = A,H → **Audrey Hepburn**; 15 = A,E → Einstein, whose signature action is **scribbling equations**. Audrey Hepburn scribbling equations on a battlefield = 1815.
+
+=== Why Dominic System works ===
+Person-first variant of PAO: proper names and celebrity schemas are highly distinctive and pre-elaborated, lowering the image-generation cost relative to arbitrary Major words.
+
+Evidence grade: promising (confidence 0.55, primarily memory-sport).
+Caveats: Essentially untested in labs; treat as a PAO-family variant whose plausibility rides on the same chunking + imagery mechanisms.
+
+Key studies:
+- O'Brien (1993): System used to win eight World Memory Championships; practitioner method, never lab-trialed
+
+=== Number–Shape System ===
+Aliases: Shape Pegs.
+Each digit 0–9 becomes an object it visually resembles (1=candle, 2=swan, 3=handcuffs, 8=snowman, 0=ring), used as pegs or to image short numbers.
+
+How to apply:
+1. Fix one shape per digit and never change it.
+2. For a short number, image the digit-shapes interacting in order.
+3. As pegs: attach item *n* to shape *n* via interactive imagery.
+
+Use when: children or first-ever mnemonic; lists of ≤10; quick hooks for 1–3 digit numbers.
+Avoid when: long numbers; learners ready to invest in the Major system.
+
+Common failure modes:
+- Ambiguous shape choices (is 5 a hook or a seahorse?) cause decode errors.
+- Does not scale past ten positions.
+
+Worked example (numeric-constants): Speed of sound ≈ 343 m/s: **handcuffs (3)** locked to the bow of a **sailboat (4)**, another pair of **handcuffs (3)** at the stern — the boat outrunning a jet's roar.
+
+=== Why Number–Shape System works ===
+Zero-training visual mapping: digits become images by resemblance rather than a learned code, giving instant (but capacity-limited) access to imagery mnemonics.
+
+Evidence grade: promising (confidence 0.6, primarily cogpsych).
+Caveats: The shape variant itself is rarely tested directly; evidence is inherited from the peg literature. Hard ceiling of 10 pegs.
+
+Key studies:
+- Bugelski, Kidd & Segmen (1968): Peg pretraining improved paced serial learning (rhyme pegs; shape variant assumed to generalize)
+
+=== Number–Rhyme System ===
+Aliases: Rhyme Pegs, One-Bun System.
+Digits map to rhyming pegs (one–bun, two–shoe, three–tree, four–door...); items are imaged interacting with the peg at their position.
+
+How to apply:
+1. Memorize the rhyme pegs once (usually already known).
+2. For each list position, form a vivid interaction between the peg image and the item.
+3. Retrieve any position directly: say the rhyme, see the scene.
+
+Use when: short ordered lists needing positional access; ranked facts (top-N by position).
+Avoid when: lists beyond the peg set; abstract items you can't image without a concretization step.
+
+Common failure modes:
+- Reusing pegs across lists in the same period causes interference.
+- Static (non-interacting) peg+item images fail quietly.
+
+Worked example (numeric-constants): First elements by atomic number: one–bun = a **hydrogen balloon baked into a bun**; two–shoe = a **shoe floating away on helium**; three–tree = **lithium batteries growing on a tree**.
+
+=== Why Number–Rhyme System works ===
+Rhyme supplies an automatic, pre-memorized ordered cue set; interactive imagery binds item→peg, enabling direct random access by position — unlike chains, a lost item doesn't break neighbors.
+
+Evidence grade: established (confidence 0.75, primarily cogpsych).
+Caveats: Ceiling of ~10–20 pegs; evidence mostly concrete word lists at short retention.
+
+Key studies:
+- Bugelski, Kidd & Segmen (1968): One-bun pegs improved serial recall given sufficient encoding time per item
+- Roediger (1980): Pegs ≈ loci, both > rehearsal, with pegs giving good positional access
+
+=== Peg Systems (general) ===
+Aliases: Pegword Method, Hook System.
+Any pre-memorized, ordered set of concrete 'hooks' (rhymes, shapes, alphabet images, body parts, Major words) to which new items are attached by interactive imagery.
+
+How to apply:
+1. Acquire a peg set sized to the job (10 rhymes → 100 Major words).
+2. Overlearn it to instant recall.
+3. Bind each new item to its peg with a distinct interaction.
+4. Retrieve by peg number; drill bindings on a schedule.
+
+Use when: ordered material with positional lookup; recurring list-memorization workflows.
+Avoid when: relational/conceptual structure (use the structure itself); one-off trivial lists.
+
+Common failure modes:
+- Peg reuse without decay time → cross-list interference.
+- Treating pegs as storage rather than cues: the interaction image is the storage.
+
+Worked example (procedure-syntax): Body pegs for the PICERL incident-response phases: feet=**P**reparation (boots), knees=**I**dentification (kneeling to inspect a log), waist=**C**ontainment (belt cinched tight), chest=**E**radication (scrubbing), shoulders=**R**ecovery (carrying a server), head=**L**essons (lightbulb).
+
+=== Why Peg Systems (general) works ===
+Separates the *ordering* problem (solved once by the peg list) from the *binding* problem (one vivid image per item). Pegs give O(1) positional access and are reusable scaffolds — loci are simply spatial pegs.
+
+Evidence grade: established (confidence 0.8, primarily cogpsych).
+Caveats: Most trials are short-retention word-list studies; durability requires spaced retrieval of the bindings.
+
+Key studies:
+- Bugelski, Kidd & Segmen (1968): Pegword pretraining improved serial learning under paced presentation
+- Roediger (1980): Pegs and loci comparable and superior to rehearsal for ordered recall
+- Wang & Thomas (2000): Mnemonic gains can fade faster than rote at long delays without relearning
+
+=== Mind Mapping ===
+Aliases: Buzan Mind Map, Radial Outlining.
+A radial diagram: central concept branching into keyword-labeled sub-branches with color and images.
+
+How to apply:
+1. Put the target concept at center.
+2. Add major branches as single keywords; sub-branch details.
+3. Draw cross-links between branches and label *why* they connect.
+4. Redraw from memory later (converts it into retrieval practice).
+
+Use when: initial survey/brainstorm of a domain; planning talks or essays; externalizing structure to seed or review a KG.
+Avoid when: verbatim/detail retention; as a substitute for retrieval practice.
+
+Common failure modes:
+- Decorative mapping: pretty branches, zero processing.
+- Copying the source's structure instead of generating your own kills the organization benefit.
+
+Worked example (abstract-concept): Center: **OAuth 2.0**. Branches: roles, grant types, tokens, attacks. The cross-link *attacks → grant types* ('implicit flow → token leakage via redirect') is where the map earns its keep — labeled cross-links are the concept-map ingredient with actual evidence.
+
+=== Why Mind Mapping works ===
+Claimed: imagery + spatial layout + color. Best-supported ingredient is the *generative act of selecting and organizing* — an organization/elaboration effect — not the radial format itself.
+
+Evidence grade: contested (confidence 0.45, primarily cogpsych).
+Caveats: Buzan-style radial maps specifically have weak evidence. Concept mapping — explicit labeled edges and cross-links — is the better-supported cousin, and maps directly onto a knowledge-graph substrate.
+
+Key studies:
+- Farrand, Hussain & Hennessy (2002): Small recall advantage over preferred study at 1 week, but lower motivation; benefit tied to actually applying the technique
+- Nesbit & Adesope (2006): Meta-analysis: node-link mapping shows moderate benefits — strongest for *concept maps* with labeled relations, not Buzan-style maps
+
+=== Multi-Sensory / Elaborative Imagery ===
+Aliases: Interactive Imagery, Visualization, Multi-Sensory Encoding.
+Deliberately encode material as vivid mental images that engage multiple senses and, critically, show the to-be-associated items *interacting*.
+
+How to apply:
+1. Concretize each element (abstract terms first pass through a metaphor or keyword).
+2. Build one scene where the elements act on each other.
+3. Add 1–2 non-visual channels: sound, smell, motion, touch.
+4. Replay once immediately, then drill on a schedule.
+
+Use when: paired associations; vocabulary and terminology; names–faces.
+Avoid when: purely formal manipulation skills (proofs, derivations) where practice beats picturing.
+
+Common failure modes:
+- Static side-by-side images (no interaction) — the most common silent failure.
+- Generic recycled images blur across items.
+
+Worked example (abstract-concept): Meeting a 'Rosalind': rose petals wound in a double-helix lattice tumbling from her hair (Rosalind Franklin) — smell the rose, hear the petals rustle. Two senses, one interaction, name bound to face.
+
+=== Why Multi-Sensory / Elaborative Imagery works ===
+Dual coding (verbal + imaginal traces) plus relational binding: interacting images strengthen the associative link itself, whereas side-by-side images only strengthen the items. Sensory richness adds retrieval routes and distinctiveness.
+
+Evidence grade: established (confidence 0.85, primarily cogpsych).
+Caveats: Concreteness-dependent — abstract material needs a concretization step; learners with aphantasia need verbal-elaborative substitutes.
+
+Key studies:
+- Paivio (1969): Imageability and imagery instructions strongly predict and improve paired-associate learning
+- Bower (1970): Interacting imagery roughly doubled paired-associate recall vs. separated images
+
+=== Exaggeration / Bizarreness ===
+Aliases: Bizarreness Effect, Absurd Imagery.
+Make mnemonic images absurd, exaggerated, or impossible on the theory that weird is inherently more memorable.
+
+How to apply:
+1. Encode normally first (concrete + interacting).
+2. Spend bizarreness selectively — on the items most at risk of blending in.
+3. Prefer exaggerated *interaction* (size, number, violation of physics) over gross-out shock.
+4. Keep a common baseline so the bizarre items have something to contrast with.
+
+Use when: a few high-confusion items within otherwise mundane material.
+Avoid when: as a blanket policy across all images; contexts where offensive imagery would distract.
+
+Common failure modes:
+- Arms race of grotesquerie with diminishing returns.
+- Bizarre-but-static images: the weirdness replaced the interaction instead of amplifying it.
+
+Worked example (abstract-concept): Encoding 'race condition': two sprinters diving through one revolving door and fusing into a corrupted blur. Silly — but the *interaction through a shared resource* is doing the mnemonic work; the absurdity just keeps it from blending into other concurrency images.
+
+=== Why Exaggeration / Bizarreness works ===
+The real driver is *distinctiveness at retrieval*: bizarre items win only when they stand out against a common backdrop (mixed lists); in all-bizarre lists the advantage vanishes. Exaggeration also incidentally forces interaction and specificity, which genuinely help.
+
+Evidence grade: contested (confidence 0.5, primarily cogpsych).
+Caveats: Budget it: if everything is bizarre, nothing is distinctive. Vividness and interaction matter more than weirdness.
+
+Key studies:
+- McDaniel & Einstein (1986): Bizarreness advantage in mixed lists, absent in pure lists — a distinctiveness effect, not stronger encoding
+- Wollen, Weber & Lowry (1972): Interaction between images improved recall; bizarreness per se did not
+- O'Brien; Foer (2011): Universal advice in memory sport — practitioner consensus overstates the lab picture
+
+=== Keyword Method ===
+Aliases: Keyword Mnemonic, Atkinson Keyword Method.
+Learn a foreign or technical term by (1) finding a familiar word that sounds like it (the keyword) and (2) forming an image of the keyword interacting with the term's meaning.
+
+How to apply:
+1. Hear/say the new term; pick a concrete keyword that sounds like (part of) it.
+2. Image the keyword interacting with the meaning — not merely beside it.
+3. Recall path: term → keyword → image → meaning.
+4. Schedule spaced retrieval; the method's gains decay fastest without it.
+
+Use when: foreign vocabulary; jargon and taxonomy terms; drug/species/protocol names.
+Avoid when: productive fluency and pronunciation (needs production practice); abstract function words with no imageable meaning.
+
+Common failure modes:
+- The keyword hijacks pronunciation of the real term.
+- Retrieving the keyword but not the keyword→meaning image (the second link was under-encoded).
+
+Worked example (abstract-concept): Manx Gaelic *moddey* ('dog') sounds like 'muddy' → a muddy dog shaking itself dry over a white carpet. Recall: moddey → muddy → that dog → 'dog'.
+
+=== Why Keyword Method works ===
+Bridges an arbitrary sound→meaning mapping through two easy links: acoustic (term→keyword) and imaginal (keyword→meaning). Converts rote paired-associate learning into elaborated interactive imagery.
+
+Evidence grade: established (confidence 0.75, primarily cogpsych).
+Caveats: Strongest for receptive recall at short/medium delays; must be paired with spaced retrieval or gains erode. Keyword generation is hard for some words and low-imagery learners.
+
+Key studies:
+- Raugh & Atkinson (1975): Keyword group hit ~88% vs ~28% control on Spanish vocabulary tests
+- Pressley, Levin & Delaney (1982): Review: robust benefits across languages, ages, and materials
+- Wang, Thomas & Ouellette (1992): Advantage shrank or reversed at long delays vs. rote in some conditions — faster forgetting without relearning
+
+=== Cognitive Chunking ===
+Aliases: Recoding, Grouping, Hierarchical Chunking.
+Recode many low-level units into fewer meaningful higher-order units, spending long-term-memory patterns to stretch effective working-memory capacity.
+
+How to apply:
+1. Find or impose meaningful boundaries aligned with the material's real structure.
+2. Name each chunk; the label becomes its retrieval handle.
+3. Build upward: chunks of chunks.
+4. Drill chunk recognition until it's perceptual, not deliberate.
+
+Use when: everything — it is the substrate of expertise; syntax patterns, idioms, board states, digit groups.
+Avoid when: never truly avoided; but don't impose arbitrary groupings on structured material.
+
+Common failure modes:
+- Chunk boundaries misaligned with real structure (e.g., splitting an IP across octets' natural dots).
+- Labels without content: naming a chunk you can't unpack.
+
+Worked example (procedure-syntax): Reading `^(?:\d{1,3}\.){3}\d{1,3}$` as one chunk — 'naive IPv4 matcher' — instead of ~20 tokens. An expert stores the pattern and its known flaw (matches 999.999.999.999) as a single retrievable unit.
+
+=== Why Cognitive Chunking works ===
+Working memory holds ~4 chunks *regardless of chunk size*; expertise is a library of retrievable patterns that lets large structures occupy one slot. Hierarchies of chunks give roughly logarithmic effective capacity.
+
+Evidence grade: established (confidence 0.95, primarily cogpsych).
+Caveats: Chunks must already exist in long-term memory to be spent; imposed boundaries that fight the material's structure actively hurt.
+
+Key studies:
+- Miller (1956): Capacity is constant in chunks, not items — recoding expands span
+- Chase & Simon (1973): Chess masters recall real positions via larger chunks; no advantage on random boards
+- Ericsson, Chase & Faloon (1980): Undergraduate reached 79-digit span by recoding digits as running times — skill, not raw capacity
+
+=== Dual Coding ===
+Aliases: Verbal + Visual Coding, Multimedia Principle.
+Present and encode information in complementary verbal and visual forms (diagram + explanation), yielding two mutually cueing memory traces.
+
+How to apply:
+1. Pair every key verbal explanation with a matched visual (diagram, timeline, schematic).
+2. Integrate them: labels on the diagram, not in a separate block.
+3. Have the learner translate one code into the other (describe the diagram; sketch the text).
+4. Cut decorative imagery — relevance is the filter.
+
+Use when: structures, processes, architectures; anything with spatial or causal layout.
+Avoid when: content with no genuine visual structure — forced diagrams add noise.
+
+Common failure modes:
+- Seductive details: interesting-but-irrelevant graphics depress learning.
+- Split attention: diagram on one page, explanation on another.
+
+Worked example (procedure-syntax): TCP three-way handshake: a sequence diagram (SYN →, ← SYN-ACK, ACK →) with the one-line verbal gloss per arrow ('client proposes; server accepts and proposes back; client confirms'). Learner later reproduces the diagram from the words, then the words from the diagram.
+
+=== Why Dual Coding works ===
+Paivio: separate verbal and imaginal systems with referential links between them — two retrieval routes instead of one. Mayer: words + pictures beat words alone when spatially/temporally integrated, because both channels work in parallel without overload.
+
+Evidence grade: established (confidence 0.85, primarily cogpsych).
+Caveats: This is not learning styles: everyone benefits from both channels. Decorative pictures and redundant on-screen text can backfire (coherence/redundancy effects).
+
+Key studies:
+- Paivio (1971): Dual coding theory: picture superiority and concreteness effects across paradigms
+- Mayer & Anderson (1991): Integrated narration + animation improved transfer vs. either alone or separated in time
+
+=== Retrieval Practice ===
+Aliases: Testing Effect, Practice Testing, Active Recall.
+Deliberately recalling target material from memory (self-testing, free recall, flashcards) instead of restudying it.
+
+How to apply:
+1. After initial exposure, close the book and recall — free recall or short-answer beats recognition.
+2. Check and give corrective feedback, especially on errors and omissions.
+3. Repeat on a spaced schedule; keep difficulty high enough to require effort but allow success.
+4. Test at the level of the target skill (derivations, not definitions, if derivations are the goal).
+
+Use when: any fact or concept after initial exposure — the tutor's default verb; pre-exam consolidation; diagnosing what a learner actually knows.
+Avoid when: zero prior exposure without feedback (use pretesting deliberately or worked examples instead).
+
+Common failure modes:
+- Recognition-only quizzing (multiple choice with weak distractors) breeds familiarity illusions.
+- Tests so easy they require no retrieval effort, or so hard nothing is retrieved and no feedback follows.
+
+Worked example (procedure-syntax): After teaching subnetting, don't re-display the table. Ask: 'How many usable hosts in a /26?' and require the derivation (2^(32−26) − 2 = 62). The derivation is the retrieval target, so the derivation is what gets tested.
+
+=== Why Retrieval Practice works ===
+Effortful successful retrieval modifies the trace itself: it strengthens and diversifies retrieval routes, re-encodes the item in the current context, and elaborates cue–target links — effects restudy cannot produce. Retrieval attempts also potentiate encoding of subsequent feedback.
+
+Evidence grade: established (confidence 0.97, primarily cogpsych).
+Caveats: Feedback is required when success rates are low. Size of benefit for very complex, highly interlinked material is still debated (element interactivity).
+
+Key studies:
+- Roediger & Karpicke (2006): Tested group beat rereaders at 1 week despite losing at 5 minutes — the fluency illusion in one figure
+- Rowland (2014): Meta-analysis: g ≈ 0.50 across 159 effects; larger with feedback and effortful formats
+- Adesope, Trevisan & Sundararajan (2017): Meta-analysis: g ≈ 0.61, robust across ages, formats, and settings
+
+=== Spaced / Distributed Practice ===
+Aliases: Distributed Practice, Spacing Effect, Spaced Repetition, SRS.
+Distribute study and retrieval episodes over increasing time gaps rather than massing them into one session.
+
+How to apply:
+1. Schedule each review near the edge of forgetting — effortful but recoverable.
+2. Expand gaps after successes; contract after failures.
+3. Scale gaps to the retention goal (longer horizon → longer gaps, roughly 10–20% of the retention interval).
+4. Automate per-item scheduling (SM-2/FSRS-style) keyed to recall outcomes.
+
+Use when: everything intended to last beyond a week; scheduling layer for all other techniques.
+Avoid when: genuinely one-shot needs with no retention goal (then cramming is rationally fine).
+
+Common failure modes:
+- Gaps so long that retrieval fails without feedback — relearning cost spikes.
+- Massing disguised as spacing: many 'sessions' within one sitting.
+
+Worked example (numeric-constants): A fact first recalled correctly today gets reviewed at ~1d → 3d → 7d → 16d → 5w, each successful recall stretching the next gap; a failure resets to a short gap with feedback. That policy *is* the spacing literature operationalized.
+
+=== Why Spaced / Distributed Practice works ===
+Three converging accounts: encoding variability (each session stores fresh contextual cues), study-phase retrieval (reviewing a *partly forgotten* trace forces harder, more potent reprocessing), and between-session consolidation. Forgetting between reps is the feature, not the bug.
+
+Evidence grade: established (confidence 0.97, primarily cogpsych).
+Caveats: Optimal-gap prescriptions are coarse; expanding vs. equal-interval differences are small. The big win is any spacing at all versus massing.
+
+Key studies:
+- Cepeda, Pashler, Vul, Wixted & Rohrer (2006): Meta-analysis of 839 assessments: spaced beat massed in ~96% of comparisons
+- Cepeda et al. (2008): Optimal gap scales with retention interval (~10–20% of RI)
+- Dunlosky et al. (2013): Rated one of only two high-utility techniques across learners and materials
+
+=== Interleaving ===
+Aliases: Mixed Practice, Contextual Interference (motor-learning cousin).
+Mix problem types or categories within a session (ABCABC) instead of blocking them (AAABBB).
+
+How to apply:
+1. Identify confusable categories (sibling concepts, similar problem types).
+2. Shuffle practice items across them within a session.
+3. Strip surface cues that give the category away (e.g., chapter headers).
+4. Warn the learner it will *feel* worse while working better.
+
+Use when: confusable sibling nodes (sorting algorithms, cipher modes, verb conjugations); when learners pattern-match instead of choosing methods.
+Avoid when: mutually unrelated topics; the very first exposures to a brand-new category.
+
+Common failure modes:
+- Learner demotivation from lower practice accuracy, without framing.
+- 'Interleaving' across unrelated domains that share no discrimination problem.
+
+Worked example (procedure-syntax): Drill AES modes with shuffled prompts — an ECB question, then GCM, then CBC — so the learner must *select* the relevant property (deterministic leakage vs. authenticated encryption vs. IV misuse) rather than pattern-matching within a blocked ECB section.
+
+=== Why Interleaving works ===
+Forces discriminative contrast: the learner must repeatedly decide *which* concept or method applies, not just execute it — blocking lets them ride the surface cue 'same as the last one'. Also embeds spacing between same-type items for free.
+
+Evidence grade: established (confidence 0.85, primarily cogpsych).
+Caveats: Only pays when categories are genuinely confusable; interleaving unrelated topics is just noise. Brief initial blocking can help absolute novices before mixing.
+
+Key studies:
+- Rohrer & Taylor (2007): Interleaved math practice hurt practice-session accuracy but roughly doubled test performance
+- Kornell & Bjork (2008): Interleaving painters' works improved style induction; learners still judged blocking better — a metacognitive illusion
+- Brunmair & Richter (2019): Meta-analysis g ≈ 0.42; strongest for confusable categories, weak or negative for unrelated material
+
+=== Successive Relearning ===
+Aliases: Relearning to Criterion, Spaced Criterion Learning.
+In each of several spaced sessions, practice retrieval with feedback until every item is recalled correctly (criterion), then relearn to criterion again in the next session.
+
+How to apply:
+1. Define the item set and a criterion (typically 1 correct recall per session; ~3 in the first).
+2. Quiz with feedback; misses re-enter the within-session queue until correct.
+3. Repeat across ≥3 sessions spaced days apart.
+4. Retire items after stable criterion performance; resurrect on later failure.
+
+Use when: core facts, definitions, and mappings that must be durable; the default policy for an SRS-backed tutor's 'known node' maintenance.
+Avoid when: goals demanding transfer beyond recall — add elaboration and varied problems on top.
+
+Common failure modes:
+- Criterion met via recognition or ordering cues rather than genuine recall.
+- Sessions spaced too tightly — criterion becomes trivial and the spacing benefit evaporates.
+
+Worked example (abstract-concept): Tutor policy: every key KG node must be recalled correctly once per session across ≥3 sessions ≥2 days apart; a miss re-queues the node later in the same session until recalled, and postpones retirement.
+
+=== Why Successive Relearning works ===
+Welds the two largest effects — retrieval practice and spacing — with a mastery rule that guarantees each session ends in successful retrieval and automatically allocates more trials to weaker items.
+
+Evidence grade: established (confidence 0.8, primarily cogpsych).
+Caveats: Fewer independent labs than its parent effects (which are rock-solid); criterion bookkeeping needs tooling — a non-issue for a software tutor.
+
+Key studies:
+- Rawson & Dunlosky (2011): ~3 initial correct recalls plus spaced relearning sessions gave the best durability-per-trial trade-off
+- Rawson, Dunlosky & Sciartelli (2013): Classroom deployment improved exam performance on targeted concepts by roughly a letter grade
+
+=== Elaboration / Elaborative Interrogation ===
+Aliases: Why-Questioning, EI.
+For each to-be-learned statement, generate an answer to 'Why is this true?' / 'Why does this make sense?'
+
+How to apply:
+1. Present the fact.
+2. Prompt: 'Why would this be true?' and require a produced answer.
+3. Verify or correct the explanation (a tutor must catch confabulated 'whys').
+4. Reuse the explanation as a retrieval cue in later testing.
+
+Use when: discrete facts with underlying causes; learners with relevant background; Socratic follow-ups after a correct recall.
+Avoid when: true rote arbitrariness (there is no why to port 443); novices with nothing to connect to.
+
+Common failure modes:
+- Confabulated explanations encoded as fact.
+- Shallow restatement ('because it is') passing as elaboration.
+
+Worked example (abstract-concept): Fact: 'TLS 1.3 removed static RSA key exchange.' Why? → Because without ephemeral keys, a later server-key compromise retroactively decrypts recorded traffic; mandating (EC)DHE buys forward secrecy. The generated *why* is the glue that makes the fact stick and transfer.
+
+=== Why Elaboration / Elaborative Interrogation works ===
+Forces integration with prior knowledge: the generated explanation becomes a retrieval structure and discriminates the fact from similar facts. The *generation* is the active ingredient — supplied explanations do far less.
+
+Evidence grade: promising (confidence 0.7, primarily cogpsych).
+Caveats: Depends on adequate prior knowledge to generate correct explanations; wrong self-generated 'whys' encode errors unless checked.
+
+Key studies:
+- Pressley, McDaniel, Turnure, Wood & Ahmad (1987): Answering why-questions roughly doubled fact learning vs. reading
+- Dunlosky et al. (2013): Rated moderate utility: reliable for factual material, thinner evidence for complex content and low-knowledge learners
+
+=== Self-Explanation ===
+Aliases: Explanation-Based Learning, Step Explanation.
+While studying a worked example or text, the learner explains each step to themselves — what it does, why it's justified, and how it connects to principles.
+
+How to apply:
+1. Work through material step by step.
+2. At each step ask: what happened, why is it legal/justified, what principle licenses it?
+3. Flag any step you can only describe, not justify — that's a gap.
+4. Resolve gaps against the source, then re-explain without it.
+
+Use when: worked examples, proofs, code reading; any stepwise procedure with hidden rationale.
+Avoid when: time-critical drilling of already-understood material.
+
+Common failure modes:
+- Paraphrase loops (restating without inference).
+- Explaining to the tutor's satisfaction rather than to coherence — gaming the prompt.
+
+Worked example (procedure-syntax): Reading concurrency code line by line: 'Why does this mutex guard *this* field and not that one? What invariant holds between lock and unlock?' The moment a line can be described but not justified, a gap has been located and can be repaired.
+
+=== Why Self-Explanation works ===
+Gap detection and repair: articulating each step exposes missing inferences, forces their generation, and integrates the material with existing schemas. The benefit concentrates in *generated* inferences, not paraphrase.
+
+Evidence grade: established (confidence 0.75, primarily cogpsych).
+Caveats: Time-expensive; paraphrasing masquerades as explaining; providing explanations instead of eliciting them forfeits most of the benefit.
+
+Key studies:
+- Chi, Bassok, Lewis, Reimann & Glaser (1989): Successful physics learners spontaneously self-explained worked examples; weak learners paraphrased
+- Chi, de Leeuw, Chiu & LaVancher (1994): Prompted self-explanation improved learning from text, especially deep questions
+- Bisra, Liu, Nesbit, Salimi & Winne (2018): Meta-analysis g ≈ 0.55 across 69 studies; prompt design moderates strongly
+
+=== Feynman Technique ===
+Aliases: Teach-to-Learn, Explain-Like-I'm-Five Protocol.
+Explain a concept from scratch in plain language as if teaching a novice; locate the point where you stall; return to the source; simplify and re-explain.
+
+How to apply:
+1. Closed book, write/say the explanation for an imagined novice.
+2. Mark every stall, hedge, or jargon-hiding-a-gap.
+3. Return to sources for exactly those points.
+4. Re-explain simpler; iterate until it flows without props.
+
+Use when: conceptual material after initial study; audit of supposed understanding before an exam or design review.
+Avoid when: pure fact sets with no explanatory structure; as a first exposure method.
+
+Common failure modes:
+- Fluent analogy that hides the gap instead of exposing it.
+- Skipping the loop-back step — the stall must trigger source revisits.
+
+Worked example (abstract-concept): Explain public-key crypto with the open-padlock analogy until the stall arrives: 'wait — if anyone can lock, how does *signing* work? That's the padlock backwards...' The stall pinpoints exactly which half of the keypair asymmetry was never actually understood.
+
+=== Why Feynman Technique works ===
+A composite protocol: closed-book explanation (retrieval practice) + step justification (self-explanation) + a built-in calibration probe (the stall point is a *measured* gap) + benefits of teaching expectancy and audience-tuned reorganization.
+
+Evidence grade: promising (confidence 0.6, primarily cogpsych).
+Caveats: The branded technique itself has no controlled trials; its ingredients are evidenced separately. Treat as a packaging of retrieval + self-explanation + calibration, not a distinct mechanism.
+
+Key studies:
+- Fiorella & Mayer (2013): Actually teaching (and preparing to teach) improved comprehension and transfer vs. studying for a test
+- Nestojko, Bui, Kornell & Bjork (2014): Mere expectation of teaching improved recall and organization of studied material
+
+=== Concrete Examples ===
+Aliases: Exemplification, Concreteness Fading, Multiple Examples.
+Illustrate an abstract principle with multiple concrete, varied examples, then fade toward the abstract representation as understanding grows.
+
+How to apply:
+1. State the principle, then give 2–3 examples that differ on the surface but share the deep structure.
+2. Prompt the learner to identify what's common across them (the principle) and what's incidental.
+3. Fade: move from richly concrete to schematic to symbolic once the pattern is seen.
+4. Have the learner generate a fresh example as a transfer check.
+
+Use when: abstract or formal principles; definitions that learners can state but not apply; before asking for transfer to novel cases.
+Avoid when: material that is already concrete; when a single vivid example would over-anchor (need varied set instead).
+
+Common failure modes:
+- One example → the learner learns the example, not the principle.
+- Surface-similar examples → no discrimination of deep vs. incidental features.
+- Never fading → the concept stays welded to its scaffold.
+
+Worked example (abstract-concept): Teaching 'confused deputy': show SSRF (a server tricked into fetching an internal URL), then CSRF (a browser tricked into sending an authenticated request), then a classic compiler-billing example. Same deep structure — an authorized agent misused by a third party — surfaced across three concrete skins, then named as the abstract principle.
+
+=== Why Concrete Examples works ===
+Abstract rules are hard to encode and retrieve cold; concrete cases give imageable, relatable hooks. Comparing *several varied* examples is the active ingredient — it lets the learner abstract the shared deep structure while discarding surface features. Concreteness fading transfers the grounding to a portable symbolic form.
+
+Evidence grade: established (confidence 0.8, primarily cogpsych).
+Caveats: A single example (or examples too alike) breeds surface-bound, non-transferring knowledge. Highly concrete/seductive examples can also anchor the learner to irrelevant details.
+
+Key studies:
+- Goldstone & Son (2005): Concreteness fading (concrete → idealized) beat purely concrete or purely abstract training on transfer
+- Fyfe, McNeil, Son & Goldstone (2014): Review: fading from concrete to abstract supports transfer better than either alone across math learning
+- Weinstein, Madan & Sumeracki (2018): Practitioner review: varied concrete examples aid comprehension and transfer of abstract ideas
+
+=== Worked Examples ===
+Aliases: Worked-Example Effect, Faded Worked Examples.
+Give novices fully solved problems to study (each step shown and justified) rather than problems to solve unaided, then fade steps toward independent problem-solving as competence grows.
+
+How to apply:
+1. Present a complete, step-by-step solution with each step's rationale.
+2. Have the learner self-explain each step (the pairing that makes worked examples work).
+3. Fade: blank out the last step, then more steps (completion problems), until the learner solves unaided.
+4. Switch to retrieval practice / independent problems once competence is established.
+
+Use when: novices meeting a new problem type; multi-step procedures with high element interactivity; before independent problem-solving.
+Avoid when: learners who already have the schema (expertise reversal — switch to solving); single-step trivial problems.
+
+Common failure modes:
+- Passive example-watching without self-explanation → shallow copying.
+- Keeping learners on worked examples past competence → wasted effort and boredom (expertise reversal).
+
+Worked example (procedure-syntax): Teaching a buffer-overflow exploit: first walk the complete solved chain (find offset → control EIP → locate a JMP ESP → place shellcode), justifying each step; then fade — the learner supplies the offset, then the gadget, then the whole chain — before handing them a fresh binary to own unaided.
+
+=== Why Worked Examples works ===
+For novices, unguided problem-solving spends working memory on means-ends search and leaves none for schema construction. A worked example removes the search, freeing capacity to encode the solution *pattern*. Completion/faded examples gradually reintroduce the effort as schemas form.
+
+Evidence grade: established (confidence 0.9, primarily cogpsych).
+Caveats: Expertise reversal is the governing rule — the technique's benefit shrinks and then reverses as the learner gains competence; the tutor must hand off to retrieval practice as mastery rises.
+
+Key studies:
+- Sweller & Cooper (1985): Studying worked examples produced faster, better algebra learning than solving equivalent problems for novices
+- Renkl & Atkinson (2003): Gradually fading worked steps into problem-solving improved learning and near/far transfer
+- Kalyuga, Ayres, Chandler & Sweller (2003): Expertise reversal: worked examples help novices but hurt more advanced learners, for whom solving is better
+
+=== Generation Effect ===
+Aliases: Generative Learning, Produce-Don't-Read.
+Information that the learner generates (produces, completes, or fills in) is remembered better than the same information read passively.
+
+How to apply:
+1. Replace 'read this' with 'produce this': cloze deletions, fill-in-the-blank, predict-the-output, complete-the-partial-solution.
+2. Keep the generation within reach (partial cues) so it succeeds with effort.
+3. Always give immediate feedback — generated errors stick too.
+4. Escalate from heavily cued generation toward free recall.
+
+Use when: converting passive material into active production; cloze/flashcard authoring; predict-then-verify exercises.
+Avoid when: no feedback loop available; content the learner cannot yet generate at all (use worked examples first).
+
+Common failure modes:
+- Generation without feedback cements wrong answers.
+- 'Generation' so cued it is really reading (no productive effort).
+
+Worked example (procedure-syntax): Instead of showing `chmod 750 file` and its meaning, prompt: 'Owner rwx, group r-x, others none → what octal?' The learner generates 750 (and can verify), encoding the permission-bit mapping far better than reading the mapping table.
+
+=== Why Generation Effect works ===
+Producing an answer engages the target's semantic and cue–target relations more deeply than reading it, and commits the learner to a response that feedback can then correct. Overlaps with retrieval practice; the distinguishing case is generation with partial cues rather than pure recall.
+
+Evidence grade: established (confidence 0.9, primarily cogpsych).
+Caveats: Generated *errors* without feedback are encoded and persist. The benefit narrows when generation is too hard (nothing produced) or trivially easy. Cloze deletion in an SRS is applied generation.
+
+Key studies:
+- Slamecka & Graf (1978): Words generated from a rule + cue were recalled better than read words — the original generation effect
+- Bertsch, Pesta, Wiscott & McDaniel (2007): Meta-analysis: reliable generation advantage, g ≈ 0.40, moderated by difficulty and feedback
+
+=== Pretesting ===
+Aliases: Errorful Generation, Prequestions, Test-Before-Teach.
+Have learners attempt to answer questions on material *before* studying it, even though they will mostly fail, then teach the answers.
+
+How to apply:
+1. Pose target questions before instruction; require a genuine attempt (a guess, not a shrug).
+2. Immediately follow with the correct answer / the lesson.
+3. Keep pretests focused on what the lesson will actually cover.
+4. Frame errors as expected and useful, to protect motivation.
+
+Use when: opening move of a lesson; activating prior knowledge before new material; a Socratic tutor's first question on a topic.
+Avoid when: no feedback will follow; high-anxiety learners without careful error framing.
+
+Common failure modes:
+- Pretest without a prompt answer → wasted frustration.
+- Testing content the lesson won't address → no priming payoff.
+
+Worked example (abstract-concept): Before teaching CSRF defenses, ask: 'How would you stop a forged cross-site request?' The learner guesses ('check the referer?') and mostly misses — then when the lesson introduces same-site cookies and CSRF tokens, those answers land against a primed, gap-aware slot.
+
+=== Why Pretesting works ===
+The failed retrieval attempt primes the memory system: it activates related knowledge, exposes the gap, and makes the subsequent correct answer more salient and better encoded when feedback arrives. Curiosity and attention to the answer both rise after a miss.
+
+Evidence grade: promising (confidence 0.7, primarily cogpsych).
+Caveats: Requires prompt feedback (an unanswered pretest just frustrates). Benefit concentrates on pretested and closely related content; may not spread to untested material. Motivation cost if failure isn't framed.
+
+Key studies:
+- Richland, Kornell & Kao (2009): Answering prequestions (and failing) before reading improved later test performance on that material vs. extra study time
+- Kornell, Hays & Bjork (2009): Unsuccessful retrieval attempts before study enhanced later learning of the answers
+
+=== Metacognition & Calibration ===
+Aliases: Judgments of Learning, Calibration of Comprehension, Self-Monitoring.
+Monitoring what you do and don't know accurately, and using that judgment to allocate study — with an emphasis on correcting the systematic illusions that make monitoring wrong.
+
+How to apply:
+1. Elicit a confidence prediction before checking (predict recall, then test).
+2. Compare prediction to outcome; score the miscalibration (e.g., Brier score).
+3. Prefer *delayed* judgments and actual retrieval over immediate 'feels known' ratings.
+4. Route study time to overconfident items — the ones judged known but failed.
+
+Use when: deciding what to restudy or reschedule; surfacing over/underconfidence to the learner; driving a confidence-weighted scheduler.
+Avoid when: as a substitute for actual testing (self-report alone is the weak part).
+
+Common failure modes:
+- Trusting immediate 'I know this' fluency (the core illusion).
+- Confidence collected but never checked against outcomes → no calibration.
+
+Worked example (abstract-concept): Before each drill the tutor asks the learner to predict recall (0–100%); it Brier-scores prediction vs. outcome and flags systematically overconfident nodes — feeding the KG's confidence weights so bluffed-but-failed topics resurface sooner. Calibration data *is* scheduler input.
+
+=== Why Metacognition & Calibration works ===
+Learners judge learning from fluency cues (ease of reading, familiarity) that dissociate from actual retrievability, producing overconfidence. Delayed and test-based judgments realign the judgment with reality; accurate monitoring then drives efficient restudy allocation.
+
+Evidence grade: established (confidence 0.75, primarily cogpsych).
+Caveats: Monitoring accuracy is domain- and cue-dependent; simply asking for confidence doesn't fix it — the correction comes from delayed, test-based feedback that breaks the fluency illusion.
+
+Key studies:
+- Nelson & Dunlosky (1991): Delayed judgments of learning were far more accurate than immediate ones (the delayed-JOL effect)
+- Koriat & Bjork (2005): Foresight bias: presence of the answer at study inflates predicted future recall — an illusion of competence
+
+=== Desirable Difficulties ===
+Aliases: Bjork Desirable Difficulties, Learning vs. Performance.
+Umbrella principle: conditions that make practice harder and slower in the moment (spacing, interleaving, testing, generation, varied practice) often produce more durable, transferable learning — while easy conditions inflate immediate performance without learning.
+
+How to apply:
+1. Recognize when performance is high but learning may be low (massing, rereading, cueing).
+2. Deliberately inject the evidenced difficulties: space it, mix it, test it, make them generate it, vary the conditions.
+3. Keep difficulty *desirable* — effortful yet surmountable with feedback, not defeating.
+4. Warn learners that it will feel worse; use outcome data to prove it works.
+
+Use when: choosing between an easy-feeling and an effortful practice design; explaining to learners why the harder path is chosen; as the meta-rationale behind spacing/interleaving/testing.
+Avoid when: the learner lacks the prerequisites or feedback to overcome the difficulty (then it's just undesirable).
+
+Common failure modes:
+- Adding difficulty the learner can't overcome (no feedback, missing background) — undesirable, pure harm.
+- Optimizing for practice-session performance (looks great, learns little).
+
+Worked example (abstract-concept): Re-reading the exploit walkthrough five times feels productive (high fluency) but teaches little; making the learner reconstruct the chain from memory, days apart, mixed with other CVEs, feels worse and harder — and that discomfort is the signature of the conditions that actually build durable skill.
+
+=== Why Desirable Difficulties works ===
+Current performance (how fluent you are now) and learning (durable change in retrievability) are dissociable. Difficulties that force effortful reconstruction — retrieval, spacing, interleaving, generation — increase learning even as they depress momentary performance; fluent, massed, re-read practice does the reverse.
+
+Evidence grade: established (confidence 0.85, primarily cogpsych).
+Caveats: 'Desirable' is load-bearing: a difficulty helps only if the learner has the resources to overcome it (feedback, prior knowledge). Undesirable difficulties (poor legibility, missing background) just hurt. Learners reliably misjudge which condition is better (they prefer the ineffective easy one).
+
+Key studies:
+- Bjork (1994): Introduced 'desirable difficulties': manipulations that impair acquisition performance but enhance long-term retention and transfer
+- Soderstrom & Bjork (2015): Review formalizing the learning-vs-performance distinction across spacing, interleaving, testing, and variability
+

@@ -1,0 +1,892 @@
+{
+  "batch_1_encoding": [
+    {
+      "id": "method-of-loci",
+      "name": "Method of Loci",
+      "aliases": ["Memory Palace", "Journey Method", "Roman Room"],
+      "tier": "encoding",
+      "definition": "Associate items with ordered locations along a well-known spatial route, then recall by mentally walking the route.",
+      "mechanism": "Exploits highly developed spatial/navigational memory as a pre-built ordered scaffold. Each locus is a distinctive, low-interference retrieval cue, so recall inherits the route's order for free; imagery at each locus does the item binding.",
+      "how_to": "1. Choose a familiar route with 10–20 visually distinct loci and fix a traversal order.\n2. Convert each item into a concrete, vivid image.\n3. Place each image *interacting* with its locus (not floating beside it).\n4. Recall by walking the route; note dropped loci and re-encode them harder.\n5. Keep dedicated palaces per list, or let a palace decay before reuse.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.9,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bower", "year": 1970, "finding": "Loci instructions produced 2–3x serial recall vs. controls on word lists", "source_class": "cogpsych"},
+          {"authors": "Maguire, Valentine, Wilding & Kapur", "year": 2003, "finding": "Memory champions rely on loci with spatial-memory brain activation; no structural brain differences", "source_class": "cogpsych"},
+          {"authors": "Dresler et al.", "year": 2017, "finding": "6 weeks of loci training in novices doubled word recall and reorganized memory networks; gains held at 4 months", "source_class": "cogpsych"}
+        ],
+        "caveats": "Evidence is strongest for ordered, discrete, imageable items. Direct evidence for conceptual/relational understanding is weak; setup and image-generation costs are nontrivial."
+      },
+      "use_when": ["ordered lists", "speech or talk outlines", "exam fact dumps", "foreign vocabulary batches"],
+      "avoid_when": ["abstract relational concepts", "skills acquired by doing", "material needing fast random access"],
+      "failure_modes": "- Locus reuse causes interference (ghost images from prior lists).\n- Weak images at low-salience loci silently drop out.\n- Retrieval is route-serial: reaching item *k* means traversal unless loci are numbered.",
+      "composes_with": [
+        {"target": "major-system", "relation": "encode-then-place", "note": "convert numbers to images via Major/PAO, deposit at loci"},
+        {"target": "spaced-practice", "relation": "then-drill", "note": "palace walk-throughs on an expanding schedule"},
+        {"target": "retrieval-practice", "relation": "then-drill", "note": "test palace contents from memory rather than re-touring while reading notes"}
+      ],
+      "contrasts_with": ["link-story-method", "rote-rehearsal"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "TLS 1.3 handshake around your house: front door = **ClientHello** (a client hollering through the letterbox, waving cipher suites), hallway = **ServerHello + key_share** (butler hands over half a key), kitchen = **Certificate + CertificateVerify** (a framed diploma being notarized), living room = **Finished** (two people shaking hands in MAC raincoats), back door = application data flowing out."
+      }
+    },
+    {
+      "id": "link-story-method",
+      "name": "Link / Story Method",
+      "aliases": ["Chain Method", "Story Method", "Linking"],
+      "tier": "encoding",
+      "definition": "Chain items pairwise into interacting images or a running absurd narrative so each item cues the next.",
+      "mechanism": "Each association is a direct cue→target pair; the story variant adds causal glue and the imagery adds distinctiveness, converting free recall into cued serial recall with zero setup.",
+      "how_to": "1. Convert each item to a concrete image.\n2. Form an exaggerated *interaction* between item 1 and item 2; then 2 and 3; continue pairwise.\n3. Story variant: weave the images into one causal narrative.\n4. Recall by replaying the chain/story from the start.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.8,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bower & Clark", "year": 1969, "finding": "Narrative chaining yielded ~93% vs ~13% recall across twelve 10-word lists (~7x)", "source_class": "cogpsych"},
+          {"authors": "Roediger", "year": 1980, "finding": "Link method beat rehearsal but gave poorer positional access than loci/pegs", "source_class": "cogpsych"}
+        ],
+        "caveats": "Almost all evidence is serial word lists; little on complex material. Chain integrity is the known weak point."
+      },
+      "use_when": ["short lists (≤15 items)", "one-off encodings with no prepared palace or pegs"],
+      "avoid_when": ["long lists", "random positional access", "material with its own meaningful structure"],
+      "failure_modes": "- One broken link loses the entire downstream tail.\n- Similar stories across lists blur together (interference).\n- Accessing item *k* requires traversal from the start.",
+      "composes_with": [
+        {"target": "bizarreness-exaggeration", "relation": "amplified-by", "note": "distinctive interactions strengthen individual links"},
+        {"target": "method-of-loci", "relation": "alternative-or-hybrid", "note": "loci adds robustness and random access at the cost of setup"}
+      ],
+      "contrasts_with": ["method-of-loci", "peg-system"],
+      "worked_example": {
+        "domain": "historical-sequence",
+        "text": "Irish state milestones: a **rising phoenix (1916)** signs a **birth cert labelled 'Free State' (1922)**; the cert unfolds into a **constitution scroll (1937)**; the scroll flings a **crown off a cliff (1949, Republic)**. Each image hands off to the next."
+      }
+    },
+    {
+      "id": "major-system",
+      "name": "Major System",
+      "aliases": ["Phonetic Number System", "Major Method", "00–99 Peg Lexicon"],
+      "tier": "encoding",
+      "definition": "Encode digits as consonant sounds (0=s/z, 1=t/d, 2=n, 3=m, 4=r, 5=l, 6=j/sh/ch, 7=k/g, 8=f/v, 9=p/b), inserting vowels freely to form concrete, imageable words.",
+      "mechanism": "Numbers are abstract and non-imageable; a fixed phonetic code maps them into the word/image system where elaborative and spatial mnemonics apply. A pre-memorized 00–99 word list ('100-peg build-out') amortizes encoding cost and chunks two digits per image.",
+      "how_to": "1. Drill the consonant table to automaticity (sound-based, not spelling-based).\n2. Build and memorize a fixed word for every pair 00–99.\n3. Chunk target numbers into digit pairs; pull the peg word for each.\n4. Bind the peg images together (link) or deposit along loci.\n5. Decode at recall by reversing sounds → digits.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.65,
+        "source_class": "memory-sport",
+        "citations": [
+          {"authors": "Slak", "year": 1970, "finding": "Phonemic recoding of digits improved digit learning and retention in trained subjects", "source_class": "cogpsych"},
+          {"authors": "Foer", "year": 2011, "finding": "Major-derived 2/3-digit systems documented as standard among elite digit-event competitors", "source_class": "memory-sport"}
+        ],
+        "caveats": "Lab literature is thin and old; the overwhelming evidence is practitioner adoption by self-selected experts. Weeks of up-front cost before break-even."
+      },
+      "use_when": ["long digit strings", "constants, dates, ports, IDs", "any recurring heavy numeric load"],
+      "avoid_when": ["occasional short numbers (overhead exceeds benefit)", "learners unwilling to invest setup time"],
+      "failure_modes": "- Slow, error-prone decoding if the consonant table isn't automatic.\n- Applying the code to spelling instead of sound produces ambiguous pegs.",
+      "composes_with": [
+        {"target": "method-of-loci", "relation": "encode-then-place", "note": "peg images go into palaces for long numbers"},
+        {"target": "pao-system", "relation": "extended-by", "note": "PAO compresses 6 digits per locus using Major-derived persons/objects"},
+        {"target": "spaced-practice", "relation": "then-drill", "note": "the 00–99 lexicon itself must be drilled to automaticity and maintained"}
+      ],
+      "contrasts_with": ["number-rhyme", "number-shape", "dominic-system"],
+      "worked_example": {
+        "domain": "numeric-constants",
+        "text": "e ≈ 2.718: pairs 27 / 18 → 27 = n,k = 'NecK'; 18 = d,v = 'DoVe'. Image: a dove balancing on a giraffe's neck. Decode: reversed sound-by-sound gives 2–7–1–8."
+      }
+    },
+    {
+      "id": "pao-system",
+      "name": "PAO (Person–Action–Object)",
+      "aliases": ["Person-Action-Object System"],
+      "tier": "encoding",
+      "definition": "Assign each 00–99 pair a Person performing an Action on an Object; any 6 digits compress into one composite scene (Person of pair 1 + Action of pair 2 + Object of pair 3).",
+      "mechanism": "Triples the compression of a plain 2-digit peg system (6 digits per image), consuming fewer loci, and exploits how easily memory binds agent–action–patient scenes.",
+      "how_to": "1. Build a 00–99 PAO table (often seeded from Major or Dominic codes).\n2. Drill each component (P, A, O separately) to instant recall.\n3. Chunk digits in sixes; compose the scene P(pair1)+A(pair2)+O(pair3).\n4. Place composite scenes at loci; decode by unpacking each role.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.6,
+        "source_class": "memory-sport",
+        "citations": [
+          {"authors": "Foer", "year": 2011, "finding": "PAO documented as the dominant intermediate system in competitive memory for digits and cards", "source_class": "memory-sport"},
+          {"authors": "Ericsson, Chase & Faloon", "year": 1980, "finding": "Theoretical basis only: skilled memory arises from meaningful hierarchical chunking (not a PAO trial)", "source_class": "cogpsych"}
+        ],
+        "caveats": "No controlled trials of PAO itself; justification is theoretical (chunking + imagery) plus expert practice consensus."
+      },
+      "use_when": ["heavy digit/card memorization", "memory sport", "long constants where Major pegs consume too many loci"],
+      "avoid_when": ["casual learners", "non-numeric material", "anyone unwilling to maintain a 300-component table"],
+      "failure_modes": "- Role confusion under speed (whose action was it?).\n- Table decays without maintenance drills.\n- Setup measured in weeks to months.",
+      "composes_with": [
+        {"target": "method-of-loci", "relation": "encode-then-place", "note": "one PAO scene per locus = 6 digits per locus"},
+        {"target": "major-system", "relation": "derives-from", "note": "PAO tables are usually generated from Major phonetics"},
+        {"target": "spaced-practice", "relation": "then-drill", "note": "component tables need scheduled maintenance"}
+      ],
+      "contrasts_with": ["dominic-system", "major-system"],
+      "worked_example": {
+        "domain": "numeric-constants",
+        "text": "π digits 141592 → 14/15/92: Person(14)= a **Tsar**, Action(15)= **towelling off**, Object(92)= a **frying pan**. One scene — a Tsar towelling off a frying pan — stores all six digits at a single locus."
+      }
+    },
+    {
+      "id": "dominic-system",
+      "name": "Dominic System",
+      "aliases": ["DOMINIC", "Person-Action Number System"],
+      "tier": "encoding",
+      "definition": "Digit pairs map to letter pairs (1=A, 2=B, 3=C, 4=D, 5=E, 6=S, 7=G, 8=H, 9=N, 0=O) which become a memorable person's initials, each with a signature action; 4 digits = Person(pair1) + Action(pair2).",
+      "mechanism": "Person-first variant of PAO: proper names and celebrity schemas are highly distinctive and pre-elaborated, lowering the image-generation cost relative to arbitrary Major words.",
+      "how_to": "1. Learn the digit→letter code.\n2. Assign a person to each 00–99 pair by initials, plus a signature action per person.\n3. Encode 4-digit chunks as Person + (other person's) Action.\n4. Place scenes at loci for longer numbers.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.55,
+        "source_class": "memory-sport",
+        "citations": [
+          {"authors": "O'Brien", "year": 1993, "finding": "System used to win eight World Memory Championships; practitioner method, never lab-trialed", "source_class": "memory-sport"}
+        ],
+        "caveats": "Essentially untested in labs; treat as a PAO-family variant whose plausibility rides on the same chunking + imagery mechanisms."
+      },
+      "use_when": ["learners who find people easier to image than objects", "dates and 4-digit codes"],
+      "avoid_when": ["learners without a rich stock of vivid public/personal figures", "non-numeric material"],
+      "failure_modes": "- Initial collisions force awkward person choices.\n- People you feel nothing about make weak pegs.",
+      "composes_with": [
+        {"target": "method-of-loci", "relation": "encode-then-place", "note": "person+action scenes placed at loci"},
+        {"target": "pao-system", "relation": "variant-of", "note": "same architecture; letters instead of phonetics, P+A instead of P+A+O"}
+      ],
+      "contrasts_with": ["major-system"],
+      "worked_example": {
+        "domain": "numeric-constants",
+        "text": "1815 (Waterloo): 18 = A,H → **Audrey Hepburn**; 15 = A,E → Einstein, whose signature action is **scribbling equations**. Audrey Hepburn scribbling equations on a battlefield = 1815."
+      }
+    },
+    {
+      "id": "number-shape",
+      "name": "Number–Shape System",
+      "aliases": ["Shape Pegs"],
+      "tier": "encoding",
+      "definition": "Each digit 0–9 becomes an object it visually resembles (1=candle, 2=swan, 3=handcuffs, 8=snowman, 0=ring), used as pegs or to image short numbers.",
+      "mechanism": "Zero-training visual mapping: digits become images by resemblance rather than a learned code, giving instant (but capacity-limited) access to imagery mnemonics.",
+      "how_to": "1. Fix one shape per digit and never change it.\n2. For a short number, image the digit-shapes interacting in order.\n3. As pegs: attach item *n* to shape *n* via interactive imagery.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.6,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bugelski, Kidd & Segmen", "year": 1968, "finding": "Peg pretraining improved paced serial learning (rhyme pegs; shape variant assumed to generalize)", "source_class": "cogpsych"}
+        ],
+        "caveats": "The shape variant itself is rarely tested directly; evidence is inherited from the peg literature. Hard ceiling of 10 pegs."
+      },
+      "use_when": ["children or first-ever mnemonic", "lists of ≤10", "quick hooks for 1–3 digit numbers"],
+      "avoid_when": ["long numbers", "learners ready to invest in the Major system"],
+      "failure_modes": "- Ambiguous shape choices (is 5 a hook or a seahorse?) cause decode errors.\n- Does not scale past ten positions.",
+      "composes_with": [
+        {"target": "peg-system", "relation": "instance-of", "note": "one of the standard beginner peg sets"},
+        {"target": "elaborative-imagery", "relation": "depends-on", "note": "interaction quality carries the effect"}
+      ],
+      "contrasts_with": ["major-system", "number-rhyme"],
+      "worked_example": {
+        "domain": "numeric-constants",
+        "text": "Speed of sound ≈ 343 m/s: **handcuffs (3)** locked to the bow of a **sailboat (4)**, another pair of **handcuffs (3)** at the stern — the boat outrunning a jet's roar."
+      }
+    },
+    {
+      "id": "number-rhyme",
+      "name": "Number–Rhyme System",
+      "aliases": ["Rhyme Pegs", "One-Bun System"],
+      "tier": "encoding",
+      "definition": "Digits map to rhyming pegs (one–bun, two–shoe, three–tree, four–door...); items are imaged interacting with the peg at their position.",
+      "mechanism": "Rhyme supplies an automatic, pre-memorized ordered cue set; interactive imagery binds item→peg, enabling direct random access by position — unlike chains, a lost item doesn't break neighbors.",
+      "how_to": "1. Memorize the rhyme pegs once (usually already known).\n2. For each list position, form a vivid interaction between the peg image and the item.\n3. Retrieve any position directly: say the rhyme, see the scene.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.75,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bugelski, Kidd & Segmen", "year": 1968, "finding": "One-bun pegs improved serial recall given sufficient encoding time per item", "source_class": "cogpsych"},
+          {"authors": "Roediger", "year": 1980, "finding": "Pegs ≈ loci, both > rehearsal, with pegs giving good positional access", "source_class": "cogpsych"}
+        ],
+        "caveats": "Ceiling of ~10–20 pegs; evidence mostly concrete word lists at short retention."
+      },
+      "use_when": ["short ordered lists needing positional access", "ranked facts (top-N by position)"],
+      "avoid_when": ["lists beyond the peg set", "abstract items you can't image without a concretization step"],
+      "failure_modes": "- Reusing pegs across lists in the same period causes interference.\n- Static (non-interacting) peg+item images fail quietly.",
+      "composes_with": [
+        {"target": "peg-system", "relation": "instance-of", "note": "the canonical pegword set"},
+        {"target": "spaced-practice", "relation": "then-drill", "note": "peg bindings decay like any association"}
+      ],
+      "contrasts_with": ["link-story-method", "major-system"],
+      "worked_example": {
+        "domain": "numeric-constants",
+        "text": "First elements by atomic number: one–bun = a **hydrogen balloon baked into a bun**; two–shoe = a **shoe floating away on helium**; three–tree = **lithium batteries growing on a tree**."
+      }
+    },
+    {
+      "id": "peg-system",
+      "name": "Peg Systems (general)",
+      "aliases": ["Pegword Method", "Hook System"],
+      "tier": "encoding",
+      "definition": "Any pre-memorized, ordered set of concrete 'hooks' (rhymes, shapes, alphabet images, body parts, Major words) to which new items are attached by interactive imagery.",
+      "mechanism": "Separates the *ordering* problem (solved once by the peg list) from the *binding* problem (one vivid image per item). Pegs give O(1) positional access and are reusable scaffolds — loci are simply spatial pegs.",
+      "how_to": "1. Acquire a peg set sized to the job (10 rhymes → 100 Major words).\n2. Overlearn it to instant recall.\n3. Bind each new item to its peg with a distinct interaction.\n4. Retrieve by peg number; drill bindings on a schedule.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.8,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bugelski, Kidd & Segmen", "year": 1968, "finding": "Pegword pretraining improved serial learning under paced presentation", "source_class": "cogpsych"},
+          {"authors": "Roediger", "year": 1980, "finding": "Pegs and loci comparable and superior to rehearsal for ordered recall", "source_class": "cogpsych"},
+          {"authors": "Wang & Thomas", "year": 2000, "finding": "Mnemonic gains can fade faster than rote at long delays without relearning", "source_class": "cogpsych"}
+        ],
+        "caveats": "Most trials are short-retention word-list studies; durability requires spaced retrieval of the bindings."
+      },
+      "use_when": ["ordered material with positional lookup", "recurring list-memorization workflows"],
+      "avoid_when": ["relational/conceptual structure (use the structure itself)", "one-off trivial lists"],
+      "failure_modes": "- Peg reuse without decay time → cross-list interference.\n- Treating pegs as storage rather than cues: the interaction image is the storage.",
+      "composes_with": [
+        {"target": "method-of-loci", "relation": "family", "note": "loci = spatial pegs; choose by whether space or number is the natural index"},
+        {"target": "major-system", "relation": "extended-by", "note": "Major/PAO are 100-peg numeric builds"}
+      ],
+      "contrasts_with": ["link-story-method", "rote-rehearsal"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Body pegs for the PICERL incident-response phases: feet=**P**reparation (boots), knees=**I**dentification (kneeling to inspect a log), waist=**C**ontainment (belt cinched tight), chest=**E**radication (scrubbing), shoulders=**R**ecovery (carrying a server), head=**L**essons (lightbulb)."
+      }
+    },
+    {
+      "id": "mind-mapping",
+      "name": "Mind Mapping",
+      "aliases": ["Buzan Mind Map", "Radial Outlining"],
+      "tier": "encoding",
+      "definition": "A radial diagram: central concept branching into keyword-labeled sub-branches with color and images.",
+      "mechanism": "Claimed: imagery + spatial layout + color. Best-supported ingredient is the *generative act of selecting and organizing* — an organization/elaboration effect — not the radial format itself.",
+      "how_to": "1. Put the target concept at center.\n2. Add major branches as single keywords; sub-branch details.\n3. Draw cross-links between branches and label *why* they connect.\n4. Redraw from memory later (converts it into retrieval practice).",
+      "evidence": {
+        "grade": "contested",
+        "confidence": 0.45,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Farrand, Hussain & Hennessy", "year": 2002, "finding": "Small recall advantage over preferred study at 1 week, but lower motivation; benefit tied to actually applying the technique", "source_class": "cogpsych"},
+          {"authors": "Nesbit & Adesope", "year": 2006, "finding": "Meta-analysis: node-link mapping shows moderate benefits — strongest for *concept maps* with labeled relations, not Buzan-style maps", "source_class": "cogpsych"}
+        ],
+        "caveats": "Buzan-style radial maps specifically have weak evidence. Concept mapping — explicit labeled edges and cross-links — is the better-supported cousin, and maps directly onto a knowledge-graph substrate."
+      },
+      "use_when": ["initial survey/brainstorm of a domain", "planning talks or essays", "externalizing structure to seed or review a KG"],
+      "avoid_when": ["verbatim/detail retention", "as a substitute for retrieval practice"],
+      "failure_modes": "- Decorative mapping: pretty branches, zero processing.\n- Copying the source's structure instead of generating your own kills the organization benefit.",
+      "composes_with": [
+        {"target": "retrieval-practice", "relation": "generate-from-memory", "note": "closed-book map drawing, then compare — mapping becomes testing"},
+        {"target": "chunking", "relation": "externalizes", "note": "branches make the learner's chunk boundaries visible and correctable"}
+      ],
+      "contrasts_with": ["concept-mapping", "linear-note-taking"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Center: **OAuth 2.0**. Branches: roles, grant types, tokens, attacks. The cross-link *attacks → grant types* ('implicit flow → token leakage via redirect') is where the map earns its keep — labeled cross-links are the concept-map ingredient with actual evidence."
+      }
+    },
+    {
+      "id": "elaborative-imagery",
+      "name": "Multi-Sensory / Elaborative Imagery",
+      "aliases": ["Interactive Imagery", "Visualization", "Multi-Sensory Encoding"],
+      "tier": "encoding",
+      "definition": "Deliberately encode material as vivid mental images that engage multiple senses and, critically, show the to-be-associated items *interacting*.",
+      "mechanism": "Dual coding (verbal + imaginal traces) plus relational binding: interacting images strengthen the associative link itself, whereas side-by-side images only strengthen the items. Sensory richness adds retrieval routes and distinctiveness.",
+      "how_to": "1. Concretize each element (abstract terms first pass through a metaphor or keyword).\n2. Build one scene where the elements act on each other.\n3. Add 1–2 non-visual channels: sound, smell, motion, touch.\n4. Replay once immediately, then drill on a schedule.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.85,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Paivio", "year": 1969, "finding": "Imageability and imagery instructions strongly predict and improve paired-associate learning", "source_class": "cogpsych"},
+          {"authors": "Bower", "year": 1970, "finding": "Interacting imagery roughly doubled paired-associate recall vs. separated images", "source_class": "cogpsych"}
+        ],
+        "caveats": "Concreteness-dependent — abstract material needs a concretization step; learners with aphantasia need verbal-elaborative substitutes."
+      },
+      "use_when": ["paired associations", "vocabulary and terminology", "names–faces"],
+      "avoid_when": ["purely formal manipulation skills (proofs, derivations) where practice beats picturing"],
+      "failure_modes": "- Static side-by-side images (no interaction) — the most common silent failure.\n- Generic recycled images blur across items.",
+      "composes_with": [
+        {"target": "method-of-loci", "relation": "substrate-for", "note": "every mnemonic above runs on this"},
+        {"target": "keyword-method", "relation": "substrate-for", "note": "the keyword→meaning link is an interactive image"},
+        {"target": "dual-coding", "relation": "self-generated-variant", "note": "imagery is learner-generated dual coding"}
+      ],
+      "contrasts_with": ["rote-rehearsal", "bizarreness-exaggeration"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Meeting a 'Rosalind': rose petals wound in a double-helix lattice tumbling from her hair (Rosalind Franklin) — smell the rose, hear the petals rustle. Two senses, one interaction, name bound to face."
+      }
+    },
+    {
+      "id": "bizarreness-exaggeration",
+      "name": "Exaggeration / Bizarreness",
+      "aliases": ["Bizarreness Effect", "Absurd Imagery"],
+      "tier": "encoding",
+      "definition": "Make mnemonic images absurd, exaggerated, or impossible on the theory that weird is inherently more memorable.",
+      "mechanism": "The real driver is *distinctiveness at retrieval*: bizarre items win only when they stand out against a common backdrop (mixed lists); in all-bizarre lists the advantage vanishes. Exaggeration also incidentally forces interaction and specificity, which genuinely help.",
+      "how_to": "1. Encode normally first (concrete + interacting).\n2. Spend bizarreness selectively — on the items most at risk of blending in.\n3. Prefer exaggerated *interaction* (size, number, violation of physics) over gross-out shock.\n4. Keep a common baseline so the bizarre items have something to contrast with.",
+      "evidence": {
+        "grade": "contested",
+        "confidence": 0.5,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "McDaniel & Einstein", "year": 1986, "finding": "Bizarreness advantage in mixed lists, absent in pure lists — a distinctiveness effect, not stronger encoding", "source_class": "cogpsych"},
+          {"authors": "Wollen, Weber & Lowry", "year": 1972, "finding": "Interaction between images improved recall; bizarreness per se did not", "source_class": "cogpsych"},
+          {"authors": "O'Brien; Foer", "year": 2011, "finding": "Universal advice in memory sport — practitioner consensus overstates the lab picture", "source_class": "memory-sport"}
+        ],
+        "caveats": "Budget it: if everything is bizarre, nothing is distinctive. Vividness and interaction matter more than weirdness."
+      },
+      "use_when": ["a few high-confusion items within otherwise mundane material"],
+      "avoid_when": ["as a blanket policy across all images", "contexts where offensive imagery would distract"],
+      "failure_modes": "- Arms race of grotesquerie with diminishing returns.\n- Bizarre-but-static images: the weirdness replaced the interaction instead of amplifying it.",
+      "composes_with": [
+        {"target": "link-story-method", "relation": "amplifies", "note": "spend on the weakest links in a chain"},
+        {"target": "elaborative-imagery", "relation": "modifier-of", "note": "a salience dial on top of interaction, not a substitute"}
+      ],
+      "contrasts_with": ["elaborative-imagery"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Encoding 'race condition': two sprinters diving through one revolving door and fusing into a corrupted blur. Silly — but the *interaction through a shared resource* is doing the mnemonic work; the absurdity just keeps it from blending into other concurrency images."
+      }
+    },
+    {
+      "id": "keyword-method",
+      "name": "Keyword Method",
+      "aliases": ["Keyword Mnemonic", "Atkinson Keyword Method"],
+      "tier": "encoding",
+      "definition": "Learn a foreign or technical term by (1) finding a familiar word that sounds like it (the keyword) and (2) forming an image of the keyword interacting with the term's meaning.",
+      "mechanism": "Bridges an arbitrary sound→meaning mapping through two easy links: acoustic (term→keyword) and imaginal (keyword→meaning). Converts rote paired-associate learning into elaborated interactive imagery.",
+      "how_to": "1. Hear/say the new term; pick a concrete keyword that sounds like (part of) it.\n2. Image the keyword interacting with the meaning — not merely beside it.\n3. Recall path: term → keyword → image → meaning.\n4. Schedule spaced retrieval; the method's gains decay fastest without it.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.75,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Raugh & Atkinson", "year": 1975, "finding": "Keyword group hit ~88% vs ~28% control on Spanish vocabulary tests", "source_class": "cogpsych"},
+          {"authors": "Pressley, Levin & Delaney", "year": 1982, "finding": "Review: robust benefits across languages, ages, and materials", "source_class": "cogpsych"},
+          {"authors": "Wang, Thomas & Ouellette", "year": 1992, "finding": "Advantage shrank or reversed at long delays vs. rote in some conditions — faster forgetting without relearning", "source_class": "cogpsych"}
+        ],
+        "caveats": "Strongest for receptive recall at short/medium delays; must be paired with spaced retrieval or gains erode. Keyword generation is hard for some words and low-imagery learners."
+      },
+      "use_when": ["foreign vocabulary", "jargon and taxonomy terms", "drug/species/protocol names"],
+      "avoid_when": ["productive fluency and pronunciation (needs production practice)", "abstract function words with no imageable meaning"],
+      "failure_modes": "- The keyword hijacks pronunciation of the real term.\n- Retrieving the keyword but not the keyword→meaning image (the second link was under-encoded).",
+      "composes_with": [
+        {"target": "spaced-practice", "relation": "then-drill", "note": "decay is the documented failure mode; schedule reviews"},
+        {"target": "elaborative-imagery", "relation": "depends-on", "note": "the second link is an interactive image"},
+        {"target": "method-of-loci", "relation": "batched-by", "note": "place keyword images along a route for vocabulary sets"}
+      ],
+      "contrasts_with": ["rote-rehearsal"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Manx Gaelic *moddey* ('dog') sounds like 'muddy' → a muddy dog shaking itself dry over a white carpet. Recall: moddey → muddy → that dog → 'dog'."
+      }
+    },
+    {
+      "id": "chunking",
+      "name": "Cognitive Chunking",
+      "aliases": ["Recoding", "Grouping", "Hierarchical Chunking"],
+      "tier": "encoding",
+      "definition": "Recode many low-level units into fewer meaningful higher-order units, spending long-term-memory patterns to stretch effective working-memory capacity.",
+      "mechanism": "Working memory holds ~4 chunks *regardless of chunk size*; expertise is a library of retrievable patterns that lets large structures occupy one slot. Hierarchies of chunks give roughly logarithmic effective capacity.",
+      "how_to": "1. Find or impose meaningful boundaries aligned with the material's real structure.\n2. Name each chunk; the label becomes its retrieval handle.\n3. Build upward: chunks of chunks.\n4. Drill chunk recognition until it's perceptual, not deliberate.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.95,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Miller", "year": 1956, "finding": "Capacity is constant in chunks, not items — recoding expands span", "source_class": "cogpsych"},
+          {"authors": "Chase & Simon", "year": 1973, "finding": "Chess masters recall real positions via larger chunks; no advantage on random boards", "source_class": "cogpsych"},
+          {"authors": "Ericsson, Chase & Faloon", "year": 1980, "finding": "Undergraduate reached 79-digit span by recoding digits as running times — skill, not raw capacity", "source_class": "cogpsych"}
+        ],
+        "caveats": "Chunks must already exist in long-term memory to be spent; imposed boundaries that fight the material's structure actively hurt."
+      },
+      "use_when": ["everything — it is the substrate of expertise", "syntax patterns, idioms, board states, digit groups"],
+      "avoid_when": ["never truly avoided; but don't impose arbitrary groupings on structured material"],
+      "failure_modes": "- Chunk boundaries misaligned with real structure (e.g., splitting an IP across octets' natural dots).\n- Labels without content: naming a chunk you can't unpack.",
+      "composes_with": [
+        {"target": "major-system", "relation": "instance-of", "note": "digit pegs are engineered chunks"},
+        {"target": "worked-examples", "relation": "built-by", "note": "studying examples is how solution-schema chunks form"},
+        {"target": "method-of-loci", "relation": "combines-with", "note": "one composite scene per locus is a chunk"}
+      ],
+      "contrasts_with": ["rote-rehearsal"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Reading `^(?:\\d{1,3}\\.){3}\\d{1,3}$` as one chunk — 'naive IPv4 matcher' — instead of ~20 tokens. An expert stores the pattern and its known flaw (matches 999.999.999.999) as a single retrievable unit."
+      }
+    },
+    {
+      "id": "dual-coding",
+      "name": "Dual Coding",
+      "aliases": ["Verbal + Visual Coding", "Multimedia Principle"],
+      "tier": "encoding",
+      "definition": "Present and encode information in complementary verbal and visual forms (diagram + explanation), yielding two mutually cueing memory traces.",
+      "mechanism": "Paivio: separate verbal and imaginal systems with referential links between them — two retrieval routes instead of one. Mayer: words + pictures beat words alone when spatially/temporally integrated, because both channels work in parallel without overload.",
+      "how_to": "1. Pair every key verbal explanation with a matched visual (diagram, timeline, schematic).\n2. Integrate them: labels on the diagram, not in a separate block.\n3. Have the learner translate one code into the other (describe the diagram; sketch the text).\n4. Cut decorative imagery — relevance is the filter.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.85,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Paivio", "year": 1971, "finding": "Dual coding theory: picture superiority and concreteness effects across paradigms", "source_class": "cogpsych"},
+          {"authors": "Mayer & Anderson", "year": 1991, "finding": "Integrated narration + animation improved transfer vs. either alone or separated in time", "source_class": "cogpsych"}
+        ],
+        "caveats": "This is not learning styles: everyone benefits from both channels. Decorative pictures and redundant on-screen text can backfire (coherence/redundancy effects)."
+      },
+      "use_when": ["structures, processes, architectures", "anything with spatial or causal layout"],
+      "avoid_when": ["content with no genuine visual structure — forced diagrams add noise"],
+      "failure_modes": "- Seductive details: interesting-but-irrelevant graphics depress learning.\n- Split attention: diagram on one page, explanation on another.",
+      "composes_with": [
+        {"target": "concrete-examples", "relation": "multiplies-with", "note": "example + diagram of the example"},
+        {"target": "elaborative-imagery", "relation": "learner-generated-variant", "note": "self-built imagery when no diagram is supplied"}
+      ],
+      "contrasts_with": ["learning-styles-matching"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "TCP three-way handshake: a sequence diagram (SYN →, ← SYN-ACK, ACK →) with the one-line verbal gloss per arrow ('client proposes; server accepts and proposes back; client confirms'). Learner later reproduces the diagram from the words, then the words from the diagram."
+      }
+    }
+  ],
+  "batch_2_retrieval_scheduling_metacognitive": [
+    {
+      "id": "retrieval-practice",
+      "name": "Retrieval Practice",
+      "aliases": ["Testing Effect", "Practice Testing", "Active Recall"],
+      "tier": "retrieval",
+      "definition": "Deliberately recalling target material from memory (self-testing, free recall, flashcards) instead of restudying it.",
+      "mechanism": "Effortful successful retrieval modifies the trace itself: it strengthens and diversifies retrieval routes, re-encodes the item in the current context, and elaborates cue–target links — effects restudy cannot produce. Retrieval attempts also potentiate encoding of subsequent feedback.",
+      "how_to": "1. After initial exposure, close the book and recall — free recall or short-answer beats recognition.\n2. Check and give corrective feedback, especially on errors and omissions.\n3. Repeat on a spaced schedule; keep difficulty high enough to require effort but allow success.\n4. Test at the level of the target skill (derivations, not definitions, if derivations are the goal).",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.97,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Roediger & Karpicke", "year": 2006, "finding": "Tested group beat rereaders at 1 week despite losing at 5 minutes — the fluency illusion in one figure", "source_class": "cogpsych"},
+          {"authors": "Rowland", "year": 2014, "finding": "Meta-analysis: g ≈ 0.50 across 159 effects; larger with feedback and effortful formats", "source_class": "cogpsych"},
+          {"authors": "Adesope, Trevisan & Sundararajan", "year": 2017, "finding": "Meta-analysis: g ≈ 0.61, robust across ages, formats, and settings", "source_class": "cogpsych"}
+        ],
+        "caveats": "Feedback is required when success rates are low. Size of benefit for very complex, highly interlinked material is still debated (element interactivity)."
+      },
+      "use_when": ["any fact or concept after initial exposure — the tutor's default verb", "pre-exam consolidation", "diagnosing what a learner actually knows"],
+      "avoid_when": ["zero prior exposure without feedback (use pretesting deliberately or worked examples instead)"],
+      "failure_modes": "- Recognition-only quizzing (multiple choice with weak distractors) breeds familiarity illusions.\n- Tests so easy they require no retrieval effort, or so hard nothing is retrieved and no feedback follows.",
+      "composes_with": [
+        {"target": "spaced-practice", "relation": "multiplies-with", "note": "spaced retrieval is the core SRS loop — the two biggest effects compound"},
+        {"target": "successive-relearning", "relation": "instantiated-by", "note": "relearning-to-criterion is retrieval practice with a mastery rule"},
+        {"target": "metacognition-calibration", "relation": "feeds", "note": "test outcomes are the ground truth that corrects self-judgment"}
+      ],
+      "contrasts_with": ["rereading", "highlighting"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "After teaching subnetting, don't re-display the table. Ask: 'How many usable hosts in a /26?' and require the derivation (2^(32−26) − 2 = 62). The derivation is the retrieval target, so the derivation is what gets tested."
+      }
+    },
+    {
+      "id": "spaced-practice",
+      "name": "Spaced / Distributed Practice",
+      "aliases": ["Distributed Practice", "Spacing Effect", "Spaced Repetition", "SRS"],
+      "tier": "scheduling",
+      "definition": "Distribute study and retrieval episodes over increasing time gaps rather than massing them into one session.",
+      "mechanism": "Three converging accounts: encoding variability (each session stores fresh contextual cues), study-phase retrieval (reviewing a *partly forgotten* trace forces harder, more potent reprocessing), and between-session consolidation. Forgetting between reps is the feature, not the bug.",
+      "how_to": "1. Schedule each review near the edge of forgetting — effortful but recoverable.\n2. Expand gaps after successes; contract after failures.\n3. Scale gaps to the retention goal (longer horizon → longer gaps, roughly 10–20% of the retention interval).\n4. Automate per-item scheduling (SM-2/FSRS-style) keyed to recall outcomes.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.97,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Cepeda, Pashler, Vul, Wixted & Rohrer", "year": 2006, "finding": "Meta-analysis of 839 assessments: spaced beat massed in ~96% of comparisons", "source_class": "cogpsych"},
+          {"authors": "Cepeda et al.", "year": 2008, "finding": "Optimal gap scales with retention interval (~10–20% of RI)", "source_class": "cogpsych"},
+          {"authors": "Dunlosky et al.", "year": 2013, "finding": "Rated one of only two high-utility techniques across learners and materials", "source_class": "cogpsych"}
+        ],
+        "caveats": "Optimal-gap prescriptions are coarse; expanding vs. equal-interval differences are small. The big win is any spacing at all versus massing."
+      },
+      "use_when": ["everything intended to last beyond a week", "scheduling layer for all other techniques"],
+      "avoid_when": ["genuinely one-shot needs with no retention goal (then cramming is rationally fine)"],
+      "failure_modes": "- Gaps so long that retrieval fails without feedback — relearning cost spikes.\n- Massing disguised as spacing: many 'sessions' within one sitting.",
+      "composes_with": [
+        {"target": "retrieval-practice", "relation": "multiplies-with", "note": "space the *tests*, not just the exposures"},
+        {"target": "interleaving", "relation": "induces", "note": "mixing topics automatically spaces each topic"},
+        {"target": "successive-relearning", "relation": "instantiated-by", "note": "criterion relearning across spaced sessions"}
+      ],
+      "contrasts_with": ["massed-practice", "cramming"],
+      "worked_example": {
+        "domain": "numeric-constants",
+        "text": "A fact first recalled correctly today gets reviewed at ~1d → 3d → 7d → 16d → 5w, each successful recall stretching the next gap; a failure resets to a short gap with feedback. That policy *is* the spacing literature operationalized."
+      }
+    },
+    {
+      "id": "interleaving",
+      "name": "Interleaving",
+      "aliases": ["Mixed Practice", "Contextual Interference (motor-learning cousin)"],
+      "tier": "scheduling",
+      "definition": "Mix problem types or categories within a session (ABCABC) instead of blocking them (AAABBB).",
+      "mechanism": "Forces discriminative contrast: the learner must repeatedly decide *which* concept or method applies, not just execute it — blocking lets them ride the surface cue 'same as the last one'. Also embeds spacing between same-type items for free.",
+      "how_to": "1. Identify confusable categories (sibling concepts, similar problem types).\n2. Shuffle practice items across them within a session.\n3. Strip surface cues that give the category away (e.g., chapter headers).\n4. Warn the learner it will *feel* worse while working better.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.85,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Rohrer & Taylor", "year": 2007, "finding": "Interleaved math practice hurt practice-session accuracy but roughly doubled test performance", "source_class": "cogpsych"},
+          {"authors": "Kornell & Bjork", "year": 2008, "finding": "Interleaving painters' works improved style induction; learners still judged blocking better — a metacognitive illusion", "source_class": "cogpsych"},
+          {"authors": "Brunmair & Richter", "year": 2019, "finding": "Meta-analysis g ≈ 0.42; strongest for confusable categories, weak or negative for unrelated material", "source_class": "cogpsych"}
+        ],
+        "caveats": "Only pays when categories are genuinely confusable; interleaving unrelated topics is just noise. Brief initial blocking can help absolute novices before mixing."
+      },
+      "use_when": ["confusable sibling nodes (sorting algorithms, cipher modes, verb conjugations)", "when learners pattern-match instead of choosing methods"],
+      "avoid_when": ["mutually unrelated topics", "the very first exposures to a brand-new category"],
+      "failure_modes": "- Learner demotivation from lower practice accuracy, without framing.\n- 'Interleaving' across unrelated domains that share no discrimination problem.",
+      "composes_with": [
+        {"target": "spaced-practice", "relation": "contains", "note": "mixing implies within-type spacing"},
+        {"target": "retrieval-practice", "relation": "combined-as", "note": "interleaved quizzing is both at once"},
+        {"target": "concrete-examples", "relation": "sharpens", "note": "contrasting cases side by side drive schema discrimination"}
+      ],
+      "contrasts_with": ["blocked-practice"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Drill AES modes with shuffled prompts — an ECB question, then GCM, then CBC — so the learner must *select* the relevant property (deterministic leakage vs. authenticated encryption vs. IV misuse) rather than pattern-matching within a blocked ECB section."
+      }
+    },
+    {
+      "id": "successive-relearning",
+      "name": "Successive Relearning",
+      "aliases": ["Relearning to Criterion", "Spaced Criterion Learning"],
+      "tier": "scheduling",
+      "definition": "In each of several spaced sessions, practice retrieval with feedback until every item is recalled correctly (criterion), then relearn to criterion again in the next session.",
+      "mechanism": "Welds the two largest effects — retrieval practice and spacing — with a mastery rule that guarantees each session ends in successful retrieval and automatically allocates more trials to weaker items.",
+      "how_to": "1. Define the item set and a criterion (typically 1 correct recall per session; ~3 in the first).\n2. Quiz with feedback; misses re-enter the within-session queue until correct.\n3. Repeat across ≥3 sessions spaced days apart.\n4. Retire items after stable criterion performance; resurrect on later failure.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.8,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Rawson & Dunlosky", "year": 2011, "finding": "~3 initial correct recalls plus spaced relearning sessions gave the best durability-per-trial trade-off", "source_class": "cogpsych"},
+          {"authors": "Rawson, Dunlosky & Sciartelli", "year": 2013, "finding": "Classroom deployment improved exam performance on targeted concepts by roughly a letter grade", "source_class": "cogpsych"}
+        ],
+        "caveats": "Fewer independent labs than its parent effects (which are rock-solid); criterion bookkeeping needs tooling — a non-issue for a software tutor."
+      },
+      "use_when": ["core facts, definitions, and mappings that must be durable", "the default policy for an SRS-backed tutor's 'known node' maintenance"],
+      "avoid_when": ["goals demanding transfer beyond recall — add elaboration and varied problems on top"],
+      "failure_modes": "- Criterion met via recognition or ordering cues rather than genuine recall.\n- Sessions spaced too tightly — criterion becomes trivial and the spacing benefit evaporates.",
+      "composes_with": [
+        {"target": "retrieval-practice", "relation": "instantiates", "note": "retrieval with a mastery rule"},
+        {"target": "spaced-practice", "relation": "instantiates", "note": "the sessions are the spacing"},
+        {"target": "metacognition-calibration", "relation": "replaces", "note": "measured criterion supersedes flawed self-judgment of 'knowing it'"}
+      ],
+      "contrasts_with": ["single-session-mastery", "cramming"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Tutor policy: every key KG node must be recalled correctly once per session across ≥3 sessions ≥2 days apart; a miss re-queues the node later in the same session until recalled, and postpones retirement."
+      }
+    },
+    {
+      "id": "elaborative-interrogation",
+      "name": "Elaboration / Elaborative Interrogation",
+      "aliases": ["Why-Questioning", "EI"],
+      "tier": "retrieval",
+      "definition": "For each to-be-learned statement, generate an answer to 'Why is this true?' / 'Why does this make sense?'",
+      "mechanism": "Forces integration with prior knowledge: the generated explanation becomes a retrieval structure and discriminates the fact from similar facts. The *generation* is the active ingredient — supplied explanations do far less.",
+      "how_to": "1. Present the fact.\n2. Prompt: 'Why would this be true?' and require a produced answer.\n3. Verify or correct the explanation (a tutor must catch confabulated 'whys').\n4. Reuse the explanation as a retrieval cue in later testing.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.7,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Pressley, McDaniel, Turnure, Wood & Ahmad", "year": 1987, "finding": "Answering why-questions roughly doubled fact learning vs. reading", "source_class": "cogpsych"},
+          {"authors": "Dunlosky et al.", "year": 2013, "finding": "Rated moderate utility: reliable for factual material, thinner evidence for complex content and low-knowledge learners", "source_class": "cogpsych"}
+        ],
+        "caveats": "Depends on adequate prior knowledge to generate correct explanations; wrong self-generated 'whys' encode errors unless checked."
+      },
+      "use_when": ["discrete facts with underlying causes", "learners with relevant background", "Socratic follow-ups after a correct recall"],
+      "avoid_when": ["true rote arbitrariness (there is no why to port 443)", "novices with nothing to connect to"],
+      "failure_modes": "- Confabulated explanations encoded as fact.\n- Shallow restatement ('because it is') passing as elaboration.",
+      "composes_with": [
+        {"target": "retrieval-practice", "relation": "follows", "note": "recall the fact, then interrogate it"},
+        {"target": "self-explanation", "relation": "sibling", "note": "EI targets facts; self-explanation targets steps and texts"}
+      ],
+      "contrasts_with": ["rote-rehearsal", "rereading"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Fact: 'TLS 1.3 removed static RSA key exchange.' Why? → Because without ephemeral keys, a later server-key compromise retroactively decrypts recorded traffic; mandating (EC)DHE buys forward secrecy. The generated *why* is the glue that makes the fact stick and transfer."
+      }
+    },
+    {
+      "id": "self-explanation",
+      "name": "Self-Explanation",
+      "aliases": ["Explanation-Based Learning", "Step Explanation"],
+      "tier": "retrieval",
+      "definition": "While studying a worked example or text, the learner explains each step to themselves — what it does, why it's justified, and how it connects to principles.",
+      "mechanism": "Gap detection and repair: articulating each step exposes missing inferences, forces their generation, and integrates the material with existing schemas. The benefit concentrates in *generated* inferences, not paraphrase.",
+      "how_to": "1. Work through material step by step.\n2. At each step ask: what happened, why is it legal/justified, what principle licenses it?\n3. Flag any step you can only describe, not justify — that's a gap.\n4. Resolve gaps against the source, then re-explain without it.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.75,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Chi, Bassok, Lewis, Reimann & Glaser", "year": 1989, "finding": "Successful physics learners spontaneously self-explained worked examples; weak learners paraphrased", "source_class": "cogpsych"},
+          {"authors": "Chi, de Leeuw, Chiu & LaVancher", "year": 1994, "finding": "Prompted self-explanation improved learning from text, especially deep questions", "source_class": "cogpsych"},
+          {"authors": "Bisra, Liu, Nesbit, Salimi & Winne", "year": 2018, "finding": "Meta-analysis g ≈ 0.55 across 69 studies; prompt design moderates strongly", "source_class": "cogpsych"}
+        ],
+        "caveats": "Time-expensive; paraphrasing masquerades as explaining; providing explanations instead of eliciting them forfeits most of the benefit."
+      },
+      "use_when": ["worked examples, proofs, code reading", "any stepwise procedure with hidden rationale"],
+      "avoid_when": ["time-critical drilling of already-understood material"],
+      "failure_modes": "- Paraphrase loops (restating without inference).\n- Explaining to the tutor's satisfaction rather than to coherence — gaming the prompt.",
+      "composes_with": [
+        {"target": "worked-examples", "relation": "multiplies-with", "note": "the canonical pairing: study example + explain each step"},
+        {"target": "feynman-technique", "relation": "component-of", "note": "Feynman is self-explanation aimed at an imagined novice"}
+      ],
+      "contrasts_with": ["rereading"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Reading concurrency code line by line: 'Why does this mutex guard *this* field and not that one? What invariant holds between lock and unlock?' The moment a line can be described but not justified, a gap has been located and can be repaired."
+      }
+    },
+    {
+      "id": "feynman-technique",
+      "name": "Feynman Technique",
+      "aliases": ["Teach-to-Learn", "Explain-Like-I'm-Five Protocol"],
+      "tier": "retrieval",
+      "definition": "Explain a concept from scratch in plain language as if teaching a novice; locate the point where you stall; return to the source; simplify and re-explain.",
+      "mechanism": "A composite protocol: closed-book explanation (retrieval practice) + step justification (self-explanation) + a built-in calibration probe (the stall point is a *measured* gap) + benefits of teaching expectancy and audience-tuned reorganization.",
+      "how_to": "1. Closed book, write/say the explanation for an imagined novice.\n2. Mark every stall, hedge, or jargon-hiding-a-gap.\n3. Return to sources for exactly those points.\n4. Re-explain simpler; iterate until it flows without props.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.6,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Fiorella & Mayer", "year": 2013, "finding": "Actually teaching (and preparing to teach) improved comprehension and transfer vs. studying for a test", "source_class": "cogpsych"},
+          {"authors": "Nestojko, Bui, Kornell & Bjork", "year": 2014, "finding": "Mere expectation of teaching improved recall and organization of studied material", "source_class": "cogpsych"}
+        ],
+        "caveats": "The branded technique itself has no controlled trials; its ingredients are evidenced separately. Treat as a packaging of retrieval + self-explanation + calibration, not a distinct mechanism."
+      },
+      "use_when": ["conceptual material after initial study", "audit of supposed understanding before an exam or design review"],
+      "avoid_when": ["pure fact sets with no explanatory structure", "as a first exposure method"],
+      "failure_modes": "- Fluent analogy that hides the gap instead of exposing it.\n- Skipping the loop-back step — the stall must trigger source revisits.",
+      "composes_with": [
+        {"target": "self-explanation", "relation": "packages", "note": "audience framing adds simplification pressure"},
+        {"target": "retrieval-practice", "relation": "packages", "note": "closed-book explanation is free recall"},
+        {"target": "metacognition-calibration", "relation": "implements", "note": "stall points are objective gap measurements"}
+      ],
+      "contrasts_with": ["rereading", "passive-summarization"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Explain public-key crypto with the open-padlock analogy until the stall arrives: 'wait — if anyone can lock, how does *signing* work? That's the padlock backwards...' The stall pinpoints exactly which half of the keypair asymmetry was never actually understood."
+      }
+    },
+    {
+      "id": "concrete-examples",
+      "name": "Concrete Examples",
+      "aliases": ["Exemplification", "Concreteness Fading", "Multiple Examples"],
+      "tier": "retrieval",
+      "definition": "Illustrate an abstract principle with multiple concrete, varied examples, then fade toward the abstract representation as understanding grows.",
+      "mechanism": "Abstract rules are hard to encode and retrieve cold; concrete cases give imageable, relatable hooks. Comparing *several varied* examples is the active ingredient — it lets the learner abstract the shared deep structure while discarding surface features. Concreteness fading transfers the grounding to a portable symbolic form.",
+      "how_to": "1. State the principle, then give 2–3 examples that differ on the surface but share the deep structure.\n2. Prompt the learner to identify what's common across them (the principle) and what's incidental.\n3. Fade: move from richly concrete to schematic to symbolic once the pattern is seen.\n4. Have the learner generate a fresh example as a transfer check.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.8,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Goldstone & Son", "year": 2005, "finding": "Concreteness fading (concrete → idealized) beat purely concrete or purely abstract training on transfer", "source_class": "cogpsych"},
+          {"authors": "Fyfe, McNeil, Son & Goldstone", "year": 2014, "finding": "Review: fading from concrete to abstract supports transfer better than either alone across math learning", "source_class": "cogpsych"},
+          {"authors": "Weinstein, Madan & Sumeracki", "year": 2018, "finding": "Practitioner review: varied concrete examples aid comprehension and transfer of abstract ideas", "source_class": "cogpsych"}
+        ],
+        "caveats": "A single example (or examples too alike) breeds surface-bound, non-transferring knowledge. Highly concrete/seductive examples can also anchor the learner to irrelevant details."
+      },
+      "use_when": ["abstract or formal principles", "definitions that learners can state but not apply", "before asking for transfer to novel cases"],
+      "avoid_when": ["material that is already concrete", "when a single vivid example would over-anchor (need varied set instead)"],
+      "failure_modes": "- One example → the learner learns the example, not the principle.\n- Surface-similar examples → no discrimination of deep vs. incidental features.\n- Never fading → the concept stays welded to its scaffold.",
+      "composes_with": [
+        {"target": "dual-coding", "relation": "multiplies-with", "note": "diagram the example, not just describe it"},
+        {"target": "interleaving", "relation": "sharpened-by", "note": "contrasting cases across categories drives schema discrimination"},
+        {"target": "worked-examples", "relation": "specializes-into", "note": "a worked example is a concrete example carried through a full solution"}
+      ],
+      "contrasts_with": ["abstract-only-instruction", "single-example-teaching"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Teaching 'confused deputy': show SSRF (a server tricked into fetching an internal URL), then CSRF (a browser tricked into sending an authenticated request), then a classic compiler-billing example. Same deep structure — an authorized agent misused by a third party — surfaced across three concrete skins, then named as the abstract principle."
+      }
+    },
+    {
+      "id": "worked-examples",
+      "name": "Worked Examples",
+      "aliases": ["Worked-Example Effect", "Faded Worked Examples"],
+      "tier": "retrieval",
+      "definition": "Give novices fully solved problems to study (each step shown and justified) rather than problems to solve unaided, then fade steps toward independent problem-solving as competence grows.",
+      "mechanism": "For novices, unguided problem-solving spends working memory on means-ends search and leaves none for schema construction. A worked example removes the search, freeing capacity to encode the solution *pattern*. Completion/faded examples gradually reintroduce the effort as schemas form.",
+      "how_to": "1. Present a complete, step-by-step solution with each step's rationale.\n2. Have the learner self-explain each step (the pairing that makes worked examples work).\n3. Fade: blank out the last step, then more steps (completion problems), until the learner solves unaided.\n4. Switch to retrieval practice / independent problems once competence is established.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.9,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Sweller & Cooper", "year": 1985, "finding": "Studying worked examples produced faster, better algebra learning than solving equivalent problems for novices", "source_class": "cogpsych"},
+          {"authors": "Renkl & Atkinson", "year": 2003, "finding": "Gradually fading worked steps into problem-solving improved learning and near/far transfer", "source_class": "cogpsych"},
+          {"authors": "Kalyuga, Ayres, Chandler & Sweller", "year": 2003, "finding": "Expertise reversal: worked examples help novices but hurt more advanced learners, for whom solving is better", "source_class": "cogpsych"}
+        ],
+        "caveats": "Expertise reversal is the governing rule — the technique's benefit shrinks and then reverses as the learner gains competence; the tutor must hand off to retrieval practice as mastery rises."
+      },
+      "use_when": ["novices meeting a new problem type", "multi-step procedures with high element interactivity", "before independent problem-solving"],
+      "avoid_when": ["learners who already have the schema (expertise reversal — switch to solving)", "single-step trivial problems"],
+      "failure_modes": "- Passive example-watching without self-explanation → shallow copying.\n- Keeping learners on worked examples past competence → wasted effort and boredom (expertise reversal).",
+      "composes_with": [
+        {"target": "self-explanation", "relation": "multiplies-with", "note": "worked examples only pay when each step is self-explained"},
+        {"target": "chunking", "relation": "builds", "note": "studied solutions become retrievable solution-schema chunks"},
+        {"target": "retrieval-practice", "relation": "hands-off-to", "note": "fade into independent solving as competence grows"}
+      ],
+      "contrasts_with": ["unguided-discovery", "problem-solving-for-novices"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Teaching a buffer-overflow exploit: first walk the complete solved chain (find offset → control EIP → locate a JMP ESP → place shellcode), justifying each step; then fade — the learner supplies the offset, then the gadget, then the whole chain — before handing them a fresh binary to own unaided."
+      }
+    },
+    {
+      "id": "generation-effect",
+      "name": "Generation Effect",
+      "aliases": ["Generative Learning", "Produce-Don't-Read"],
+      "tier": "retrieval",
+      "definition": "Information that the learner generates (produces, completes, or fills in) is remembered better than the same information read passively.",
+      "mechanism": "Producing an answer engages the target's semantic and cue–target relations more deeply than reading it, and commits the learner to a response that feedback can then correct. Overlaps with retrieval practice; the distinguishing case is generation with partial cues rather than pure recall.",
+      "how_to": "1. Replace 'read this' with 'produce this': cloze deletions, fill-in-the-blank, predict-the-output, complete-the-partial-solution.\n2. Keep the generation within reach (partial cues) so it succeeds with effort.\n3. Always give immediate feedback — generated errors stick too.\n4. Escalate from heavily cued generation toward free recall.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.9,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Slamecka & Graf", "year": 1978, "finding": "Words generated from a rule + cue were recalled better than read words — the original generation effect", "source_class": "cogpsych"},
+          {"authors": "Bertsch, Pesta, Wiscott & McDaniel", "year": 2007, "finding": "Meta-analysis: reliable generation advantage, g ≈ 0.40, moderated by difficulty and feedback", "source_class": "cogpsych"}
+        ],
+        "caveats": "Generated *errors* without feedback are encoded and persist. The benefit narrows when generation is too hard (nothing produced) or trivially easy. Cloze deletion in an SRS is applied generation."
+      },
+      "use_when": ["converting passive material into active production", "cloze/flashcard authoring", "predict-then-verify exercises"],
+      "avoid_when": ["no feedback loop available", "content the learner cannot yet generate at all (use worked examples first)"],
+      "failure_modes": "- Generation without feedback cements wrong answers.\n- 'Generation' so cued it is really reading (no productive effort).",
+      "composes_with": [
+        {"target": "retrieval-practice", "relation": "overlaps-with", "note": "free-recall retrieval is maximal generation; cloze is partial-cue generation"},
+        {"target": "spaced-practice", "relation": "scheduled-by", "note": "generated cloze items ride the SRS schedule"},
+        {"target": "pretesting", "relation": "related-to", "note": "guessing before instruction is generation under uncertainty"}
+      ],
+      "contrasts_with": ["passive-reading", "copying"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Instead of showing `chmod 750 file` and its meaning, prompt: 'Owner rwx, group r-x, others none → what octal?' The learner generates 750 (and can verify), encoding the permission-bit mapping far better than reading the mapping table."
+      }
+    },
+    {
+      "id": "pretesting",
+      "name": "Pretesting",
+      "aliases": ["Errorful Generation", "Prequestions", "Test-Before-Teach"],
+      "tier": "retrieval",
+      "definition": "Have learners attempt to answer questions on material *before* studying it, even though they will mostly fail, then teach the answers.",
+      "mechanism": "The failed retrieval attempt primes the memory system: it activates related knowledge, exposes the gap, and makes the subsequent correct answer more salient and better encoded when feedback arrives. Curiosity and attention to the answer both rise after a miss.",
+      "how_to": "1. Pose target questions before instruction; require a genuine attempt (a guess, not a shrug).\n2. Immediately follow with the correct answer / the lesson.\n3. Keep pretests focused on what the lesson will actually cover.\n4. Frame errors as expected and useful, to protect motivation.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.7,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Richland, Kornell & Kao", "year": 2009, "finding": "Answering prequestions (and failing) before reading improved later test performance on that material vs. extra study time", "source_class": "cogpsych"},
+          {"authors": "Kornell, Hays & Bjork", "year": 2009, "finding": "Unsuccessful retrieval attempts before study enhanced later learning of the answers", "source_class": "cogpsych"}
+        ],
+        "caveats": "Requires prompt feedback (an unanswered pretest just frustrates). Benefit concentrates on pretested and closely related content; may not spread to untested material. Motivation cost if failure isn't framed."
+      },
+      "use_when": ["opening move of a lesson", "activating prior knowledge before new material", "a Socratic tutor's first question on a topic"],
+      "avoid_when": ["no feedback will follow", "high-anxiety learners without careful error framing"],
+      "failure_modes": "- Pretest without a prompt answer → wasted frustration.\n- Testing content the lesson won't address → no priming payoff.",
+      "composes_with": [
+        {"target": "generation-effect", "relation": "instance-of", "note": "pretesting is generation under uncertainty before instruction"},
+        {"target": "retrieval-practice", "relation": "precedes", "note": "pretest opens, spaced retrieval consolidates"},
+        {"target": "elaborative-interrogation", "relation": "leads-into", "note": "a failed 'why' pretest primes the explanation that follows"}
+      ],
+      "contrasts_with": ["study-then-test-only"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Before teaching CSRF defenses, ask: 'How would you stop a forged cross-site request?' The learner guesses ('check the referer?') and mostly misses — then when the lesson introduces same-site cookies and CSRF tokens, those answers land against a primed, gap-aware slot."
+      }
+    },
+    {
+      "id": "metacognition-calibration",
+      "name": "Metacognition & Calibration",
+      "aliases": ["Judgments of Learning", "Calibration of Comprehension", "Self-Monitoring"],
+      "tier": "metacognitive",
+      "definition": "Monitoring what you do and don't know accurately, and using that judgment to allocate study — with an emphasis on correcting the systematic illusions that make monitoring wrong.",
+      "mechanism": "Learners judge learning from fluency cues (ease of reading, familiarity) that dissociate from actual retrievability, producing overconfidence. Delayed and test-based judgments realign the judgment with reality; accurate monitoring then drives efficient restudy allocation.",
+      "how_to": "1. Elicit a confidence prediction before checking (predict recall, then test).\n2. Compare prediction to outcome; score the miscalibration (e.g., Brier score).\n3. Prefer *delayed* judgments and actual retrieval over immediate 'feels known' ratings.\n4. Route study time to overconfident items — the ones judged known but failed.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.75,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Nelson & Dunlosky", "year": 1991, "finding": "Delayed judgments of learning were far more accurate than immediate ones (the delayed-JOL effect)", "source_class": "cogpsych"},
+          {"authors": "Koriat & Bjork", "year": 2005, "finding": "Foresight bias: presence of the answer at study inflates predicted future recall — an illusion of competence", "source_class": "cogpsych"}
+        ],
+        "caveats": "Monitoring accuracy is domain- and cue-dependent; simply asking for confidence doesn't fix it — the correction comes from delayed, test-based feedback that breaks the fluency illusion."
+      },
+      "use_when": ["deciding what to restudy or reschedule", "surfacing over/underconfidence to the learner", "driving a confidence-weighted scheduler"],
+      "avoid_when": ["as a substitute for actual testing (self-report alone is the weak part)"],
+      "failure_modes": "- Trusting immediate 'I know this' fluency (the core illusion).\n- Confidence collected but never checked against outcomes → no calibration.",
+      "composes_with": [
+        {"target": "retrieval-practice", "relation": "corrected-by", "note": "test outcomes are the ground truth that recalibrates judgment"},
+        {"target": "successive-relearning", "relation": "superseded-by", "note": "a measured criterion beats self-judged 'knowing it'"},
+        {"target": "spaced-practice", "relation": "informs", "note": "overconfident-but-failed items get scheduled sooner"}
+      ],
+      "contrasts_with": ["fluency-based-judgment", "self-rated-mastery"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Before each drill the tutor asks the learner to predict recall (0–100%); it Brier-scores prediction vs. outcome and flags systematically overconfident nodes — feeding the KG's confidence weights so bluffed-but-failed topics resurface sooner. Calibration data *is* scheduler input."
+      }
+    },
+    {
+      "id": "desirable-difficulties",
+      "name": "Desirable Difficulties",
+      "aliases": ["Bjork Desirable Difficulties", "Learning vs. Performance"],
+      "tier": "metacognitive",
+      "definition": "Umbrella principle: conditions that make practice harder and slower in the moment (spacing, interleaving, testing, generation, varied practice) often produce more durable, transferable learning — while easy conditions inflate immediate performance without learning.",
+      "mechanism": "Current performance (how fluent you are now) and learning (durable change in retrievability) are dissociable. Difficulties that force effortful reconstruction — retrieval, spacing, interleaving, generation — increase learning even as they depress momentary performance; fluent, massed, re-read practice does the reverse.",
+      "how_to": "1. Recognize when performance is high but learning may be low (massing, rereading, cueing).\n2. Deliberately inject the evidenced difficulties: space it, mix it, test it, make them generate it, vary the conditions.\n3. Keep difficulty *desirable* — effortful yet surmountable with feedback, not defeating.\n4. Warn learners that it will feel worse; use outcome data to prove it works.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.85,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bjork", "year": 1994, "finding": "Introduced 'desirable difficulties': manipulations that impair acquisition performance but enhance long-term retention and transfer", "source_class": "cogpsych"},
+          {"authors": "Soderstrom & Bjork", "year": 2015, "finding": "Review formalizing the learning-vs-performance distinction across spacing, interleaving, testing, and variability", "source_class": "cogpsych"}
+        ],
+        "caveats": "'Desirable' is load-bearing: a difficulty helps only if the learner has the resources to overcome it (feedback, prior knowledge). Undesirable difficulties (poor legibility, missing background) just hurt. Learners reliably misjudge which condition is better (they prefer the ineffective easy one)."
+      },
+      "use_when": ["choosing between an easy-feeling and an effortful practice design", "explaining to learners why the harder path is chosen", "as the meta-rationale behind spacing/interleaving/testing"],
+      "avoid_when": ["the learner lacks the prerequisites or feedback to overcome the difficulty (then it's just undesirable)"],
+      "failure_modes": "- Adding difficulty the learner can't overcome (no feedback, missing background) — undesirable, pure harm.\n- Optimizing for practice-session performance (looks great, learns little).",
+      "composes_with": [
+        {"target": "spaced-practice", "relation": "umbrella-over", "note": "spacing is a canonical desirable difficulty"},
+        {"target": "interleaving", "relation": "umbrella-over", "note": "mixing is a desirable difficulty"},
+        {"target": "retrieval-practice", "relation": "umbrella-over", "note": "effortful recall is a desirable difficulty"},
+        {"target": "generation-effect", "relation": "umbrella-over", "note": "producing rather than reading is a desirable difficulty"}
+      ],
+      "contrasts_with": ["fluency-based-study", "massed-rereading"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Re-reading the exploit walkthrough five times feels productive (high fluency) but teaches little; making the learner reconstruct the chain from memory, days apart, mixed with other CVEs, feels worse and harder — and that discomfort is the signature of the conditions that actually build durable skill."
+      }
+    }
+  ],
+  "taxonomy": {
+    "description": "How the techniques relate by function. Encoding gets material in; retrieval and generative strategies strengthen and integrate it; scheduling decides when practice happens; metacognitive strategies decide what to practice and govern the rest.",
+    "encoding": ["method-of-loci", "link-story-method", "major-system", "pao-system", "dominic-system", "number-shape", "number-rhyme", "peg-system", "mind-mapping", "elaborative-imagery", "bizarreness-exaggeration", "keyword-method", "chunking", "dual-coding"],
+    "retrieval": ["retrieval-practice", "generation-effect", "pretesting", "elaborative-interrogation", "self-explanation", "feynman-technique", "concrete-examples", "worked-examples"],
+    "scheduling": ["spaced-practice", "interleaving", "successive-relearning"],
+    "metacognitive": ["metacognition-calibration", "desirable-difficulties"]
+  },
+  "top_five": [
+    {"id": "retrieval-practice", "why": "Largest and most replicated learning effect; recalling beats restudying across ages, formats, and materials. It is the tutor's default verb — every 'known' node should be tested, not re-shown."},
+    {"id": "spaced-practice", "why": "The highest-leverage scheduling decision; distributing practice multiplies the benefit of everything else and is the substrate of the SRS the tutor already runs."},
+    {"id": "successive-relearning", "why": "A turnkey policy that operationalizes retrieval + spacing with a mastery criterion — the cleanest default for maintaining durable knowledge of core KG nodes."},
+    {"id": "worked-examples", "why": "The evidence-backed on-ramp for novices; studying faded solutions builds schemas without overloading working memory, and the expertise-reversal rule tells the tutor exactly when to hand off to retrieval practice."},
+    {"id": "interleaving", "why": "Exploits the KG's structure directly: scheduling confusable sibling nodes together forces discrimination and yields transfer that blocked practice cannot."}
+  ],
+  "myths": [
+    {"id": "learning-styles-matching", "name": "Learning Styles (matching modality to learner)", "claim": "Teaching to a learner's preferred 'style' (visual/auditory/kinesthetic) improves learning.", "why_false": "No credible evidence for the matching (meshing) hypothesis; controlled tests find matching instruction to stated style gives no benefit. Everyone benefits from dual coding regardless of 'style'.", "citation": {"authors": "Pashler, McDaniel, Rohrer & Bjork", "year": 2008, "source_class": "cogpsych"}},
+    {"id": "rereading-highlighting-works", "name": "Rereading & Highlighting Are Effective Study", "claim": "Rereading notes and highlighting text are good ways to learn.", "why_false": "Both rated low-utility: they inflate fluency and familiarity without building durable retrieval strength. Retrieval practice and spacing dominate them.", "citation": {"authors": "Dunlosky, Rawson, Marsh, Nathan & Willingham", "year": 2013, "source_class": "cogpsych"}},
+    {"id": "photographic-memory", "name": "Photographic / Eidetic Memory", "claim": "Some people have a literal photographic memory; champions are born with special brains.", "why_false": "No verified adult eidetikers; memory champions show normal memory and normal brain structure, using trainable spatial mnemonics — not innate hardware.", "citation": {"authors": "Maguire, Valentine, Wilding & Kapur", "year": 2003, "source_class": "cogpsych"}},
+    {"id": "learning-pyramid-cone", "name": "Learning Pyramid / Dale's Cone Percentages", "claim": "We remember 10% of what we read, 20% of what we hear, 90% of what we teach, etc.", "why_false": "The fixed retention percentages are fabricated — traceable to no study and often attached to invented citations. The numbers are pseudoscience even though 'teaching helps' is separately true.", "citation": {"authors": "Letrud & Hernes", "year": 2018, "source_class": "cogpsych"}},
+    {"id": "brain-training-far-transfer", "name": "Brain-Training Games Improve General Cognition", "claim": "Commercial brain-training transfers to broad real-world intelligence and memory.", "why_false": "Consensus review finds gains are largely task-specific; little credible evidence of far transfer to everyday cognitive performance.", "citation": {"authors": "Simons, Boot, Charness, Gathercole, Chabris, Hambrick & Stine-Morrow", "year": 2016, "source_class": "cogpsych"}},
+    {"id": "mozart-effect", "name": "The Mozart Effect", "claim": "Listening to Mozart durably raises intelligence.", "why_false": "Meta-analysis finds no reliable IQ benefit; early effects were tiny, transient arousal/mood effects, not lasting cognitive gains.", "citation": {"authors": "Pietschnig, Voracek & Formann", "year": 2010, "source_class": "cogpsych"}}
+  ]
+}

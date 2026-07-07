@@ -1,0 +1,60 @@
+[project]
+name = "salient-tutor"
+version = "0.0.1"
+description = "A spaced-repetition teaching agent built on the salient-core kernel."
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [{ name = "Jon O'Brien" }]
+dependencies = [
+    # Kept unpinned: the kernel is installed from git (CI: git@main; local:
+    # editable), never a package index — a PEP 440 pin makes pip query PyPI,
+    # where salient-core doesn't exist, and the install fails. Version is pinned
+    # at the git ref instead (CI installs @main).
+    "salient-core",
+    "claude-agent-sdk>=0.2.110,<0.3",
+    "pydantic>=2.0",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "fastapi>=0.100",
+    "uvicorn[standard]>=0.27",
+    "websockets>=12",   # /ws/tutor streaming bridge (also in uvicorn[standard])
+    "json-repair>=0.30",  # last-resort recovery of malformed model JSON (librarian extractions)
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.15.20",
+    "pytest>=8.0",
+    "pytest-subtests>=0.12",
+]
+# Diffusion illustrations (method-of-loci / mnemonic imagery) via the sibling
+# `imagegen` package, which drives ComfyUI on the ai.home GPU box. Optional and
+# opt-in (TUTOR_IMAGES=1) — salient_tutor.illustrations imports it lazily and
+# degrades to "unavailable" if absent, so the app boots without it.
+#   pip install -e ../imagegen
+images = ["imagegen"]
+
+[project.scripts]
+salient-tutor = "salient_tutor.cli:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["F", "B", "C4", "I", "UP"]
+ignore = ["F403", "F405"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B008", "B011"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

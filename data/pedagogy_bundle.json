@@ -1,0 +1,3829 @@
+{
+  "metadata": {
+    "schema_version": "1.0",
+    "generator": "graphify",
+    "corpus": "memory & study technique PDFs (pedagogical meta-layer for cybersecurity tutor) + evidence-graded learning-methods catalog (research-authored, 27 techniques) + evidence-graded learning-methods catalog (research-authored, 27 techniques) + evidence-graded learning-methods catalog (research-authored, 27 techniques) + evidence-graded learning-methods catalog (research-authored, 27 techniques) + evidence-graded learning-methods catalog (research-authored, 27 techniques)",
+    "intended_use": "Pedagogical knowledge graph for an LLM-based cybersecurity tutoring agent (red & blue team). Use this as the META-LAYER for teaching strategies; cyber domain content should be linked in via applies_to / teaches relations.",
+    "stats": {
+      "nodes": 73,
+      "edges": 75,
+      "hyperedges": 3,
+      "communities": 15
+    },
+    "node_id_format": "{parent_dir}_{filename}_{entity} all lowercase, snake_case",
+    "file_type_taxonomy": [
+      "code",
+      "document",
+      "paper",
+      "image",
+      "rationale",
+      "concept"
+    ],
+    "edge_relations": [
+      "calls",
+      "implements",
+      "references",
+      "cites",
+      "conceptually_related_to",
+      "shares_data_with",
+      "semantically_similar_to",
+      "rationale_for"
+    ],
+    "confidence_levels": {
+      "EXTRACTED": 1.0,
+      "INFERRED": "0.55-0.95",
+      "AMBIGUOUS": "0.1-0.3"
+    }
+  },
+  "node_type_counts": {
+    "document": 27,
+    "concept": 63,
+    "rationale": 34,
+    "paper": 1
+  },
+  "communities": [
+    {
+      "id": "0",
+      "label": "Memory Palace (Loci & Classical Mnemonics)",
+      "size": 12,
+      "node_ids": [
+        "extracted_how_to_pass_exams_journey_method",
+        "extracted_how_to_pass_exams_quotations",
+        "extracted_perfect_memory_mental_diary",
+        "extracted_perfect_memory_directions",
+        "concept_location_anchoring",
+        "concept_journey_method",
+        "concept_mental_diary",
+        "concept_ancient_greek_art_of_memory",
+        "rationale_open_spaces_for_loci",
+        "rationale_journey_logical_direction",
+        "entity_cicero",
+        "entity_ad_herennium"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_journey_method",
+          "label": "The Memory Palace (Method of Loci)"
+        },
+        {
+          "id": "extracted_how_to_pass_exams_quotations",
+          "label": "Never Forget a Quotation"
+        },
+        {
+          "id": "extracted_perfect_memory_mental_diary",
+          "label": "The Mental Diary"
+        },
+        {
+          "id": "extracted_perfect_memory_directions",
+          "label": "How to Remember Directions"
+        },
+        {
+          "id": "concept_location_anchoring",
+          "label": "Location Anchoring (Three-Dimensional Filing)"
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "label": "Numbers, Dates & Calendar Encoding",
+      "size": 11,
+      "node_ids": [
+        "extracted_how_to_pass_exams_language_of_numbers",
+        "extracted_perfect_memory_numbers",
+        "extracted_perfect_memory_calendar",
+        "concept_dominic_system",
+        "concept_number_shape_method",
+        "concept_number_rhyme_method",
+        "concept_calendar_calculation",
+        "concept_complex_images",
+        "rationale_people_over_objects",
+        "rationale_dominic_pairs_over_four_digits",
+        "rationale_action_interchangeability"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_language_of_numbers",
+          "label": "The Language of Numbers"
+        },
+        {
+          "id": "extracted_perfect_memory_numbers",
+          "label": "How to Remember Numbers"
+        },
+        {
+          "id": "extracted_perfect_memory_calendar",
+          "label": "Learning the 20th Century Calendar"
+        },
+        {
+          "id": "concept_dominic_system",
+          "label": "DOMINIC System (Number-to-Person Encoding)"
+        },
+        {
+          "id": "concept_number_shape_method",
+          "label": "Number-Shape Method"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "label": "Imagination, Association & Name Recall",
+      "size": 10,
+      "node_ids": [
+        "extracted_how_to_pass_exams_imagination",
+        "extracted_how_to_pass_exams_visualisation",
+        "extracted_perfect_memory_names",
+        "concept_imagination_muscle",
+        "concept_imagination_as_key",
+        "concept_association_principle",
+        "concept_first_impressions",
+        "concept_feature_link_names",
+        "rationale_first_impression_strength",
+        "concept_brad_pitt_factor"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_imagination",
+          "label": "Imagination and Association"
+        },
+        {
+          "id": "extracted_how_to_pass_exams_visualisation",
+          "label": "Visualisation"
+        },
+        {
+          "id": "extracted_perfect_memory_names",
+          "label": "Names and Faces (5 Techniques)"
+        },
+        {
+          "id": "concept_imagination_muscle",
+          "label": "Imagination as a Trainable Muscle"
+        },
+        {
+          "id": "concept_imagination_as_key",
+          "label": "Imagination is the Key to Memory"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "label": "Belief, Desire & Learning Mindset",
+      "size": 8,
+      "node_ids": [
+        "extracted_how_to_pass_exams_introduction",
+        "extracted_how_to_pass_exams_memory",
+        "extracted_perfect_memory_introduction",
+        "concept_desire_and_technique",
+        "concept_belief_and_confidence",
+        "entity_dominic_obrien",
+        "entity_creighton_carvello",
+        "entity_shereshevsky"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_introduction",
+          "label": "Introduction: Learning How to Learn"
+        },
+        {
+          "id": "extracted_how_to_pass_exams_memory",
+          "label": "Memory: Desire and Technique"
+        },
+        {
+          "id": "extracted_perfect_memory_introduction",
+          "label": "Introduction: Learning to Use Your Brain"
+        },
+        {
+          "id": "concept_desire_and_technique",
+          "label": "Desire and Technique as Memory Drivers"
+        },
+        {
+          "id": "concept_belief_and_confidence",
+          "label": "Belief and Confidence as Learning Prerequisites"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "label": "Mind Mapping & Note-taking",
+      "size": 8,
+      "node_ids": [
+        "extracted_how_to_pass_exams_mind_mapping",
+        "concept_mind_mapping",
+        "concept_brain_hemisphere_specialisation",
+        "concept_active_reading_querying",
+        "concept_essay_planning_via_mindmap",
+        "rationale_imagination_cortical_satisfaction",
+        "entity_tony_buzan",
+        "entity_roger_sperry"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_mind_mapping",
+          "label": "Note-taking and Mind Mapping"
+        },
+        {
+          "id": "concept_mind_mapping",
+          "label": "Mind Mapping (Buzan Radiant Thinking)"
+        },
+        {
+          "id": "concept_brain_hemisphere_specialisation",
+          "label": "Left/Right Brain Hemisphere Specialisation"
+        },
+        {
+          "id": "concept_active_reading_querying",
+          "label": "Active Reading: Planning, Central Message, Questioning"
+        },
+        {
+          "id": "concept_essay_planning_via_mindmap",
+          "label": "Essay Planning via Mind Map (Skeleton before Flesh)"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "label": "Link Method & Multi-Sensory Chains",
+      "size": 8,
+      "node_ids": [
+        "extracted_how_to_pass_exams_link_method",
+        "extracted_perfect_memory_lists",
+        "extracted_perfect_memory_time_travel",
+        "concept_senses_engagement",
+        "concept_exaggeration_bizarreness",
+        "concept_link_method",
+        "concept_time_travel_recall",
+        "rationale_visual_substitute_unvisualisable"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_link_method",
+          "label": "The Link Method"
+        },
+        {
+          "id": "extracted_perfect_memory_lists",
+          "label": "How to Remember Lists"
+        },
+        {
+          "id": "extracted_perfect_memory_time_travel",
+          "label": "Time Travel (Recalling Lost Memories)"
+        },
+        {
+          "id": "concept_senses_engagement",
+          "label": "Multi-Sensory Encoding (see/hear/touch/taste/smell/movement)"
+        },
+        {
+          "id": "concept_exaggeration_bizarreness",
+          "label": "Exaggeration and Bizarreness for Memorable Images"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "label": "Mental Filing Systems (In-Tray, Speeches)",
+      "size": 5,
+      "node_ids": [
+        "extracted_perfect_memory_mental_intray",
+        "extracted_perfect_memory_interviews",
+        "extracted_perfect_memory_speeches",
+        "concept_mental_intray",
+        "concept_mental_speech_file"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_perfect_memory_mental_intray",
+          "label": "The Mental In-Tray"
+        },
+        {
+          "id": "extracted_perfect_memory_interviews",
+          "label": "Memory and Job Interviews"
+        },
+        {
+          "id": "extracted_perfect_memory_speeches",
+          "label": "How to Remember Speeches"
+        },
+        {
+          "id": "concept_mental_intray",
+          "label": "Mental In-Tray (Chore Memory System)"
+        },
+        {
+          "id": "concept_mental_speech_file",
+          "label": "Mental Speech File (Key-Point Cueing)"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "label": "Speed Reading Techniques",
+      "size": 4,
+      "node_ids": [
+        "extracted_how_to_pass_exams_speed_reading",
+        "concept_speed_reading_finger_guide",
+        "concept_rhythm_eye_movement",
+        "concept_subvocalisation_elimination"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_speed_reading",
+          "label": "Speed Reading"
+        },
+        {
+          "id": "concept_speed_reading_finger_guide",
+          "label": "Finger/Pointer Speed Reading Technique"
+        },
+        {
+          "id": "concept_rhythm_eye_movement",
+          "label": "Rhythmic Eye Movement Without Backtracking"
+        },
+        {
+          "id": "concept_subvocalisation_elimination",
+          "label": "Subvocalisation Elimination for Speed Reading"
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "label": "Language Learning Memory",
+      "size": 1,
+      "node_ids": [
+        "extracted_how_to_pass_exams_languages"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_languages",
+          "label": "Easy Route to Learning Languages"
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "label": "Mathematical Shortcuts",
+      "size": 1,
+      "node_ids": [
+        "extracted_how_to_pass_exams_maths_shortcuts"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_maths_shortcuts",
+          "label": "Mathematical Shortcuts"
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "label": "Abstract Science Memory",
+      "size": 1,
+      "node_ids": [
+        "extracted_how_to_pass_exams_abstract_science"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_abstract_science",
+          "label": "Abstract World of Science"
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "label": "History Dates Recall",
+      "size": 1,
+      "node_ids": [
+        "extracted_how_to_pass_exams_history_dates"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_history_dates",
+          "label": "How to Remember History Dates"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "label": "Geography & Map Memory",
+      "size": 1,
+      "node_ids": [
+        "extracted_how_to_pass_exams_geographical_tips"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_geographical_tips",
+          "label": "Geographical Tips"
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "label": "Revision Planning",
+      "size": 1,
+      "node_ids": [
+        "extracted_how_to_pass_exams_revision_planning"
+      ],
+      "sample_nodes": [
+        {
+          "id": "extracted_how_to_pass_exams_revision_planning",
+          "label": "Planning Your Revision"
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "label": "Long-term vs Working Memory",
+      "size": 1,
+      "node_ids": [
+        "concept_master_vs_blank_discs"
+      ],
+      "sample_nodes": [
+        {
+          "id": "concept_master_vs_blank_discs",
+          "label": "Master vs. Blank Mental Discs (Long-term vs Working Memory)"
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "label": "Encoding & Mnemonic Techniques"
+    },
+    {
+      "id": 101,
+      "label": "Retrieval & Generative Practice"
+    },
+    {
+      "id": 102,
+      "label": "Scheduling (Spacing / Interleaving)"
+    },
+    {
+      "id": 103,
+      "label": "Metacognition & Desirable Difficulties"
+    }
+  ],
+  "nodes": [
+    {
+      "label": "Introduction: Learning How to Learn",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 64-123",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_introduction",
+      "community": 4,
+      "norm_label": "introduction: learning how to learn"
+    },
+    {
+      "label": "Speed Reading",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 124-358",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_speed_reading",
+      "community": 7,
+      "norm_label": "speed reading"
+    },
+    {
+      "label": "Note-taking and Mind Mapping",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 359-751",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_mind_mapping",
+      "community": 3,
+      "norm_label": "note-taking and mind mapping"
+    },
+    {
+      "label": "Memory: Desire and Technique",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 752-910",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_memory",
+      "community": 4,
+      "norm_label": "memory: desire and technique"
+    },
+    {
+      "label": "Imagination and Association",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 910-1047",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_imagination",
+      "community": 2,
+      "norm_label": "imagination and association"
+    },
+    {
+      "label": "The Link Method",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1048-1186",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_link_method",
+      "community": 5,
+      "norm_label": "the link method"
+    },
+    {
+      "label": "Visualisation",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1187-1279",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_visualisation",
+      "community": 2,
+      "norm_label": "visualisation"
+    },
+    {
+      "label": "The Memory Palace (Method of Loci)",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1280-1502",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_journey_method",
+      "community": 0,
+      "norm_label": "the memory palace (method of loci)"
+    },
+    {
+      "label": "The Language of Numbers",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1503-1998",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_language_of_numbers",
+      "community": 1,
+      "norm_label": "the language of numbers"
+    },
+    {
+      "label": "Never Forget a Quotation",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1999-2600",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_quotations",
+      "community": 0,
+      "norm_label": "never forget a quotation"
+    },
+    {
+      "label": "Easy Route to Learning Languages",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines ~2600-3000",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_languages",
+      "community": 12,
+      "norm_label": "easy route to learning languages"
+    },
+    {
+      "label": "Mathematical Shortcuts",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines ~3000-3300",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_maths_shortcuts",
+      "community": 13,
+      "norm_label": "mathematical shortcuts"
+    },
+    {
+      "label": "Abstract World of Science",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines ~3300-3600",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_abstract_science",
+      "community": 9,
+      "norm_label": "abstract world of science"
+    },
+    {
+      "label": "How to Remember History Dates",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines ~3600-3900",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_history_dates",
+      "community": 11,
+      "norm_label": "how to remember history dates"
+    },
+    {
+      "label": "Geographical Tips",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines ~3900-4200",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_geographical_tips",
+      "community": 10,
+      "norm_label": "geographical tips"
+    },
+    {
+      "label": "Planning Your Revision",
+      "file_type": "document",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines ~4400-4694",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_how_to_pass_exams_revision_planning",
+      "community": 14,
+      "norm_label": "planning your revision"
+    },
+    {
+      "label": "Introduction: Learning to Use Your Brain",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 42-134",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_introduction",
+      "community": 4,
+      "norm_label": "introduction: learning to use your brain"
+    },
+    {
+      "label": "How to Remember Lists",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 135-405",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_lists",
+      "community": 5,
+      "norm_label": "how to remember lists"
+    },
+    {
+      "label": "Names and Faces (5 Techniques)",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 406-737",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_names",
+      "community": 2,
+      "norm_label": "names and faces (5 techniques)"
+    },
+    {
+      "label": "How to Remember Numbers",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 738-1254",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_numbers",
+      "community": 1,
+      "norm_label": "how to remember numbers"
+    },
+    {
+      "label": "The Mental Diary",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1255-1451",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_mental_diary",
+      "community": 0,
+      "norm_label": "the mental diary"
+    },
+    {
+      "label": "The Mental In-Tray",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1452-1512",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_mental_intray",
+      "community": 6,
+      "norm_label": "the mental in-tray"
+    },
+    {
+      "label": "Memory and Job Interviews",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1513-1586",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_interviews",
+      "community": 6,
+      "norm_label": "memory and job interviews"
+    },
+    {
+      "label": "How to Remember Speeches",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1587-1706",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_speeches",
+      "community": 6,
+      "norm_label": "how to remember speeches"
+    },
+    {
+      "label": "How to Remember Directions",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1707-1860",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_directions",
+      "community": 0,
+      "norm_label": "how to remember directions"
+    },
+    {
+      "label": "Learning the 20th Century Calendar",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1861-2210",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_calendar",
+      "community": 1,
+      "norm_label": "learning the 20th century calendar"
+    },
+    {
+      "label": "Time Travel (Recalling Lost Memories)",
+      "file_type": "document",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 2211-2299",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Dominic O'Brien",
+      "contributor": null,
+      "id": "extracted_perfect_memory_time_travel",
+      "community": 5,
+      "norm_label": "time travel (recalling lost memories)"
+    },
+    {
+      "label": "Imagination as a Trainable Muscle",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 80-83, 824-826",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_imagination_muscle",
+      "community": 2,
+      "norm_label": "imagination as a trainable muscle"
+    },
+    {
+      "label": "Imagination is the Key to Memory",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "line 206",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_imagination_as_key",
+      "community": 2,
+      "norm_label": "imagination is the key to memory"
+    },
+    {
+      "label": "Desire and Technique as Memory Drivers",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 776-799",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_desire_and_technique",
+      "community": 4,
+      "norm_label": "desire and technique as memory drivers"
+    },
+    {
+      "label": "Association: the Mechanism of Memory",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 681, 1029-1047",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_association_principle",
+      "community": 2,
+      "norm_label": "association: the mechanism of memory"
+    },
+    {
+      "label": "Multi-Sensory Encoding (see/hear/touch/taste/smell/movement)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 249-253, 1319-1331",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_senses_engagement",
+      "community": 5,
+      "norm_label": "multi-sensory encoding (see/hear/touch/taste/smell/movement)"
+    },
+    {
+      "label": "Exaggeration and Bizarreness for Memorable Images",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 244-258, 1100-1124",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_exaggeration_bizarreness",
+      "community": 5,
+      "norm_label": "exaggeration and bizarreness for memorable images"
+    },
+    {
+      "label": "Location Anchoring (Three-Dimensional Filing)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 208-235, 1289-1502",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_location_anchoring",
+      "community": 0,
+      "norm_label": "location anchoring (three-dimensional filing)"
+    },
+    {
+      "label": "Memory Palace (Method of Loci)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 211-235, 1289-1502",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_journey_method",
+      "community": 0,
+      "norm_label": "memory palace (method of loci)"
+    },
+    {
+      "label": "Link Method (Sequential Chain of Bizarre Images)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1058-1186",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_link_method",
+      "community": 5,
+      "norm_label": "link method (sequential chain of bizarre images)"
+    },
+    {
+      "label": "DOMINIC System (Number-to-Person Encoding)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 780-1254",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_dominic_system",
+      "community": 1,
+      "norm_label": "dominic system (number-to-person encoding)"
+    },
+    {
+      "label": "Number-Shape Method",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 795-826",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_number_shape_method",
+      "community": 1,
+      "norm_label": "number-shape method"
+    },
+    {
+      "label": "Number-Rhyme Method",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1576-1601",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_number_rhyme_method",
+      "community": 1,
+      "norm_label": "number-rhyme method"
+    },
+    {
+      "label": "Mind Mapping (Buzan Radiant Thinking)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 512-632",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Tony Buzan",
+      "contributor": null,
+      "id": "concept_mind_mapping",
+      "community": 3,
+      "norm_label": "mind mapping (buzan radiant thinking)"
+    },
+    {
+      "label": "First Impressions / Look-alike Linking for Names",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 456-560",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_first_impressions",
+      "community": 2,
+      "norm_label": "first impressions / look-alike linking for names"
+    },
+    {
+      "label": "Master vs. Blank Mental Discs (Long-term vs Working Memory)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1411-1430",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_master_vs_blank_discs",
+      "community": 8,
+      "norm_label": "master vs. blank mental discs (long-term vs working memory)"
+    },
+    {
+      "label": "Mental Diary (31-Stage Journey per Month)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1255-1451",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_mental_diary",
+      "community": 0,
+      "norm_label": "mental diary (31-stage journey per month)"
+    },
+    {
+      "label": "Mental In-Tray (Chore Memory System)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1452-1586",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_mental_intray",
+      "community": 6,
+      "norm_label": "mental in-tray (chore memory system)"
+    },
+    {
+      "label": "Mental Speech File (Key-Point Cueing)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1587-1706",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_mental_speech_file",
+      "community": 6,
+      "norm_label": "mental speech file (key-point cueing)"
+    },
+    {
+      "label": "Finger/Pointer Speed Reading Technique",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 301-358",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_speed_reading_finger_guide",
+      "community": 7,
+      "norm_label": "finger/pointer speed reading technique"
+    },
+    {
+      "label": "Rhythmic Eye Movement Without Backtracking",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 282-300",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_rhythm_eye_movement",
+      "community": 7,
+      "norm_label": "rhythmic eye movement without backtracking"
+    },
+    {
+      "label": "Time Travel Recall (Revisiting Past Locations)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 2211-2299",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_time_travel_recall",
+      "community": 5,
+      "norm_label": "time travel recall (revisiting past locations)"
+    },
+    {
+      "label": "Belief and Confidence as Learning Prerequisites",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 96-123",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_belief_and_confidence",
+      "community": 4,
+      "norm_label": "belief and confidence as learning prerequisites"
+    },
+    {
+      "label": "Ancient Greek/Roman Art of Memory (Mnemotechnics)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 114-126, 1432-1490",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_ancient_greek_art_of_memory",
+      "community": 0,
+      "norm_label": "ancient greek/roman art of memory (mnemotechnics)"
+    },
+    {
+      "label": "Day-of-Week Calendar Calculation Method",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1861-2210",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_calendar_calculation",
+      "community": 1,
+      "norm_label": "day-of-week calendar calculation method"
+    },
+    {
+      "label": "Complex Images (Person-Action-Person Chains)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1188-1205, 1951-1977",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_complex_images",
+      "community": 1,
+      "norm_label": "complex images (person-action-person chains)"
+    },
+    {
+      "label": "Feature-Link Technique (Name-Appearance Match)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 666-706",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_feature_link_names",
+      "community": 2,
+      "norm_label": "feature-link technique (name-appearance match)"
+    },
+    {
+      "label": "Active Reading: Planning, Central Message, Questioning",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 659-691",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_active_reading_querying",
+      "community": 3,
+      "norm_label": "active reading: planning, central message, questioning"
+    },
+    {
+      "label": "Essay Planning via Mind Map (Skeleton before Flesh)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 692-732",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_essay_planning_via_mindmap",
+      "community": 3,
+      "norm_label": "essay planning via mind map (skeleton before flesh)"
+    },
+    {
+      "label": "Why people beat objects as memory pegs (Brad Pitt factor)",
+      "file_type": "rationale",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1259-1279",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_people_over_objects",
+      "community": 1,
+      "norm_label": "why people beat objects as memory pegs (brad pitt factor)"
+    },
+    {
+      "label": "Why rhyme/substitution works for unvisualisable words (paint/faint)",
+      "file_type": "rationale",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1119-1125",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_visual_substitute_unvisualisable",
+      "community": 5,
+      "norm_label": "why rhyme/substitution works for unvisualisable words (paint/faint)"
+    },
+    {
+      "label": "Why first-impression associations must be captured instantly",
+      "file_type": "rationale",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 461-487, 555-557",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_first_impression_strength",
+      "community": 2,
+      "norm_label": "why first-impression associations must be captured instantly"
+    },
+    {
+      "label": "Why open spaces beat crowded venues for memory loci",
+      "file_type": "rationale",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1126-1136, 2156-2157",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_open_spaces_for_loci",
+      "community": 0,
+      "norm_label": "why open spaces beat crowded venues for memory loci"
+    },
+    {
+      "label": "Why DOMINIC uses 2-digit pairs (10k four-digit combos infeasible)",
+      "file_type": "rationale",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1715-1725",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_dominic_pairs_over_four_digits",
+      "community": 1,
+      "norm_label": "why dominic uses 2-digit pairs (10k four-digit combos infeasible)"
+    },
+    {
+      "label": "Why actions are interchangeable across people for chaining",
+      "file_type": "rationale",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 936-950, 1179-1187",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_action_interchangeability",
+      "community": 1,
+      "norm_label": "why actions are interchangeable across people for chaining"
+    },
+    {
+      "label": "Why a journey must follow a logical one-way direction",
+      "file_type": "rationale",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 226-230, 1304-1306",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_journey_logical_direction",
+      "community": 0,
+      "norm_label": "why a journey must follow a logical one-way direction"
+    },
+    {
+      "label": "Tony Buzan (Foreword Author & Mind Map Inventor)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 32, 513-515",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "entity_tony_buzan",
+      "community": 3,
+      "norm_label": "tony buzan (foreword author & mind map inventor)"
+    },
+    {
+      "label": "Dominic O'Brien (Author, 8x World Memory Champion)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 33-41",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "entity_dominic_obrien",
+      "community": 4,
+      "norm_label": "dominic o'brien (author, 8x world memory champion)"
+    },
+    {
+      "label": "Creighton Carvello (Pi Record Holder who inspired O'Brien)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 12-15, 68-75",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "entity_creighton_carvello",
+      "community": 4,
+      "norm_label": "creighton carvello (pi record holder who inspired o'brien)"
+    },
+    {
+      "label": "Roger Sperry (Nobel 1981, Split-Brain Research)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 465-481",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "entity_roger_sperry",
+      "community": 3,
+      "norm_label": "roger sperry (nobel 1981, split-brain research)"
+    },
+    {
+      "label": "Shereshevsky 'S' (Russian Mnemonist)",
+      "file_type": "concept",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 118-126",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "entity_shereshevsky",
+      "community": 4,
+      "norm_label": "shereshevsky 's' (russian mnemonist)"
+    },
+    {
+      "label": "Cicero (Roman Orator, De Oratore)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 2238-2245",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "entity_cicero",
+      "community": 0,
+      "norm_label": "cicero (roman orator, de oratore)"
+    },
+    {
+      "label": "Ad Herennium (Anonymous Roman Rhetoric Treatise)",
+      "file_type": "paper",
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1458-1469",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Anonymous Roman Rhetorician",
+      "contributor": null,
+      "id": "entity_ad_herennium",
+      "community": 0,
+      "norm_label": "ad herennium (anonymous roman rhetoric treatise)"
+    },
+    {
+      "label": "The Brad Pitt Factor (Why vivid impressions matter more than HD imagery)",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1259-1279",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_brad_pitt_factor",
+      "community": 2,
+      "norm_label": "the brad pitt factor (why vivid impressions matter more than hd imagery)"
+    },
+    {
+      "label": "Subvocalisation Elimination for Speed Reading",
+      "file_type": "concept",
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 265-279",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_subvocalisation_elimination",
+      "community": 7,
+      "norm_label": "subvocalisation elimination for speed reading"
+    },
+    {
+      "label": "Method of Loci",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 1-20",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_method_of_loci",
+      "community": 100,
+      "norm_label": "method of loci"
+    },
+    {
+      "label": "Why Method of Loci works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 22-31",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_method_of_loci",
+      "community": 100,
+      "norm_label": "why method of loci works"
+    },
+    {
+      "label": "Link / Story Method",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 33-51",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_link_story_method",
+      "community": 100,
+      "norm_label": "link / story method"
+    },
+    {
+      "label": "Why Link / Story Method works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 53-61",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_link_story_method",
+      "community": 100,
+      "norm_label": "why link / story method works"
+    },
+    {
+      "label": "Major System",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 63-81",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_major_system",
+      "community": 100,
+      "norm_label": "major system"
+    },
+    {
+      "label": "Why Major System works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 83-91",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_major_system",
+      "community": 100,
+      "norm_label": "why major system works"
+    },
+    {
+      "label": "PAO (Person–Action–Object)",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 93-111",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_pao_system",
+      "community": 100,
+      "norm_label": "pao (person–action–object)"
+    },
+    {
+      "label": "Why PAO (Person–Action–Object) works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 113-121",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_pao_system",
+      "community": 100,
+      "norm_label": "why pao (person–action–object) works"
+    },
+    {
+      "label": "Dominic System",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 123-140",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_dominic_system",
+      "community": 100,
+      "norm_label": "dominic system"
+    },
+    {
+      "label": "Why Dominic System works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 142-149",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_dominic_system",
+      "community": 100,
+      "norm_label": "why dominic system works"
+    },
+    {
+      "label": "Number–Shape System",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 151-167",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_number_shape",
+      "community": 100,
+      "norm_label": "number–shape system"
+    },
+    {
+      "label": "Why Number–Shape System works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 169-176",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_number_shape",
+      "community": 100,
+      "norm_label": "why number–shape system works"
+    },
+    {
+      "label": "Number–Rhyme System",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 178-194",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_number_rhyme",
+      "community": 100,
+      "norm_label": "number–rhyme system"
+    },
+    {
+      "label": "Why Number–Rhyme System works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 196-204",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_number_rhyme",
+      "community": 100,
+      "norm_label": "why number–rhyme system works"
+    },
+    {
+      "label": "Peg Systems (general)",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 206-223",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_peg_system",
+      "community": 100,
+      "norm_label": "peg systems (general)"
+    },
+    {
+      "label": "Why Peg Systems (general) works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 225-234",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_peg_system",
+      "community": 100,
+      "norm_label": "why peg systems (general) works"
+    },
+    {
+      "label": "Mind Mapping",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 236-253",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_mind_mapping",
+      "community": 100,
+      "norm_label": "mind mapping"
+    },
+    {
+      "label": "Why Mind Mapping works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 255-263",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_mind_mapping",
+      "community": 100,
+      "norm_label": "why mind mapping works"
+    },
+    {
+      "label": "Multi-Sensory / Elaborative Imagery",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 265-282",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_elaborative_imagery",
+      "community": 100,
+      "norm_label": "multi-sensory / elaborative imagery"
+    },
+    {
+      "label": "Why Multi-Sensory / Elaborative Imagery works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 284-292",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_elaborative_imagery",
+      "community": 100,
+      "norm_label": "why multi-sensory / elaborative imagery works"
+    },
+    {
+      "label": "Exaggeration / Bizarreness",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 294-311",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_bizarreness_exaggeration",
+      "community": 100,
+      "norm_label": "exaggeration / bizarreness"
+    },
+    {
+      "label": "Why Exaggeration / Bizarreness works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 313-322",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_bizarreness_exaggeration",
+      "community": 100,
+      "norm_label": "why exaggeration / bizarreness works"
+    },
+    {
+      "label": "Keyword Method",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 324-341",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_keyword_method",
+      "community": 100,
+      "norm_label": "keyword method"
+    },
+    {
+      "label": "Why Keyword Method works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 343-352",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_keyword_method",
+      "community": 100,
+      "norm_label": "why keyword method works"
+    },
+    {
+      "label": "Cognitive Chunking",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 354-371",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_chunking",
+      "community": 100,
+      "norm_label": "cognitive chunking"
+    },
+    {
+      "label": "Why Cognitive Chunking works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 373-382",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_chunking",
+      "community": 100,
+      "norm_label": "why cognitive chunking works"
+    },
+    {
+      "label": "Dual Coding",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 384-401",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_dual_coding",
+      "community": 100,
+      "norm_label": "dual coding"
+    },
+    {
+      "label": "Why Dual Coding works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 403-411",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_dual_coding",
+      "community": 100,
+      "norm_label": "why dual coding works"
+    },
+    {
+      "label": "Retrieval Practice",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 413-430",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_retrieval_practice",
+      "community": 101,
+      "norm_label": "retrieval practice"
+    },
+    {
+      "label": "Why Retrieval Practice works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 432-441",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_retrieval_practice",
+      "community": 101,
+      "norm_label": "why retrieval practice works"
+    },
+    {
+      "label": "Spaced / Distributed Practice",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 443-460",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_spaced_practice",
+      "community": 102,
+      "norm_label": "spaced / distributed practice"
+    },
+    {
+      "label": "Why Spaced / Distributed Practice works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 462-471",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_spaced_practice",
+      "community": 102,
+      "norm_label": "why spaced / distributed practice works"
+    },
+    {
+      "label": "Interleaving",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 473-490",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_interleaving",
+      "community": 102,
+      "norm_label": "interleaving"
+    },
+    {
+      "label": "Why Interleaving works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 492-501",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_interleaving",
+      "community": 102,
+      "norm_label": "why interleaving works"
+    },
+    {
+      "label": "Successive Relearning",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 503-520",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_successive_relearning",
+      "community": 102,
+      "norm_label": "successive relearning"
+    },
+    {
+      "label": "Why Successive Relearning works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 522-530",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_successive_relearning",
+      "community": 102,
+      "norm_label": "why successive relearning works"
+    },
+    {
+      "label": "Elaboration / Elaborative Interrogation",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 532-549",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_elaborative_interrogation",
+      "community": 101,
+      "norm_label": "elaboration / elaborative interrogation"
+    },
+    {
+      "label": "Why Elaboration / Elaborative Interrogation works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 551-559",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_elaborative_interrogation",
+      "community": 101,
+      "norm_label": "why elaboration / elaborative interrogation works"
+    },
+    {
+      "label": "Self-Explanation",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 561-578",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_self_explanation",
+      "community": 101,
+      "norm_label": "self-explanation"
+    },
+    {
+      "label": "Why Self-Explanation works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 580-589",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_self_explanation",
+      "community": 101,
+      "norm_label": "why self-explanation works"
+    },
+    {
+      "label": "Feynman Technique",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 591-608",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_feynman_technique",
+      "community": 101,
+      "norm_label": "feynman technique"
+    },
+    {
+      "label": "Why Feynman Technique works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 610-618",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_feynman_technique",
+      "community": 101,
+      "norm_label": "why feynman technique works"
+    },
+    {
+      "label": "Concrete Examples",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 620-638",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_concrete_examples",
+      "community": 101,
+      "norm_label": "concrete examples"
+    },
+    {
+      "label": "Why Concrete Examples works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 640-649",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_concrete_examples",
+      "community": 101,
+      "norm_label": "why concrete examples works"
+    },
+    {
+      "label": "Worked Examples",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 651-668",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_worked_examples",
+      "community": 101,
+      "norm_label": "worked examples"
+    },
+    {
+      "label": "Why Worked Examples works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 670-679",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_worked_examples",
+      "community": 101,
+      "norm_label": "why worked examples works"
+    },
+    {
+      "label": "Generation Effect",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 681-698",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_generation_effect",
+      "community": 101,
+      "norm_label": "generation effect"
+    },
+    {
+      "label": "Why Generation Effect works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 700-708",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_generation_effect",
+      "community": 101,
+      "norm_label": "why generation effect works"
+    },
+    {
+      "label": "Pretesting",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 710-727",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_pretesting",
+      "community": 101,
+      "norm_label": "pretesting"
+    },
+    {
+      "label": "Why Pretesting works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 729-737",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_pretesting",
+      "community": 101,
+      "norm_label": "why pretesting works"
+    },
+    {
+      "label": "Metacognition & Calibration",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 739-756",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_metacognition_calibration",
+      "community": 103,
+      "norm_label": "metacognition & calibration"
+    },
+    {
+      "label": "Why Metacognition & Calibration works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 758-766",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_metacognition_calibration",
+      "community": 103,
+      "norm_label": "why metacognition & calibration works"
+    },
+    {
+      "label": "Desirable Difficulties",
+      "file_type": "concept",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 768-785",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_desirable_difficulties",
+      "community": 103,
+      "norm_label": "desirable difficulties"
+    },
+    {
+      "label": "Why Desirable Difficulties works",
+      "file_type": "rationale",
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 787-795",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_desirable_difficulties",
+      "community": 103,
+      "norm_label": "why desirable difficulties works"
+    }
+  ],
+  "edges": [
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 96-123",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_introduction",
+      "target": "concept_belief_and_confidence"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 12-15, 68-75",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_introduction",
+      "target": "entity_creighton_carvello"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1-29",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_introduction",
+      "target": "entity_dominic_obrien"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 282-300",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_speed_reading",
+      "target": "concept_rhythm_eye_movement"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 301-358",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_speed_reading",
+      "target": "concept_speed_reading_finger_guide"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 265-279",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_speed_reading",
+      "target": "concept_subvocalisation_elimination"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 659-691",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_mind_mapping",
+      "target": "concept_active_reading_querying"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 692-732",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_mind_mapping",
+      "target": "concept_essay_planning_via_mindmap"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 512-632",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_mind_mapping",
+      "target": "concept_mind_mapping"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 32, 513-515",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_mind_mapping",
+      "target": "entity_tony_buzan"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 776-799",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_memory",
+      "target": "concept_desire_and_technique"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1029-1047",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_imagination",
+      "target": "concept_association_principle"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 910-947",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_imagination",
+      "target": "concept_imagination_muscle"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1103-1112",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_link_method",
+      "target": "concept_exaggeration_bizarreness"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1058-1186",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_link_method",
+      "target": "concept_link_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1073-1077",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_link_method",
+      "target": "concept_senses_engagement"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1259-1279",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_visualisation",
+      "target": "concept_brad_pitt_factor"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1280-1502",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_journey_method",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1711-1998",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_language_of_numbers",
+      "target": "concept_dominic_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1576-1601",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_language_of_numbers",
+      "target": "concept_number_rhyme_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1656-1709",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_language_of_numbers",
+      "target": "concept_number_shape_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 2145-2164",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_quotations",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 2238-2245",
+      "weight": 1.0,
+      "source": "extracted_how_to_pass_exams_quotations",
+      "target": "entity_cicero"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "line 206",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_introduction",
+      "target": "concept_imagination_as_key"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 33-41",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_introduction",
+      "target": "entity_dominic_obrien"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 118-126",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_introduction",
+      "target": "entity_shereshevsky"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 366-376",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_lists",
+      "target": "concept_association_principle"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 254-258",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_lists",
+      "target": "concept_exaggeration_bizarreness"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 195-235",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_lists",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 211-235",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_lists",
+      "target": "concept_location_anchoring"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 249-253",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_lists",
+      "target": "concept_senses_engagement"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 456-560",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_names",
+      "target": "concept_first_impressions"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 780-1254",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_numbers",
+      "target": "concept_dominic_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 795-826",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_numbers",
+      "target": "concept_number_shape_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1255-1451",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_mental_diary",
+      "target": "concept_mental_diary"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1452-1512",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_mental_intray",
+      "target": "concept_mental_intray"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1547-1553",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_interviews",
+      "target": "concept_mental_intray"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": null,
+      "weight": 0.7,
+      "source": "extracted_perfect_memory_speeches",
+      "target": "concept_mental_intray"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1587-1706",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_speeches",
+      "target": "concept_mental_speech_file"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1750-1753",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_directions",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1861-2210",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_calendar",
+      "target": "concept_calendar_calculation"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 2211-2299",
+      "weight": 1.0,
+      "source": "extracted_perfect_memory_time_travel",
+      "target": "concept_time_travel_recall"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "concept_imagination_muscle",
+      "target": "concept_imagination_as_key"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": null,
+      "weight": 0.8,
+      "source": "concept_belief_and_confidence",
+      "target": "concept_desire_and_technique"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 555-557",
+      "weight": 1.0,
+      "source": "concept_association_principle",
+      "target": "rationale_first_impression_strength"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 2259-2272",
+      "weight": 1.0,
+      "source": "concept_time_travel_recall",
+      "target": "concept_senses_engagement"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1119-1125",
+      "weight": 1.0,
+      "source": "concept_exaggeration_bizarreness",
+      "target": "rationale_visual_substitute_unvisualisable"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 208-235",
+      "weight": 1.0,
+      "source": "concept_location_anchoring",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1276-1316",
+      "weight": 1.0,
+      "source": "concept_mental_diary",
+      "target": "concept_location_anchoring"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1456-1476",
+      "weight": 1.0,
+      "source": "concept_journey_method",
+      "target": "concept_ancient_greek_art_of_memory"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 226-230",
+      "weight": 1.0,
+      "source": "concept_journey_method",
+      "target": "rationale_journey_logical_direction"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1126-1136",
+      "weight": 1.0,
+      "source": "concept_journey_method",
+      "target": "rationale_open_spaces_for_loci"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": null,
+      "weight": 0.8,
+      "source": "concept_link_method",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1276-1359",
+      "weight": 1.0,
+      "source": "concept_mental_diary",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1473-1481",
+      "weight": 1.0,
+      "source": "concept_mental_intray",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1618-1622",
+      "weight": 1.0,
+      "source": "concept_mental_speech_file",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1458-1469",
+      "weight": 1.0,
+      "source": "entity_ad_herennium",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 2238-2245",
+      "weight": 1.0,
+      "source": "entity_cicero",
+      "target": "concept_journey_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1900-1910",
+      "weight": 1.0,
+      "source": "concept_calendar_calculation",
+      "target": "concept_dominic_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1188-1205",
+      "weight": 1.0,
+      "source": "concept_dominic_system",
+      "target": "concept_complex_images"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 936-950",
+      "weight": 1.0,
+      "source": "concept_dominic_system",
+      "target": "rationale_action_interchangeability"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1715-1725",
+      "weight": 1.0,
+      "source": "concept_dominic_system",
+      "target": "rationale_dominic_pairs_over_four_digits"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 1259-1279",
+      "weight": 1.0,
+      "source": "concept_dominic_system",
+      "target": "rationale_people_over_objects"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1696-1698",
+      "weight": 1.0,
+      "source": "concept_mental_speech_file",
+      "target": "concept_dominic_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1928-1929, 2047-2064",
+      "weight": 1.0,
+      "source": "concept_calendar_calculation",
+      "target": "concept_number_shape_method"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": null,
+      "weight": 0.9,
+      "source": "concept_number_shape_method",
+      "target": "concept_number_rhyme_method"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": "lines 513-515",
+      "weight": 1.0,
+      "source": "concept_mind_mapping",
+      "target": "entity_tony_buzan"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "extracted/how-to-pass-exams.txt",
+      "source_location": null,
+      "weight": 0.8,
+      "source": "concept_first_impressions",
+      "target": "concept_brad_pitt_factor"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 666-706",
+      "weight": 1.0,
+      "source": "concept_first_impressions",
+      "target": "concept_feature_link_names"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 461-487",
+      "weight": 1.0,
+      "source": "concept_first_impressions",
+      "target": "rationale_first_impression_strength"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/perfect-memory.txt",
+      "source_location": "lines 1179-1187",
+      "weight": 1.0,
+      "source": "concept_complex_images",
+      "target": "rationale_action_interchangeability"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 22-31",
+      "weight": 1.0,
+      "source": "rationale_method_of_loci",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 1-20",
+      "weight": 1.0,
+      "source": "concept_method_of_loci",
+      "target": "concept_major_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 1-20",
+      "weight": 1.0,
+      "source": "concept_method_of_loci",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 1-20",
+      "weight": 1.0,
+      "source": "concept_method_of_loci",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 53-61",
+      "weight": 1.0,
+      "source": "rationale_link_story_method",
+      "target": "concept_link_story_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 33-51",
+      "weight": 1.0,
+      "source": "concept_link_story_method",
+      "target": "concept_bizarreness_exaggeration"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 33-51",
+      "weight": 1.0,
+      "source": "concept_link_story_method",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 83-91",
+      "weight": 1.0,
+      "source": "rationale_major_system",
+      "target": "concept_major_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 63-81",
+      "weight": 1.0,
+      "source": "concept_major_system",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 63-81",
+      "weight": 1.0,
+      "source": "concept_major_system",
+      "target": "concept_pao_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 63-81",
+      "weight": 1.0,
+      "source": "concept_major_system",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 113-121",
+      "weight": 1.0,
+      "source": "rationale_pao_system",
+      "target": "concept_pao_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 93-111",
+      "weight": 1.0,
+      "source": "concept_pao_system",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 93-111",
+      "weight": 1.0,
+      "source": "concept_pao_system",
+      "target": "concept_major_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 93-111",
+      "weight": 1.0,
+      "source": "concept_pao_system",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 142-149",
+      "weight": 1.0,
+      "source": "rationale_dominic_system",
+      "target": "concept_dominic_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 123-140",
+      "weight": 1.0,
+      "source": "concept_dominic_system",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 123-140",
+      "weight": 1.0,
+      "source": "concept_dominic_system",
+      "target": "concept_pao_system"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 169-176",
+      "weight": 1.0,
+      "source": "rationale_number_shape",
+      "target": "concept_number_shape"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 151-167",
+      "weight": 1.0,
+      "source": "concept_number_shape",
+      "target": "concept_peg_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 151-167",
+      "weight": 1.0,
+      "source": "concept_number_shape",
+      "target": "concept_elaborative_imagery"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 196-204",
+      "weight": 1.0,
+      "source": "rationale_number_rhyme",
+      "target": "concept_number_rhyme"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 178-194",
+      "weight": 1.0,
+      "source": "concept_number_rhyme",
+      "target": "concept_peg_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 178-194",
+      "weight": 1.0,
+      "source": "concept_number_rhyme",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 225-234",
+      "weight": 1.0,
+      "source": "rationale_peg_system",
+      "target": "concept_peg_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 206-223",
+      "weight": 1.0,
+      "source": "concept_peg_system",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 206-223",
+      "weight": 1.0,
+      "source": "concept_peg_system",
+      "target": "concept_major_system"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 255-263",
+      "weight": 1.0,
+      "source": "rationale_mind_mapping",
+      "target": "concept_mind_mapping"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 236-253",
+      "weight": 1.0,
+      "source": "concept_mind_mapping",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 236-253",
+      "weight": 1.0,
+      "source": "concept_mind_mapping",
+      "target": "concept_chunking"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 284-292",
+      "weight": 1.0,
+      "source": "rationale_elaborative_imagery",
+      "target": "concept_elaborative_imagery"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 265-282",
+      "weight": 1.0,
+      "source": "concept_elaborative_imagery",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 265-282",
+      "weight": 1.0,
+      "source": "concept_elaborative_imagery",
+      "target": "concept_keyword_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 265-282",
+      "weight": 1.0,
+      "source": "concept_elaborative_imagery",
+      "target": "concept_dual_coding"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 313-322",
+      "weight": 1.0,
+      "source": "rationale_bizarreness_exaggeration",
+      "target": "concept_bizarreness_exaggeration"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 294-311",
+      "weight": 1.0,
+      "source": "concept_bizarreness_exaggeration",
+      "target": "concept_link_story_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 294-311",
+      "weight": 1.0,
+      "source": "concept_bizarreness_exaggeration",
+      "target": "concept_elaborative_imagery"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 343-352",
+      "weight": 1.0,
+      "source": "rationale_keyword_method",
+      "target": "concept_keyword_method"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 324-341",
+      "weight": 1.0,
+      "source": "concept_keyword_method",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 324-341",
+      "weight": 1.0,
+      "source": "concept_keyword_method",
+      "target": "concept_elaborative_imagery"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 324-341",
+      "weight": 1.0,
+      "source": "concept_keyword_method",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 373-382",
+      "weight": 1.0,
+      "source": "rationale_chunking",
+      "target": "concept_chunking"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 354-371",
+      "weight": 1.0,
+      "source": "concept_chunking",
+      "target": "concept_major_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 354-371",
+      "weight": 1.0,
+      "source": "concept_chunking",
+      "target": "concept_worked_examples"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 354-371",
+      "weight": 1.0,
+      "source": "concept_chunking",
+      "target": "concept_method_of_loci"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 403-411",
+      "weight": 1.0,
+      "source": "rationale_dual_coding",
+      "target": "concept_dual_coding"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 384-401",
+      "weight": 1.0,
+      "source": "concept_dual_coding",
+      "target": "concept_concrete_examples"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 384-401",
+      "weight": 1.0,
+      "source": "concept_dual_coding",
+      "target": "concept_elaborative_imagery"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 432-441",
+      "weight": 1.0,
+      "source": "rationale_retrieval_practice",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 413-430",
+      "weight": 1.0,
+      "source": "concept_retrieval_practice",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 413-430",
+      "weight": 1.0,
+      "source": "concept_retrieval_practice",
+      "target": "concept_successive_relearning"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 413-430",
+      "weight": 1.0,
+      "source": "concept_retrieval_practice",
+      "target": "concept_metacognition_calibration"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 462-471",
+      "weight": 1.0,
+      "source": "rationale_spaced_practice",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 443-460",
+      "weight": 1.0,
+      "source": "concept_spaced_practice",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 443-460",
+      "weight": 1.0,
+      "source": "concept_spaced_practice",
+      "target": "concept_interleaving"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 443-460",
+      "weight": 1.0,
+      "source": "concept_spaced_practice",
+      "target": "concept_successive_relearning"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 492-501",
+      "weight": 1.0,
+      "source": "rationale_interleaving",
+      "target": "concept_interleaving"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 473-490",
+      "weight": 1.0,
+      "source": "concept_interleaving",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 473-490",
+      "weight": 1.0,
+      "source": "concept_interleaving",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 473-490",
+      "weight": 1.0,
+      "source": "concept_interleaving",
+      "target": "concept_concrete_examples"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 522-530",
+      "weight": 1.0,
+      "source": "rationale_successive_relearning",
+      "target": "concept_successive_relearning"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 503-520",
+      "weight": 1.0,
+      "source": "concept_successive_relearning",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 503-520",
+      "weight": 1.0,
+      "source": "concept_successive_relearning",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 503-520",
+      "weight": 1.0,
+      "source": "concept_successive_relearning",
+      "target": "concept_metacognition_calibration"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 551-559",
+      "weight": 1.0,
+      "source": "rationale_elaborative_interrogation",
+      "target": "concept_elaborative_interrogation"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 532-549",
+      "weight": 1.0,
+      "source": "concept_elaborative_interrogation",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 532-549",
+      "weight": 1.0,
+      "source": "concept_elaborative_interrogation",
+      "target": "concept_self_explanation"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 580-589",
+      "weight": 1.0,
+      "source": "rationale_self_explanation",
+      "target": "concept_self_explanation"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 561-578",
+      "weight": 1.0,
+      "source": "concept_self_explanation",
+      "target": "concept_worked_examples"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 561-578",
+      "weight": 1.0,
+      "source": "concept_self_explanation",
+      "target": "concept_feynman_technique"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 610-618",
+      "weight": 1.0,
+      "source": "rationale_feynman_technique",
+      "target": "concept_feynman_technique"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 591-608",
+      "weight": 1.0,
+      "source": "concept_feynman_technique",
+      "target": "concept_self_explanation"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 591-608",
+      "weight": 1.0,
+      "source": "concept_feynman_technique",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 591-608",
+      "weight": 1.0,
+      "source": "concept_feynman_technique",
+      "target": "concept_metacognition_calibration"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 640-649",
+      "weight": 1.0,
+      "source": "rationale_concrete_examples",
+      "target": "concept_concrete_examples"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 620-638",
+      "weight": 1.0,
+      "source": "concept_concrete_examples",
+      "target": "concept_dual_coding"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 620-638",
+      "weight": 1.0,
+      "source": "concept_concrete_examples",
+      "target": "concept_interleaving"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 620-638",
+      "weight": 1.0,
+      "source": "concept_concrete_examples",
+      "target": "concept_worked_examples"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 670-679",
+      "weight": 1.0,
+      "source": "rationale_worked_examples",
+      "target": "concept_worked_examples"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 651-668",
+      "weight": 1.0,
+      "source": "concept_worked_examples",
+      "target": "concept_self_explanation"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 651-668",
+      "weight": 1.0,
+      "source": "concept_worked_examples",
+      "target": "concept_chunking"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 651-668",
+      "weight": 1.0,
+      "source": "concept_worked_examples",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 700-708",
+      "weight": 1.0,
+      "source": "rationale_generation_effect",
+      "target": "concept_generation_effect"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 681-698",
+      "weight": 1.0,
+      "source": "concept_generation_effect",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 681-698",
+      "weight": 1.0,
+      "source": "concept_generation_effect",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 681-698",
+      "weight": 1.0,
+      "source": "concept_generation_effect",
+      "target": "concept_pretesting"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 729-737",
+      "weight": 1.0,
+      "source": "rationale_pretesting",
+      "target": "concept_pretesting"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 710-727",
+      "weight": 1.0,
+      "source": "concept_pretesting",
+      "target": "concept_generation_effect"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 710-727",
+      "weight": 1.0,
+      "source": "concept_pretesting",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 710-727",
+      "weight": 1.0,
+      "source": "concept_pretesting",
+      "target": "concept_elaborative_interrogation"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 758-766",
+      "weight": 1.0,
+      "source": "rationale_metacognition_calibration",
+      "target": "concept_metacognition_calibration"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 739-756",
+      "weight": 1.0,
+      "source": "concept_metacognition_calibration",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 739-756",
+      "weight": 1.0,
+      "source": "concept_metacognition_calibration",
+      "target": "concept_successive_relearning"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 739-756",
+      "weight": 1.0,
+      "source": "concept_metacognition_calibration",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 787-795",
+      "weight": 1.0,
+      "source": "rationale_desirable_difficulties",
+      "target": "concept_desirable_difficulties"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 768-785",
+      "weight": 1.0,
+      "source": "concept_desirable_difficulties",
+      "target": "concept_spaced_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 768-785",
+      "weight": 1.0,
+      "source": "concept_desirable_difficulties",
+      "target": "concept_interleaving"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 768-785",
+      "weight": 1.0,
+      "source": "concept_desirable_difficulties",
+      "target": "concept_retrieval_practice"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extracted/learning-methods.txt",
+      "source_location": "lines 768-785",
+      "weight": 1.0,
+      "source": "concept_desirable_difficulties",
+      "target": "concept_generation_effect"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "he_core_memory_engine",
+      "label": "O'Brien's Core Memory Encoding Engine",
+      "nodes": [
+        "concept_imagination_as_key",
+        "concept_association_principle",
+        "concept_senses_engagement",
+        "concept_exaggeration_bizarreness",
+        "concept_location_anchoring"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "extracted/perfect-memory.txt"
+    },
+    {
+      "id": "he_journey_based_systems",
+      "label": "Journey-Method Application Family",
+      "nodes": [
+        "concept_journey_method",
+        "concept_mental_diary",
+        "concept_mental_intray",
+        "concept_mental_speech_file",
+        "concept_calendar_calculation"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "extracted/perfect-memory.txt"
+    },
+    {
+      "id": "he_number_encodings",
+      "label": "Number-Encoding Method Family",
+      "nodes": [
+        "concept_dominic_system",
+        "concept_number_shape_method",
+        "concept_number_rhyme_method",
+        "concept_complex_images"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "extracted/perfect-memory.txt"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>salient-tutor</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+        <span class="logo-text">salient-tutor</span>
+      </div>
+    </div>
+    <nav class="tab-bar">
+      <button class="tab active" data-tab="coach">Coach</button>
+      <button class="tab" data-tab="library">🏛 Library</button>
+    </nav>
+    <div class="topbar-right">
+      <button class="embed-gear" id="embed-gear" title="Embeddings + librarian settings">⚙</button>
+      <button class="rail-flip" id="rail-flip" title="Move the workspace panel to the other side">⇄</button>
+      <div class="status-pill" id="status"><span class="status-dot"></span><span class="status-text">connecting</span></div>
+      <div class="zoom-widget">
+        <button class="zoom-btn" id="zoom-out" title="Smaller text">A−</button>
+        <button class="zoom-btn" id="zoom-in" title="Larger text">A+</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Coach tab: conversation + workspace rail -->
+  <div class="tab-pane coach-pane active" id="pane-coach">
+    <div class="tutor-conversation">
+      <div class="tts-bar hidden" id="tts-bar">
+        <label class="hidden" id="tts-variant-wrap">🧠 tutor <select class="tts-select" id="tts-variant"></select></label>
+        <span class="tts-audio hidden" id="tts-audio-controls">
+          <label>🔊 voice <select class="tts-select" id="tts-voice"></select></label>
+          <label>speed
+            <select class="tts-select" id="tts-speed">
+              <option value="0.85">0.85×</option><option value="1" selected>1×</option>
+              <option value="1.15">1.15×</option><option value="1.3">1.3×</option>
+            </select>
+          </label>
+          <button class="btn small ghost tts-settings" id="tts-settings" title="Voice &amp; audio settings">⚙</button>
+        </span>
+        <div class="tts-popover hidden" id="tts-popover"></div>
+      </div>
+      <main class="chat-area"><div class="chat-scroll" id="chat-scroll"><div id="messages"></div></div></main>
+      <div class="capture-banner hidden" id="capture-banner">
+        <div class="capture-content"><div class="capture-spinner"></div><span id="capture-label">Waiting…</span></div>
+        <button class="btn-text" id="capture-cancel">Cancel</button>
+      </div>
+      <footer class="input-area">
+        <div class="input-inner">
+          <div class="quickreply-bar hidden" id="quickreply" role="group" aria-label="Quick replies">
+            <button class="quickreply-btn" data-p="Give me a hint — don't tell me the answer.">🔍 hint</button>
+            <button class="quickreply-btn" data-p="I'm stuck. Nudge me toward the next step.">🤔 stuck</button>
+            <button class="quickreply-btn" data-p="Why is that?">❓ why</button>
+            <button class="quickreply-btn" data-p="Give me a concrete example.">📎 example</button>
+            <button class="quickreply-btn" data-p="Show me a diagram of this.">🖼 diagram</button>
+            <button class="quickreply-btn hidden" id="illustrate-btn" title="Generate a mnemonic illustration of the current concept">🎨 illustrate</button>
+            <button class="quickreply-btn" data-p="Got it — what's next?">✅ got it</button>
+          </div>
+          <div class="input-row">
+            <textarea id="prompt-input" class="prompt-input" placeholder="ask your tutor…  (Enter to send · Shift+Enter for newline)" rows="1" autocomplete="off"></textarea>
+            <button class="btn-send" id="send-btn" title="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+          </div>
+          <div class="compose-actions">
+            <button class="btn small ghost" id="drill-btn" title="Rapid-fire drill on your most overdue topic">⚡ Drill</button>
+            <button class="btn small ghost" id="export-btn" title="Save this lesson as a Markdown / Obsidian note">⤓ Export</button>
+            <span class="spacer"></span>
+            <div class="strictness hidden" id="diagram-engine" role="group" aria-label="Diagram engine" title="Which diagram engine the tutor draws with">
+              <button class="strictness-btn diagram-btn" data-engine="auto" title="Tutor picks the best engine per diagram">◇ Auto</button>
+              <button class="strictness-btn diagram-btn" data-engine="mermaid" title="Mermaid — flowcharts, sequence, mindmaps">Mermaid</button>
+              <button class="strictness-btn diagram-btn" data-engine="dot" title="Graphviz — prerequisite DAGs, concept maps">Graphviz</button>
+              <button class="strictness-btn diagram-btn" data-engine="d2" title="D2 — polished modern layouts">D2</button>
+              <button class="strictness-btn diagram-btn" data-engine="plantuml" title="PlantUML — UML, state, mindmap (server opt-in)">PlantUML</button>
+            </div>
+            <div class="strictness hidden" id="image-model" role="group" aria-label="Illustration model" title="Diffusion illustrations for mnemonics (opt-in)"></div>
+            <div class="strictness hidden" id="strictness" role="group" aria-label="Tutor hint strictness" title="How much the judge lets the tutor reveal">
+              <button class="strictness-btn" data-level="explain">Explain</button>
+              <button class="strictness-btn" data-level="socratic">Socratic</button>
+              <button class="strictness-btn" data-level="bare">Bare hints</button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <aside class="tutor-rail" id="rail" aria-label="Tutor workspace">
+      <section class="rail-sec">
+        <div class="rail-hd"><h4>Progress</h4><span class="rail-hd-acts"><button class="rail-act" id="skillmap-graph-btn" title="Prerequisite map">🗺</button><button class="rail-act" id="progress-refresh" title="Refresh from your drill history">⟳</button></span></div>
+        <div id="skillmap"><div class="rail-empty">loading…</div></div>
+      </section>
+      <section class="rail-sec">
+        <div class="rail-hd"><h4>Knowledge base</h4></div>
+        <div class="kb-bar">
+          <input type="search" class="kb-search" id="kb-search" placeholder="search facts…" autocomplete="off" spellcheck="false">
+          <button class="btn small" id="kb-go">go</button>
+        </div>
+        <div class="kb-results" id="kb-results"><div class="rail-empty">Search the knowledge base.</div></div>
+      </section>
+      <section class="rail-sec">
+        <div class="rail-hd"><h4>Lesson plans</h4></div>
+        <button class="btn small ghost rail-wide" id="plans-btn">📚 Browse plans…</button>
+      </section>
+      <section class="rail-sec">
+        <div class="rail-hd"><h4>Retention</h4><button class="rail-act" id="retention-refresh" title="Refresh scheduling telemetry">⟳</button></div>
+        <div class="retention-wrap" id="retention"><div class="rail-empty">No reviews yet.</div></div>
+      </section>
+      <section class="rail-sec">
+        <div class="rail-hd"><h4>Context</h4><button class="rail-act" id="ctx-refresh" title="Refresh context usage">⟳</button></div>
+        <div class="ctx-wrap" id="ctx"><div class="rail-empty">—</div></div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- Library tab -->
+  <div class="tab-pane" id="pane-library">
+    <div class="pane-header">
+      <h2>Study Library</h2>
+      <button class="btn-primary-sm" id="study-new">+ New Project</button>
+    </div>
+    <div class="study-note hidden" id="study-note"></div>
+    <div class="pane-body" id="study-list-container">
+      <p class="empty-state">No study projects yet. Create one and upload a document to teach from it.</p>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="/js/tutor.js"></script>
+</body>
+</html>
