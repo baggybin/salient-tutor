@@ -1615,7 +1615,7 @@
 
         <!-- ── Agents section (per-agent provider/model/effort) ── -->
         <div class="set-pane" data-set="agents">
-          <p class="embed-help">Route each agent at its own provider — the tutor on Opus, the librarian on a local model, the judge on DeepSeek, etc. Non-Anthropic providers need a base URL + model. Effort sets the reasoning depth (low = fast/cheap, high = deep).</p>
+          <p class="embed-help">Route each agent at its own provider — the tutor on Opus, the librarian on a local model, the judge on DeepSeek or Codex, etc. Endpoint providers (DeepSeek/MiniMax/local) need a base URL + model. OpenAI Codex needs no endpoint — install the <code>codex</code> extra (<code>pip install -e ".[codex]"</code>) and authenticate via <code>codex login</code> or OPENAI_API_KEY; model defaults by tier. Effort sets the reasoning depth (low = fast/cheap, high = deep).</p>
           <div id="agents-list" class="agents-list"></div>
           <datalist id="ag-anthropic-models">
             <option value="claude-opus-4-8[1m]">Opus 4.8 (1M)</option>
@@ -1632,6 +1632,11 @@
             <option value="MiniMax-M2.1">M2.1</option>
             <option value="MiniMax-M2">M2</option>
             <option value="MiniMax-Text-01">Text-01</option>
+          </datalist>
+          <datalist id="ag-codex-models">
+            <option value="gpt-5.5">gpt-5.5 — flagship (≈ Opus tier)</option>
+            <option value="gpt-5.4">gpt-5.4 — balanced (≈ Sonnet tier)</option>
+            <option value="gpt-5.3-codex-spark">gpt-5.3-codex-spark — fast/cheap (≈ Haiku tier)</option>
           </datalist>
           <datalist id="ag-deepseek-models">
             <option value="deepseek-v4-pro">V4 Pro — reasoning/coding</option>
@@ -1803,7 +1808,14 @@
       minimax:   { list: "ag-minimax-models",  default: "MiniMax-M3" },
       deepseek:  { list: "ag-deepseek-models", default: "deepseek-v4-pro" },
       local:     { list: "", default: "" },
+      codex:     { list: "ag-codex-models", default: "" },
     };
+    // Model placeholder per provider shape: endpoint providers need an id,
+    // codex defaults by Claude-tier mapping, anthropic falls to the roster.
+    const modelPlaceholder = (spec) =>
+      spec.needs_endpoint ? "model id"
+      : spec.kind === "backend" ? "default by tier (e.g. gpt-5.5)"
+      : "default (e.g. claude-opus-4-8[1m])";
     async function loadAgents() {
       agentsList.innerHTML = `<p class="empty-state">loading…</p>`;
       try {
@@ -1839,7 +1851,7 @@
             <label class="embed-field ${needs ? "" : "hidden"} ag-endpoint"><span>API key</span>
               <input class="ag-key" type="password" placeholder="${cfg.api_key ? "•••• (set)" : "optional"}"></label>
             <label class="embed-field"><span>Model</span>
-              <input class="ag-model" type="text" list="${(PROVIDER_MODELS[prov] || {}).list || ""}" value="${esc(cfg.model || "")}" placeholder="${needs ? "model id" : "default (e.g. claude-opus-4-8[1m])"}"></label>
+              <input class="ag-model" type="text" list="${(PROVIDER_MODELS[prov] || {}).list || ""}" value="${esc(cfg.model || "")}" placeholder="${modelPlaceholder(spec)}"></label>
             <label class="embed-field"><span>Effort</span>
               <select class="ag-effort">${AGENT_EFFORTS.map(e => `<option value="${e}">${e}</option>`).join("")}</select></label>
           </div>
@@ -1864,7 +1876,7 @@
           const pm = PROVIDER_MODELS[prov] || {};
           model.setAttribute("list", pm.list || "");
           model.value = saved ? (cfg.model || "") : (pm.default || "");
-          model.placeholder = needs ? "model id" : "default (e.g. claude-opus-4-8[1m])";
+          model.placeholder = modelPlaceholder(spec);
           if (!needs) return;
           // Endpoint fields are provider-specific: repopulate from the saved
           // config when returning to the saved provider, else this provider's

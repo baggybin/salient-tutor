@@ -394,7 +394,9 @@ async def ws_tutor(ws: WebSocket) -> None:
             submit_text = "\n\n".join([*parts, text]) if parts else text
             loop = asyncio.get_running_loop()
             fut: asyncio.Future = loop.create_future()
-            job = runner.submit(submit_text, future=fut)
+            # cfg max_turns as the per-job budget — arms the runner's hard cap
+            # for backend-seam providers (codex) with no native turn limit.
+            job = runner.submit(submit_text, future=fut, max_turns_hint=runner.cfg.get("max_turns"))
             state["job"] = job.id
             state["gated_job"] = job.id if gated else None
             waiters.append(
@@ -755,7 +757,7 @@ async def tts(req: dict) -> Response:
         sample_rate=sample_rate,
         bitrate=bitrate,
     )
-    audio = minimax_tts.cache_lookup(key, fmt)
+    audio = await asyncio.to_thread(minimax_tts.cache_lookup, key, fmt)
     if audio is None:
         try:
             audio = await minimax_tts.synthesize(
@@ -771,7 +773,7 @@ async def tts(req: dict) -> Response:
             )
         except Exception as e:  # noqa: BLE001
             return JSONResponse({"error": str(e)}, status_code=502)
-        minimax_tts.cache_store(key, fmt, audio)
+        await asyncio.to_thread(minimax_tts.cache_store, key, fmt, audio)
     return Response(content=audio, media_type=minimax_tts.mime_for(fmt))
 
 
@@ -830,6 +832,15 @@ async def study_list() -> dict:
         facts = daemon.kg.export_by_subject_prefix(f"study:{p['project_id']}:")
         p["facts"] = len(facts)
     return {"projects": projects}
+
+
+@app.get("/api/curricula/list")
+async def curricula_list() -> dict:
+    """All curriculum tracks seeded into the ``curriculum:track:`` KG namespace
+    at daemon startup (from private ``data/curricula/*.json``)."""
+    if not daemon:
+        return {"error": "daemon not started"}
+    return {"tracks": daemon.curricula_list()}
 
 
 @app.post("/api/study/create")
@@ -1156,11 +1167,35 @@ async def agents_config() -> dict:
                 "default_base_url": spec.default_base_url,
                 "auth_style": spec.auth_style,
                 "supports_thinking": spec.supports_thinking,
+                # "sdk" | "endpoint" | "backend" — backend providers (codex)
+                # hide the endpoint fields and hint at their own auth story.
+                "kind": spec.kind,
             }
             for name, spec in PROVIDERS.items()
         },
         "efforts": ["low", "med", "high"],
     }
+
+
+@app.get("/api/providers/probe")
+async def provider_probe(name: str = "codex") -> dict:
+    """Availability probe for a backend provider (is the SDK installed and
+    authenticated?) so the Agents tab can hint inline before the operator
+    routes an agent there. FAIL-SAFE: any error → {available:false, detail}."""
+    if not daemon:
+        return {"error": "daemon not started"}
+    from salient_tutor.providers import PROVIDERS
+
+    spec = PROVIDERS.get(name)
+    if spec is None or spec.kind != "backend":
+        return {"error": f"provider {name!r} is not a probeable backend provider"}
+    try:
+        from salient_core import ProviderName, get_provider_registry
+
+        probe = await get_provider_registry().get(ProviderName(name)).probe()
+        return {"provider": name, "available": probe.available, "detail": probe.detail}
+    except Exception as exc:  # noqa: BLE001 — surface, never 500 the tab
+        return {"provider": name, "available": False, "detail": str(exc)}
 
 
 @app.post("/api/agents/config")

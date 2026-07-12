@@ -277,6 +277,21 @@ Two frames the operator should know cold:
 
 **Methodology over tools.** Tools churn quarterly; the reasoning lasts a career.
 
+### Pre-built curriculum tracks
+
+A `curriculum:track:` KG namespace holds structured study plans seeded at
+startup (cyber-fundamentals, red-team, blue-team, purple-team). Each track has
+modules → topics with concepts, key facts, ATT&CK IDs, drills, and the
+offense-defense pairing (the unicorn rule baked into every topic).
+
+- Browse tracks: `kg_query(subject="curriculum:track:", predicate="title")`
+- Browse a track's modules: `kg_query(subject="curriculum:track:<id>:module:", predicate="title")`
+- Pull a topic's full scaffold: `kg_query(subject="curriculum:track:<id>:module:<mod>:topic:<topic>")`
+- Semantic search across all tracks: `kg_semantic_query(text="...", subject_prefix="curriculum:track:")`
+
+Use these to plan lessons, suggest learning paths, and ground drills in
+real-world ATT&CK TTPs with their detection counterparts.
+
 ---
 
 ## KNOWLEDGE-BASE DISCIPLINE

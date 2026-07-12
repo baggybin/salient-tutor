@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -306,9 +307,26 @@ def cache_store(key: str, fmt: str, audio: bytes) -> None:
     try:
         d.mkdir(parents=True, exist_ok=True)
         final = d / f"{key}.{fmt}"
-        tmp = d / f".{key}.{fmt}.part"
-        tmp.write_bytes(audio)
-        tmp.replace(final)
+        # Unique tmp: cache_store now runs in a worker thread (asyncio.to_thread),
+        # so two concurrent same-key stores must not collide on one tmp inode and
+        # let a racing cache_lookup read a half-written (torn) audio blob.
+        fd, tmp = tempfile.mkstemp(dir=d, prefix=f".{key}.", suffix=f".{fmt}.part")
+        try:
+            try:
+                f = os.fdopen(fd, "wb")
+            except BaseException:
+                os.close(fd)  # fdopen didn't take ownership — close fd ourselves
+                raise
+            with f:
+                f.write(audio)
+            os.chmod(tmp, 0o644)  # mkstemp creates 0600; match umask-default perms
+            os.replace(tmp, final)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
     except OSError:
         return
     _cache_evict(d)

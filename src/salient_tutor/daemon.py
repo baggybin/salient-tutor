@@ -17,6 +17,7 @@ import json
 import logging
 import os
 from contextlib import suppress
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,7 @@ from salient_core import (
     ContextStore,
     EventHub,
     KnowledgeGraph,
+    LocalClaudeBackend,
     QuestionInbox,
     bucketed_profile,
     make_bus,
@@ -48,6 +50,8 @@ _IMAGE_SKILL_PATH = _PROMPTS_DIR / "skills" / "image_authoring.md"
 _PALACE_SKILL_PATH = _PROMPTS_DIR / "skills" / "palace_authoring.md"
 _IMAGE_SKILL_AGENTS: frozenset[str] = frozenset({"tutor", "tutor_alt", "judge"})
 _BUNDLE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "pedagogy_bundle.json"
+_CURRICULA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "curricula"
+_CURRICULUM_AGENT = "curriculum"
 
 
 def _expand_envvars(value: Any) -> Any:
@@ -308,6 +312,7 @@ class TutorDaemon:
         self.runners: dict[str, AgentRunner] = {}
         self._tasks: list[asyncio.Task] = []
         self._pedagogy_seeded = False
+        self._curricula_seeded = False
 
     # ── live event observation (DaemonServices seam) ──────────────────
     # The documented attach point for observers — the web overlay, a tailer,
@@ -348,6 +353,180 @@ class TutorDaemon:
             )
         except Exception:
             _log.exception("pedagogy KG seed failed")
+
+    # ── Curricula seed (private data/curricula/*.json) ────────────────
+
+    def _seed_curricula(self) -> None:
+        """Ingest every curriculum track in ``data/curricula/`` into the
+        ``curriculum:track:<id>:`` KG namespace.
+
+        Idempotent: ``assert_fact`` max-merges, so re-seeding on each startup
+        corroborates rather than duplicates. Skips if already seeded or the
+        directory is missing (e.g. public mirror checkout, where
+        ``.gitattributes export-ignore`` strips the dir).
+        """
+        if self._curricula_seeded:
+            return
+        if not _CURRICULA_DIR.is_dir():
+            _log.warning("curricula dir not found at %s — skipping seed", _CURRICULA_DIR)
+            return
+        total_facts = 0
+        total_topics = 0
+        for path in sorted(_CURRICULA_DIR.glob("*.json")):
+            if path.name == "index.json":
+                continue
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                facts, topics = self._ingest_curriculum_track(data)
+                total_facts += facts
+                total_topics += topics
+            except Exception:
+                _log.exception("curriculum seed failed for %s", path)
+        if total_facts:
+            self._curricula_seeded = True
+            _log.info(
+                "curricula KG seeded: %d facts across %d topics",
+                total_facts,
+                total_topics,
+            )
+
+    def _ingest_curriculum_track(self, data: dict[str, Any]) -> tuple[int, int]:
+        """Write one curriculum track's modules + topics into the KG.
+
+        Returns (facts_written, topics_count). Namespace layout::
+
+            curriculum:track:<track_id>                          track meta
+            curriculum:track:<track_id>:module:<module_id>        module meta
+            curriculum:track:<track_id>:module:<mod>:topic:<top>  topic facts
+        """
+        kg = self.kg
+        a = _CURRICULUM_AGENT
+        track_id = str(data.get("track") or "unknown")
+        ts = f"curriculum:track:{track_id}"
+        facts = 0
+
+        for key, pred in (("title", "title"), ("description", "description")):
+            if v := data.get(key):
+                kg.assert_fact(ts, pred, str(v), agent=a, expires_at=None)
+                facts += 1
+
+        topics = 0
+        for mod in data.get("modules") or []:
+            if not isinstance(mod, dict):
+                continue
+            mod_id = str(mod.get("id") or "").strip()
+            if not mod_id:
+                continue
+            ms = f"{ts}:module:{mod_id}"
+            for key, pred in (
+                ("title", "title"),
+                ("difficulty", "difficulty"),
+                ("objective", "objective"),
+            ):
+                if v := mod.get(key):
+                    kg.assert_fact(ms, pred, str(v), agent=a, expires_at=None)
+                    facts += 1
+            for prereq in mod.get("prerequisites") or []:
+                if prereq:
+                    kg.assert_fact(ms, "prerequisite", str(prereq), agent=a, expires_at=None)
+                    facts += 1
+
+            for topic in mod.get("topics") or []:
+                if not isinstance(topic, dict):
+                    continue
+                topic_id = str(topic.get("id") or "").strip()
+                if not topic_id:
+                    continue
+                ss = f"{ms}:topic:{topic_id}"
+                topics += 1
+
+                if v := topic.get("title"):
+                    kg.assert_fact(ss, "title", str(v), agent=a, expires_at=None)
+                    facts += 1
+                for concept in topic.get("concepts") or []:
+                    kg.assert_fact(ss, "concept", str(concept), agent=a, expires_at=None)
+                    facts += 1
+                for kf in topic.get("key_facts") or []:
+                    kg.assert_fact(ss, "key_fact", str(kf), agent=a, expires_at=None)
+                    facts += 1
+                for at in topic.get("attack_techniques") or []:
+                    kg.assert_fact(ss, "attack_technique", str(at), agent=a, expires_at=None)
+                    facts += 1
+                if kc := topic.get("killchain_stage"):
+                    kg.assert_fact(ss, "killchain_stage", str(kc), agent=a, expires_at=None)
+                    facts += 1
+
+                facts += self._ingest_topic_pairing(ss, topic)
+
+                for drill in topic.get("drills") or []:
+                    kg.assert_fact(ss, "drill", str(drill), agent=a, expires_at=None)
+                    facts += 1
+                for cm in topic.get("common_mistakes") or []:
+                    kg.assert_fact(ss, "common_mistake", str(cm), agent=a, expires_at=None)
+                    facts += 1
+
+        return facts, topics
+
+    def _ingest_topic_pairing(self, ss: str, topic: dict[str, Any]) -> int:
+        """Write the offense-defense pairing (the 'unicorn rule') for a topic.
+
+        Handles all four curriculum schemas uniformly:
+        - red-team ``defense_pairing``
+        - blue-team ``offense_pairing``
+        - cyber-fundamentals flat ``offense_application`` / ``defense_application``
+        - purple-team structured ``attack_side`` / ``defense_side``
+        """
+        kg = self.kg
+        a = _CURRICULUM_AGENT
+        facts = 0
+
+        def _fact(pred: str, obj: Any) -> None:
+            nonlocal facts
+            if obj:
+                kg.assert_fact(ss, pred, str(obj), agent=a, expires_at=None)
+                facts += 1
+
+        def _facts(pred: str, items: Any) -> None:
+            nonlocal facts
+            for item in items or []:
+                _fact(pred, item)
+
+        # Red-team: defense_pairing
+        if dp := topic.get("defense_pairing"):
+            _fact("defense_summary", dp.get("what_blue_sees"))
+            _facts("defense_log", dp.get("logs"))
+            _facts("defense_detection", dp.get("detections"))
+            _facts("defense_control", dp.get("controls"))
+
+        # Blue-team: offense_pairing
+        if op := topic.get("offense_pairing"):
+            _fact("offense_summary", op.get("what_red_does"))
+            _fact("offense_perspective", op.get("attacker_perspective"))
+            _facts("offense_bypass", op.get("bypass_attempts"))
+
+        # Cyber-fundamentals: flat string fields
+        _fact("offense_summary", topic.get("offense_application"))
+        _fact("defense_summary", topic.get("defense_application"))
+
+        # Purple-team: attack_side + defense_side
+        if atk := topic.get("attack_side"):
+            _fact("offense_summary", atk.get("technique"))
+            _facts("offense_step", atk.get("attack_steps"))
+            _facts("offense_tool", atk.get("tools"))
+            _facts("attack_technique", atk.get("attack_techniques"))
+            _fact("killchain_stage", atk.get("killchain_stage"))
+
+        if dfn := topic.get("defense_side"):
+            _fact("defense_summary", dfn.get("what_to_detect"))
+            _facts("defense_log", dfn.get("logs"))
+            _facts("defense_detection", dfn.get("detection_rules"))
+            _facts("defense_tool", dfn.get("tools"))
+            _facts("defense_control", dfn.get("controls"))
+
+        # Purple-team: gap_analysis
+        _fact("gap_analysis", topic.get("gap_analysis"))
+
+        return facts
 
     # ── Embeddings config + backfill ──────────────────────────────────
     # salient-core ships a provider-agnostic OpenAI-compatible embedder
@@ -514,12 +693,15 @@ class TutorDaemon:
                 continue  # explicit persisted endpoint choice wins over env
             effort = (existing or {}).get("effort", "med")
             block: dict[str, Any] = {"provider": provider, "effort": effort}
-            base_url = (os.environ.get(f"{env_name}_BASE_URL") or "").strip()
-            if base_url:
-                block["base_url"] = base_url
-            api_key = (os.environ.get(f"{env_name}_KEY") or "").strip()
-            if api_key:
-                block["api_key"] = api_key
+            if PROVIDERS[provider].kind != "backend":
+                # Endpoint fields only apply to the ANTHROPIC_BASE_URL reroute
+                # providers; a backend provider (codex) authenticates itself.
+                base_url = (os.environ.get(f"{env_name}_BASE_URL") or "").strip()
+                if base_url:
+                    block["base_url"] = base_url
+                api_key = (os.environ.get(f"{env_name}_KEY") or "").strip()
+                if api_key:
+                    block["api_key"] = api_key
             self._agent_runtime[agent] = block
             _log.info("agent %s routed to %s via %s", agent, provider, env_name)
 
@@ -600,6 +782,21 @@ class TutorDaemon:
             # per-agent Claude model (opus/sonnet/fable). Store a minimal block
             # (no endpoint fields) so the setting survives a reload.
             block = {"provider": "anthropic", "effort": effort}
+            if model:
+                block["model"] = model
+            self._agent_runtime[agent] = block
+        elif spec.kind == "backend":
+            # A backend provider (codex) has no endpoint fields — auth is
+            # OPENAI_API_KEY or an existing `codex login` session, and the
+            # model is optional for roster agents (the tier map fills it). An
+            # optional agent being CREATED here still needs a model, since the
+            # roster registers judge/tutor_alt only when one is configured.
+            if agent not in self.agent_configs and not model:
+                return {
+                    "error": f"model is required to create optional agent {agent!r}"
+                    f" on provider {provider!r}"
+                }
+            block = {"provider": provider, "effort": effort}
             if model:
                 block["model"] = model
             self._agent_runtime[agent] = block
@@ -798,7 +995,11 @@ class TutorDaemon:
         passing ``--bare`` so the CLI skips Anthropic-side startup prefetches that
         hang against a local model, and disabling extended thinking (a local
         endpoint can't stream thinking blocks). Ported from salient-core's
-        ``endpoint:`` block; only the librarian is ever rerouted."""
+        ``endpoint:`` block; only the librarian is ever rerouted.
+
+        codex agents never reach here — _make_runner branches to the
+        CodexProvider backend first (codex isn't an Anthropic-compatible
+        endpoint, so ClaudeAgentOptions don't apply to it)."""
         cfg = self.agent_configs[agent]
         system_prompt = self._load_prompt(agent)
 
@@ -921,19 +1122,125 @@ class TutorDaemon:
         bare = True  # always --bare for non-Anthropic endpoints (skip startup prefetch)
         return (base_url, model, api_key, auth_style, bare, provider, effort)
 
+    def _make_codex_backend_factory(self, agent: str) -> tuple[Any, Any]:
+        """Zero-arg backend factory producing a salient-core CodexBackend for
+        `agent`, plus the bus tool bundle it hands codex over the MCP gateway.
+
+        Mirrors salient-core's own codex runner branch: the same system prompt
+        the claude path would use rides as `instructions`, the roster's Claude
+        tier maps to a codex model unless the operator configured one, and the
+        tutor effort dial maps to codex reasoningEffort."""
+        from salient_core import ProviderName, ToolBundle, get_provider_registry
+        from salient_core.bus import make_bus_tool_bundle
+        from salient_core.codex import CodexProvider
+
+        from salient_tutor.providers import codex_effort, codex_model_for
+
+        cfg = self.agent_configs[agent]
+        rt = self._runtime_for(agent)
+        tool_bundle = ToolBundle()
+        if cfg.get("bus_tools", True):
+            tool_bundle, _wires = make_bus_tool_bundle(self, agent)
+        provider = get_provider_registry().get(ProviderName("codex"))
+        if not isinstance(provider, CodexProvider):
+            raise TypeError("registered codex provider has an incompatible implementation")
+        config: dict[str, Any] = {
+            "agent_name": agent,
+            "cwd": str(self.work_root),
+            "instructions": self._load_prompt(agent),
+            "model": codex_model_for(
+                _expand_envvars(rt.get("model", "")) or "", cfg.get("model", "")
+            ),
+        }
+        effort = codex_effort(rt.get("effort", "med"))
+        if effort:
+            config["effort"] = effort
+
+        def factory() -> Any:
+            loop = asyncio.get_running_loop()
+            return provider.create_backend(
+                config,
+                tool_bundle=tool_bundle,
+                approval_handler=self._make_codex_approval_handler(agent, loop),
+            )
+
+        return factory, tool_bundle
+
+    def _make_codex_approval_handler(self, agent: str, loop: asyncio.AbstractEventLoop) -> Any:
+        """Fail-closed codex approval policy, scoped by the agent's own tool
+        whitelist: read-only commands (core's default-deny classifier)
+        auto-accept ONLY for agents whose builtin_tools already grant
+        unconfined filesystem reads on the claude path (Bash, or Read without
+        confine_reads_to_study) — routing an agent to codex must not widen
+        what it could touch. Everything else declines and files an
+        informational note in the question inbox. The tutor has no
+        approval-answer surface, so blocking on the inbox futures (salient's
+        operator pattern) would hang the turn with nobody able to answer.
+        Called from the codex worker thread — hence call_soon_threadsafe."""
+        from salient_core import codex_command_is_read_only
+        from salient_core.codex import ApprovalDecision
+
+        builtin = set(self.agent_configs.get(agent, {}).get("builtin_tools", []))
+        reads_unconfined = "Bash" in builtin or (
+            "Read" in builtin
+            and not self.agent_configs.get(agent, {}).get("confine_reads_to_study")
+        )
+
+        def handle(request: Any) -> Any:
+            if (
+                reads_unconfined
+                and request.kind.value == "command"
+                and codex_command_is_read_only(request.params)
+            ):
+                _log.info(
+                    "codex read-only auto-accept for %s: %s",
+                    agent,
+                    str(request.params.get("command", ""))[:300],
+                )
+                return ApprovalDecision.ACCEPT
+            params = request.params
+            detail = str(
+                params.get("command")
+                or params.get("reason")
+                or params.get("permissions")
+                or request.method
+            )[:300]
+            _log.warning("codex approval declined for %s (no operator surface): %s", agent, detail)
+            loop.call_soon_threadsafe(
+                self.add_question, agent, f"[codex declined] {request.kind.value}: {detail}"
+            )
+            return ApprovalDecision.DECLINE
+
+        return handle
+
     def _make_runner(self, agent: str) -> AgentRunner:
         """Create or return the AgentRunner for an agent."""
         if agent in self.runners:
             return self.runners[agent]
 
         cfg = self.agent_configs[agent]
-        options = self._make_options(agent)
-        runner = AgentRunner(
-            name=agent,
-            cfg=cfg,
-            options=options,
-            context=self.context,
-        )
+        # Core's AgentRunner takes a provider-neutral backend_factory (the
+        # `options=` field died with the codex provider seam). codex routes
+        # through salient-core's CodexProvider backend; every other provider
+        # (anthropic + the Anthropic-compatible endpoint reroutes) is the 1:1
+        # LocalClaudeBackend passthrough over the assembled options.
+        if self._runtime_for(agent).get("provider") == "codex":
+            backend_factory, tool_bundle = self._make_codex_backend_factory(agent)
+            runner = AgentRunner(
+                name=agent,
+                cfg=cfg,
+                backend_factory=backend_factory,
+                tool_bundle=tool_bundle,
+                context=self.context,
+            )
+        else:
+            options = self._make_options(agent)
+            runner = AgentRunner(
+                name=agent,
+                cfg=cfg,
+                backend_factory=partial(LocalClaudeBackend, options),
+                context=self.context,
+            )
         runner._daemon = self  # type: ignore[attr-defined]  # DaemonServices back-injection
         # Feed the daemon-wide hub the /ws/tutor forwarder subscribes to —
         # without this the runner's live events never reach the socket and the
@@ -945,6 +1252,7 @@ class TutorDaemon:
     async def start(self) -> None:
         """Seed the mnemonic KG, then start all agent runners."""
         self._seed_pedagogy()
+        self._seed_curricula()
         for agent in self.agent_configs:
             runner = self._make_runner(agent)
             task = asyncio.create_task(runner.start())
@@ -970,7 +1278,10 @@ class TutorDaemon:
             await runner.start()
 
         future: asyncio.Future = asyncio.get_running_loop().create_future()
-        runner.submit(message, future=future)
+        # cfg max_turns as the per-job budget: claude backends enforce it via
+        # ClaudeAgentOptions, but backend-seam providers (codex) have no
+        # native turn cap — the hint arms the runner's wire-level hard cap.
+        runner.submit(message, future=future, max_turns_hint=runner.cfg.get("max_turns"))
         result_job = await asyncio.wait_for(future, timeout=timeout)
         return result_job.result or result_job.error or "(no response)"
 
@@ -1382,6 +1693,51 @@ class TutorDaemon:
         from salient_tutor.study import list_studies
 
         return list_studies(self.context)
+
+    def curricula_list(self) -> list[dict[str, Any]]:
+        """List available curriculum tracks with module/topic counts from the KG.
+
+        Reads the ``curriculum:track:`` namespace to summarise what was seeded
+        at startup. Returns one dict per track: ``{id, title, description,
+        modules, topics}``.
+        """
+        facts = self.kg.export_by_subject_prefix("curriculum:track:")
+        tracks: dict[str, dict[str, Any]] = {}
+        mod_subjects: dict[str, set[str]] = {}  # track_id → set of module subjects
+        topic_subjects: dict[str, set[str]] = {}  # track_id → set of topic subjects
+        for f in facts:
+            s = f["subject"]
+            parts = s.split(":")
+            # parts: [curriculum, track, <track_id>, module, <mod_id>, topic, <topic_id>]
+            if len(parts) < 3:
+                continue
+            track_id = parts[2]
+            if track_id not in tracks:
+                tracks[track_id] = {
+                    "id": track_id,
+                    "title": track_id,
+                    "description": "",
+                    "modules": 0,
+                    "topics": 0,
+                }
+                mod_subjects[track_id] = set()
+                topic_subjects[track_id] = set()
+            if len(parts) <= 3:
+                # Track-level fact
+                if f["predicate"] == "title":
+                    tracks[track_id]["title"] = f["object"]
+                elif f["predicate"] == "description":
+                    tracks[track_id]["description"] = f["object"]
+            elif ":module:" in s and ":topic:" not in s:
+                mod_subjects[track_id].add(s.split(":topic:")[0])
+            elif ":topic:" in s:
+                mod_key = s.split(":topic:")[0]
+                mod_subjects[track_id].add(mod_key)
+                topic_subjects[track_id].add(s)
+        for track_id, t in tracks.items():
+            t["modules"] = len(mod_subjects.get(track_id, set()))
+            t["topics"] = len(topic_subjects.get(track_id, set()))
+        return list(tracks.values())
 
     def study_show(self, project_id: str) -> dict[str, Any] | None:
         """Show one project's full envelope."""

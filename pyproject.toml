@@ -33,6 +33,15 @@ dev = [
 # degrades to "unavailable" if absent, so the app boots without it.
 #   pip install -e ../imagegen
 images = ["imagegen"]
+# OpenAI Codex agent backend (route any agent at provider=codex). Mirrors
+# salient-core's [codex] extra pins — keep in lockstep with them. Spelled out
+# here (not as salient-core[codex]) because the kernel is git-installed and a
+# PEP 440 extra spec would make pip resolve salient-core against PyPI.
+codex = [
+    "openai-codex==0.1.0b3",
+    "openai-codex-cli-bin==0.137.0a4",
+    "mcp>=1.0,<2",
+]
 
 [project.scripts]
 salient-tutor = "salient_tutor.cli:main"

@@ -57,16 +57,49 @@ class _DaemonShell:
 
 # ── Provider registry ──────────────────────────────────────────────────────
 class TestProviderRegistry:
-    def test_all_four_providers_present(self):
+    def test_all_five_providers_present(self):
         from salient_tutor.providers import PROVIDERS
 
-        assert set(PROVIDERS) == {"anthropic", "deepseek", "minimax", "local"}
+        assert set(PROVIDERS) == {"anthropic", "deepseek", "minimax", "local", "codex"}
 
-    def test_only_anthropic_needs_no_endpoint(self):
+    def test_only_endpoint_providers_need_endpoints(self):
         from salient_tutor.providers import PROVIDERS
 
         assert PROVIDERS["anthropic"].needs_endpoint is False
+        assert PROVIDERS["codex"].needs_endpoint is False
         assert all(PROVIDERS[p].needs_endpoint for p in ("deepseek", "minimax", "local"))
+
+    def test_provider_kinds(self):
+        from salient_tutor.providers import PROVIDERS
+
+        assert PROVIDERS["anthropic"].kind == "sdk"
+        assert PROVIDERS["codex"].kind == "backend"
+        assert all(PROVIDERS[p].kind == "endpoint" for p in ("deepseek", "minimax", "local"))
+
+    def test_codex_model_tier_mapping(self):
+        from salient_tutor.providers import CODEX_DEFAULT_MODEL, codex_model_for
+
+        # An explicit config model always wins.
+        assert codex_model_for(" gpt-5.5 ", "claude-opus-4-8[1m]") == "gpt-5.5"
+        # Roster Claude tier maps to its codex counterpart.
+        assert codex_model_for("", "claude-opus-4-8[1m]") == "gpt-5.5"
+        assert codex_model_for("", "claude-fable-5[1m]") == "gpt-5.5"
+        assert codex_model_for("", "claude-sonnet-5[1m]") == "gpt-5.4"
+        assert codex_model_for("", "claude-haiku-4-5") == "gpt-5.3-codex-spark"
+        # Unknown roster model → the default.
+        assert codex_model_for("", "mystery-model") == CODEX_DEFAULT_MODEL
+        assert codex_model_for("", "") == CODEX_DEFAULT_MODEL
+
+    def test_codex_effort_mapping(self):
+        from salient_tutor.providers import codex_effort
+
+        assert codex_effort("low") == "low"
+        assert codex_effort("med") == "medium"
+        assert codex_effort("high") == "high"
+        assert codex_effort("HIGH ") == "high"
+        assert codex_effort("xhigh") is None
+        assert codex_effort("") is None
+        assert codex_effort(None) is None
 
     def test_minimax_uses_bearer_deepseek_local_use_api_key(self):
         from salient_tutor.providers import PROVIDERS
@@ -158,6 +191,19 @@ class TestProviderFromEnv:
         shell._seed_providers_from_env()
         cfg = shell._runtime_for("judge")
         assert cfg["provider"] == "deepseek" and cfg["effort"] == "low"
+
+    def test_judge_env_routes_to_codex_without_endpoint_fields(self, tmp_path, monkeypatch):
+        # codex is a backend provider — no endpoint reroute, so base_url/key
+        # envs are ignored and _agent_endpoint_for stays None.
+        monkeypatch.setenv("TUTOR_JUDGE_PROVIDER", "codex")
+        monkeypatch.setenv("TUTOR_JUDGE_PROVIDER_BASE_URL", "https://ignored.example")
+        monkeypatch.setenv("TUTOR_JUDGE_PROVIDER_KEY", "sk-ignored")
+        shell = self._shell_with_judge(tmp_path, monkeypatch)
+        shell._seed_providers_from_env()
+        rt = shell._runtime_for("judge")
+        assert rt["provider"] == "codex"
+        assert "base_url" not in rt and "api_key" not in rt
+        assert shell._agent_endpoint_for("judge") is None
 
     def test_unknown_provider_is_ignored(self, tmp_path, monkeypatch):
         monkeypatch.setenv("TUTOR_JUDGE_PROVIDER", "gpt5")
@@ -270,6 +316,39 @@ class TestAgentConfigRoundTrip:
         cleared = shell.set_agent_config("tutor", provider="anthropic")
         assert cleared["provider"] == "anthropic"
         assert shell._agent_endpoint_for("tutor") is None
+
+    def test_set_codex_without_endpoint_fields_then_clear(self, tmp_path, monkeypatch):
+        # codex needs no base_url/api_key, and model is optional for a roster
+        # agent (the tier map fills it at runner build).
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        res = shell.set_agent_config("tutor", provider="codex", effort="high")
+        assert res["provider"] == "codex" and res["effort"] == "high"
+        assert res["model"] == "" and res["base_url"] == "" and res["api_key"] is False
+        assert shell._agent_endpoint_for("tutor") is None  # not an endpoint reroute
+        # a codex block persists (non-anthropic) and survives a reload
+        import json
+
+        saved = json.loads((tmp_path / "agent_configs.json").read_text())
+        assert saved["tutor"] == {"provider": "codex", "effort": "high"}
+
+        cleared = shell.set_agent_config("tutor", provider="anthropic")
+        assert cleared["provider"] == "anthropic"
+
+    def test_set_codex_with_explicit_model(self, tmp_path, monkeypatch):
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        res = shell.set_agent_config("tutor", provider="codex", model="gpt-5.5")
+        assert res["provider"] == "codex" and res["model"] == "gpt-5.5"
+        assert shell._runtime_for("tutor")["model"] == "gpt-5.5"
+
+    def test_optional_agent_on_codex_requires_model(self, tmp_path, monkeypatch):
+        # Roster registration of judge/tutor_alt keys on a configured model, so
+        # creating one on codex without a model must be a clear error, and
+        # providing one must register it live.
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        assert "error" in shell.set_agent_config("judge", provider="codex")
+        res = shell.set_agent_config("judge", provider="codex", model="gpt-5.5")
+        assert res["provider"] == "codex" and res["model"] == "gpt-5.5"
+        assert "judge" in shell.agent_configs
 
     def test_endpoint_provider_requires_base_url_and_model(self, tmp_path, monkeypatch):
         shell = _DaemonShell(tmp_path, monkeypatch)
@@ -481,8 +560,43 @@ class TestAgentConfigRoutes:
         r = TestClient(web.app).get("/api/agents/config")
         assert r.status_code == 200
         body = r.json()
-        assert set(body["providers"]) == {"anthropic", "deepseek", "minimax", "local"}
+        assert set(body["providers"]) == {"anthropic", "deepseek", "minimax", "local", "codex"}
         assert "tutor" in body["agents"] and body["agents"]["tutor"]["provider"] == "anthropic"
+        # The routing kind rides along so the UI can shape fields per provider.
+        assert body["providers"]["anthropic"]["kind"] == "sdk"
+        assert body["providers"]["codex"]["kind"] == "backend"
+        assert body["providers"]["local"]["kind"] == "endpoint"
+
+    def test_codex_probe_endpoint(self, tmp_path, monkeypatch):
+        # Stubbed provider registry — the endpoint must relay probe() and stay
+        # FAIL-SAFE (never a 500), without touching a real codex runtime.
+        from salient_core import ProviderRegistry, reset_provider_registry, set_provider_registry
+        from salient_core.codex import CodexProvider
+        from salient_core.providers import ProviderProbe
+
+        class _StubProbe(CodexProvider):
+            def __init__(self):
+                pass
+
+            async def probe(self):
+                return ProviderProbe(False, "install the optional codex extra")
+
+        set_provider_registry(ProviderRegistry([_StubProbe()]))
+        try:
+            shell = _DaemonShell(tmp_path, monkeypatch)
+            monkeypatch.setattr(web, "daemon", shell)
+            client = TestClient(web.app)
+            r = client.get("/api/providers/probe", params={"name": "codex"})
+            assert r.status_code == 200
+            body = r.json()
+            assert body["provider"] == "codex"
+            assert body["available"] is False
+            assert "codex extra" in body["detail"]
+            # Endpoint providers aren't probeable backends.
+            r2 = client.get("/api/providers/probe", params={"name": "local"})
+            assert "error" in r2.json()
+        finally:
+            reset_provider_registry()
 
     def test_post_sets_agent(self, tmp_path, monkeypatch):
         shell = _DaemonShell(tmp_path, monkeypatch)

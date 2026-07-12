@@ -37,6 +37,7 @@ import json
 import logging
 import os
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -410,6 +411,11 @@ def _index_get(content_key: str) -> str | None:
 
 
 def _index_put(content_key: str, url: str) -> None:
+    # INVARIANT: called synchronously from the event loop with no awaits inside —
+    # that is what makes this load/mutate/write atomic w.r.t. concurrent renders.
+    # The write is a sub-KB buffered rewrite (microseconds); do NOT offload to a
+    # thread without also serializing behind a lock (would trade free atomicity
+    # for a lost-update race).
     idx = _index_load()
     if idx.get(content_key, {}).get("url") == url:
         return
@@ -422,9 +428,27 @@ def _index_put(content_key: str, url: str) -> None:
 
 def _write_atomic(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_bytes(data)
-    os.replace(tmp, path)  # atomic — GET never sees a partial file
+    # Unique tmp in the same dir: keeps os.replace a same-fs atomic rename while
+    # letting concurrent writers (across renders, or uvicorn --workers N) degrade
+    # to benign last-writer-wins instead of colliding on one tmp inode → torn file.
+    # The ".wip-" prefix lets a future sweep recognize strays left by a hard crash.
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".wip-", suffix=".tmp")
+    try:
+        try:
+            f = os.fdopen(fd, "wb")
+        except BaseException:
+            os.close(fd)  # fdopen didn't take ownership — close fd ourselves
+            raise
+        with f:
+            f.write(data)
+        os.chmod(tmp, 0o644)  # mkstemp creates 0600; restore umask-typical perms
+        os.replace(tmp, path)  # atomic — GET never sees a partial file
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def _generate_blocking(
@@ -517,7 +541,7 @@ async def render(
             return None, f"image generation failed: {str(e)[:300]}"
         if not png:
             return None, "image generation produced no data"
-        _write_atomic(_cache_path(digest), png)
+        await asyncio.to_thread(_write_atomic, _cache_path(digest), png)
         _index_put(ckey, url)
         return ImageResult(url=url, cached=False, model=eff_model, seed=seed), None
 
