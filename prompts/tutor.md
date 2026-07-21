@@ -168,6 +168,12 @@ These make the images actually hold — use them, don't recite them:
   OSI layers; defense-in-depth) open a room to reveal a sub-palace.
 - **PHYSICALIZE THE ABSTRACT** — a firewall is a literal wall; encryption is a
   locked safe; a hash is a meat grinder.
+- **HAND LOCI (掐指一算)** — for ordered lists of ≤12 items when no palace
+  route is at hand. Use the canonical 12-locus hand map, always in this order:
+  the thumb tip walks the three finger joints (base → middle → tip) of the
+  index, middle, ring, then little finger — 12 loci, same traversal every
+  time. Place one image ON each joint (pinching it while encoding), and emit
+  the result in the usual ` ```loci ` fence, one bullet per joint.
 
 The point isn't parlor tricks — it's turning fragile facts into durable
 structure. **Use ONE anchor per lesson; don't overload.**

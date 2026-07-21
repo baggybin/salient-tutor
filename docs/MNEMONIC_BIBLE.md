@@ -217,3 +217,43 @@ You are an expert cognitive psychologist specializing in the Method of Loci. Bre
 
 No markdown wrappers. Raw JSON only.
 ```
+
+---
+
+## 0.8 — The No-Repeat Imagery Law (千字文 Constraint)
+
+The 千字文 (Thousand Character Classic, ~6th c.) was composed from exactly 1,000 non-repeating characters — uniqueness enforced as a compositional law, fourteen centuries before the lab named the mechanism. Adopt it as a hard rule for every palace, verse, or peg set your pipeline emits:
+
+```text
+NO-REPEAT LAW: Within one image set, every anchor image must be unique.
+Before placing a new image, diff it against every image already placed on
+three axes: dominant shape, color family, and action/creature. A collision on
+any axis = mutate the new image (scale, material, species, era) and re-check.
+Deliberate callbacks (§0.5) are the only reuse allowed — and they must MUTATE
+the quoted image, never clone it.
+```
+
+**Why it is a law and not a preference:** the Von Restorff effect (§0.1A) collapses the moment oddities repeat — two giants, two fires, two melting objects merge into one smeared trace. Worse, duplicate anchors create **cue overload** (the fan effect, Anderson 1974): one cue now points at two targets and retrieval slows and degrades for both. Uniqueness is what keeps every locus a clean one-to-one cue→fact mapping.
+
+---
+
+## Appendix — Classical Chinese Techniques, Mapped to the Lab
+
+Five classical Chinese mnemonic practices predate the modern literature by one to two millennia. None is folk superstition — each is an independent discovery of a mechanism the lab later quantified. Use them as prior art and as authoring patterns.
+
+| Classical technique | What it is | Modern lab finding it implements |
+|---|---|---|
+| **九九歌** (nine-nines chant, ~2,200 yrs) | The multiplication table recited as a fixed-cadence rhymed chant until it becomes a motor routine | **Chunking + phonological cueing**: rhythm and rhyme are external retrieval constraints — partial recall completes itself (Rubin 1995 on oral traditions) |
+| **三字经** (Three-Character Classic, ~13th c.) | A whole curriculum written in 3-character lines | **Chunking at optimal group size**: 3–4-item rhythmic groups maximize serial recall (Miller 1956; Mathy & Feldman 2012) — the beat makes a malformed chunk instantly audible |
+| **千字文** (Thousand Character Classic, ~6th c.) | A primer composed of exactly 1,000 non-repeating characters | **Distinctiveness / anti-cue-overload**: unique items avoid the fan effect and preserve the isolation effect (von Restorff 1933; Anderson 1974) — see §0.8 |
+| **谐音** (number homophones, living practice) | Numbers recoded into soundalike phrases — 520 → "I love you", 168 → "road to prosperity" | **Phonological recoding / free peg system**: meaningless digit strings become meaningful, imageable chunks (transfer-appropriate processing; the culture-specific cousin of the Major System) |
+| **掐指一算** ("pinching the fingers to reckon") | The 12 finger joints used as an ordered locus map for calendrical cycles | **Method of loci on a body-based scaffold**: an over-learned, always-available spatial order plus a motor/proprioceptive trace — a portable palace for ≤12 items |
+| **永字八法** (Eight Principles of Yong) | All eight calligraphy brush strokes taught through the one character 永 that contains them all | **Worked-example / schema abstraction**: one canonical exemplar carries a whole category; variants are learned as deltas against it (Sweller 1998; Gick & Holyoak 1983) |
+| **歇后语** (xiēhòuyǔ, two-part allegorical sayings) | A vivid concrete mini-scene, then the punchline meaning: "a mud bodhisattva crosses the river — it can't even save itself" | **Concreteness + imagery-with-meaning**: the scene enacts the fact, so the image cues the meaning directly (Paivio 1971; Bower 1972) — the folk version of the `metaphorAnchor` (§0.3): concrete scene first, meaning revealed after |
+| **藏头诗** (acrostic verse) | A poem whose line-initial characters spell the hidden key term or ordered list | **Organizational cueing / first-letter mnemonics**: narrative order + an orthographic cue per item (Bower 1970; Bellezza 1981) — predates Western acrostics (ROYGBIV) by ~a millennium |
+| **八卦 trigram rhymes** (乾三连、坤六断…) | Verses that verbally describe the visual shape of each trigram | **Dual coding across working-memory codes**: the phonological loop replays a description that reconstructs the visuospatial figure (Paivio 1971; Baddeley 1986) |
+| **对仗 / 笠翁对韵** (antithetical parallelism drills) | Strictly parallel antithetical pairs drilled call-and-response: 天对地，雨对风 ("sky/earth, rain/wind") | **Relational structure as retrieval cue / encoding specificity**: the parallel slot reinstates the partner, antithesis supplies the direction (Bower 1970; Tulving & Thomson 1973) |
+
+**Testing effect note:** all of these were historically learned by recitation *to criterion* — chanting from memory, checking, repeating — which is successive relearning (retrieval practice + spacing), the strongest finding in the modern literature. The classical techniques supplied the encoding; the drill culture supplied the retrieval.
+
+The pattern to internalize: **rhythm encodes order (九九歌, 三字经), uniqueness protects cues (千字文), sound recodes the arbitrary (谐音), and the body supplies a free palace (掐指一算).** When you author any mnemonic, you are choosing which of these four levers does the work.

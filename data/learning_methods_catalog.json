@@ -442,6 +442,354 @@
         "domain": "procedure-syntax",
         "text": "TCP three-way handshake: a sequence diagram (SYN →, ← SYN-ACK, ACK →) with the one-line verbal gloss per arrow ('client proposes; server accepts and proposes back; client confirms'). Learner later reproduces the diagram from the words, then the words from the diagram."
       }
+    },
+    {
+      "id": "rhymed-formula-verse",
+      "name": "Rhymed Formula Verse",
+      "aliases": ["口诀 (Kǒujué)", "Rhymed Formula", "Mnemonic Chant"],
+      "tier": "encoding",
+      "definition": "Compress an ordered body of facts (a table, a formula set, a procedure) into a short rhymed, rhythmic verse whose cadence forces the items back out in order.",
+      "mechanism": "Rhythm and rhyme act as external retrieval constraints: each line's meter and end-sound narrow the candidate words, so partial recall completes itself (phonological cueing + chunking). The 九九歌 (nine-nines multiplication chant, attested ~2,200 years ago) survives precisely because a 9x9 table recited to a fixed cadence becomes a motor routine, not a lookup.",
+      "how_to": "1. Reduce the material to the irreducible sequence (one fact per line or half-line).\n2. Fix a meter first (syllable count per line), then rhyme the line-ends.\n3. Say it aloud while drafting — if it doesn't chant, it won't stick.\n4. Rehearse to fluency, then switch to retrieval: recite from line cues only, checking against the full list.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.6,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Rubin", "year": 1995, "finding": "Rhyme, meter, and imagery are the organizational constraints that make oral traditions (ballads, epics) verbatim-stable across generations", "source_class": "cogpsych"},
+          {"authors": "Bower & Bolton", "year": 1969, "finding": "Rhymed word pairs recalled better than unrhymed controls — phonological relatedness is a free cue", "source_class": "cogpsych"}
+        ],
+        "caveats": "Millennia of classroom use (九九歌, alphabet song) is strong tradition evidence but thin controlled lab evidence. Verse composition cost is high; the rhyme can outlive the meaning (learners chant the verse without decoding it)."
+      },
+      "use_when": ["ordered sequences that must come out verbatim (tables, formulas, procedure steps)", "material for children or low-literacy contexts"],
+      "avoid_when": ["material too large for a verse (> ~30 items)", "facts where paraphrase tolerance is zero and a misheard rhyme corrupts the fact"],
+      "failure_modes": "- Verse recalled, meaning lost: the chant decouples from the facts it encodes.\n- Rhyme-first authoring distorts the fact to fit the meter.",
+      "composes_with": [
+        {"target": "chunking", "relation": "built-on", "note": "each line is a rhythm-bounded chunk"},
+        {"target": "dual-coding", "relation": "multiplies-with", "note": "verse supplies the verbal code; pair with a scene image"},
+        {"target": "retrieval-practice", "relation": "then-drill", "note": "recite from cues, don't re-read the verse"}
+      ],
+      "contrasts_with": ["rereading"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Thirty days hath September, / April, June, and November — the rhyme and meter make the exception list self-completing; you cannot stop mid-line."
+      }
+    },
+    {
+      "id": "trisyllabic-chunking",
+      "name": "Trisyllabic Chunking",
+      "aliases": ["三字经 Style (Three-Character Classic)", "Three-Beat Chunking", "Triplet Phrasing"],
+      "tier": "encoding",
+      "definition": "Phrase an ordered list as a chain of three-beat chunks (three syllables, words, or beats per group), exploiting the near-universal preference for triple rhythm in serial recall.",
+      "mechanism": "Chunking compresses a list into superordinate units, and a fixed 3-beat frame makes each unit self-checking: a malformed chunk is immediately audible. The 三字经 (Three-Character Classic, ~13th c.) taught a whole curriculum in 3-character lines; the same frame appears in 'Stop, Drop, and Roll' and 'Lights, Camera, Action'.",
+      "how_to": "1. Break the ordered material into groups of exactly three beats (3 syllables, or 3 short words).\n2. Keep the item order inside the chunks; the beat, not grammar, carries the sequence.\n3. Tap or speak the rhythm while rehearsing — motor entrainment deepens the trace.\n4. Test by reciting chunk-boundaries only, then expanding each chunk.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.65,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Miller", "year": 1956, "finding": "The magical number seven, plus or minus two — chunking is the classic escape from span limits", "source_class": "cogpsych"},
+          {"authors": "Mathy & Feldman", "year": 2012, "finding": "Sequences parsed into rhythmic groups are recalled better than ungrouped controls; 3–4 item groups optimal", "source_class": "cogpsych"}
+        ],
+        "caveats": "Group sizes of 3–4 are optimal; forcing 3-beat phrasing onto non-uniform material can pad or truncate facts. Rhythm aids order, not comprehension."
+      },
+      "use_when": ["short ordered procedures and checklists (safety drills, mnemonics of steps)", "lists of 6–15 items that resist meaning-based grouping"],
+      "avoid_when": ["hierarchical or relational material (use a map or palace)", "items that cannot be honestly compressed to the beat"],
+      "failure_modes": "- Beat over content: the item gets mangled to fit three beats and the fact is corrupted.\n- Chunks recalled, order across chunks lost.",
+      "composes_with": [
+        {"target": "chunking", "relation": "special-case-of", "note": "rhythm-fixed chunking with an audible error signal"},
+        {"target": "rhymed-formula-verse", "relation": "multiplies-with", "note": "triplets plus end-rhyme = a full chant"}
+      ],
+      "contrasts_with": ["rote-rehearsal"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Fire-safety response as triplets: 'Stop — Drop — Roll' / 'Crawl — Low — Go'. Each three-beat chunk is self-checking; a two-beat slip is heard instantly."
+      }
+    },
+    {
+      "id": "number-homophone-pegs",
+      "name": "Number Homophone Pegs",
+      "aliases": ["谐音 (Xiéyīn) Number Pegs", "Number Soundalikes", "Homophonic Number Encoding"],
+      "tier": "encoding",
+      "definition": "Map numbers to words or phrases that sound like their digits read aloud (in the learner's own language/dialect), turning arbitrary figures into meaningful, imageable phrases.",
+      "mechanism": "Phonological recoding converts a meaningless digit string into a semantic chunk that already has hooks in long-term memory — a free, pre-memorized peg system. Chinese internet culture demonstrates it at scale: 520 (wǔ èr líng) ≈ 'I love you' (wǒ ài nǐ), 168 = 'road to prosperity', 88 = 'bye-bye'; Cantonese license-plate premiums for 8 and penalties for 4 show the mapping is automatic for a whole population.",
+      "how_to": "1. Read the digits aloud in the learner's strongest language; listen for the nearest familiar word/phrase per digit run.\n2. Chain the soundalikes into one short phrase or image, ordered to match the digits.\n3. Record the digit→sound mapping once and reuse it — it becomes a personal peg system.\n4. Drill both directions: number → phrase and phrase → number.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.6,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Morris, Bransford & Franks", "year": 1977, "finding": "Transfer-appropriate processing: phonological encodings excel when the retrieval task is phonological; meaningful recodings beat rote digit rehearsal", "source_class": "cogpsych"},
+          {"authors": "Bellezza", "year": 1996, "finding": "Mnemonic value of pronounceability and meaningfulness for digit strings; recoding beats rehearsal", "source_class": "cogpsych"}
+        ],
+        "caveats": "Language- and dialect-specific — a mapping that sings in Mandarin is noise in English (where the Major System is the established cousin). Homophone drift (loose pronunciation) corrupts digits silently."
+      },
+      "use_when": ["short numbers that must be exact (dates, codes, ports, constants)", "learners whose L1 has rich number homophones"],
+      "avoid_when": ["long digit strings (use PAO/Major)", "precision-critical digits where a fuzzy homophone can swap a digit"],
+      "failure_modes": "- Homophone drift: the phrase is recalled but maps back to the wrong digit.\n- One-off mappings reinvented per number instead of a stable digit→sound table.",
+      "composes_with": [
+        {"target": "major-system", "relation": "cousin-of", "note": "phonetic digit encoding, culture-tuned instead of consonant-fixed"},
+        {"target": "peg-system", "relation": "free-variant-of", "note": "the homophones act as pre-existing pegs"},
+        {"target": "bizarreness-exaggeration", "relation": "multiplies-with", "note": "image the homophone phrase bizarrely"}
+      ],
+      "contrasts_with": ["rote-rehearsal"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Remembering a 1688 hotline: 168 'road to prosperity' + 88 'bye-bye' → a golden road with a waving hand at the end. Digits come back by sounding out the scene."
+      }
+    },
+    {
+      "id": "hand-loci",
+      "name": "Hand Loci",
+      "aliases": ["掐指一算 (Qiā Zhǐ Yī Suàn)", "Knuckle Loci", "Finger-Joint Palace"],
+      "tier": "encoding",
+      "definition": "Use the ordered joints and knuckles of one hand as a fixed 12-locus spatial scaffold, placing one image per joint — a body-based memory palace for small ordered sets.",
+      "mechanism": "A portable, always-available, over-learned spatial order (the finger joints), so the loci need zero setup and the body's proprioceptive trace adds a motor cue to the spatial one. 掐指一算 ('pinching the fingers to reckon') — the folk method of cycling calendrical cycles across the 12 finger joints — is the classical proof the scaffold works.",
+      "how_to": "1. Fix the canonical map ONCE: thumb tip touches the index finger's three joints in order, then middle, ring, little — 12 loci, always traversed the same direction.\n2. Convert each item to a concrete image and place it ON the joint (pinching it as you encode).\n3. Recall by walking the thumb across the joints, pinching each.\n4. Wipe and reuse freely — the joints, not the images, are permanent.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.55,
+        "source_class": "memory-sport",
+        "citations": [
+          {"authors": "Maguire, Valentine, Wilding & Kapur", "year": 2003, "finding": "Superior memorizers exploit ordered spatial scaffolds; familiar routes need no pre-learning — body maps are the most familiar of all", "source_class": "cogpsych"},
+          {"authors": "Craig et al.", "year": 2022, "finding": "Gestural/motor encoding at study improves ordered recall vs. verbal-only encoding", "source_class": "cogpsych"}
+        ],
+        "caveats": "Direct lab evidence is thin; support is by extension from loci + embodied-encoding literatures and long folk practice. Capacity is hard-capped at 12, and joints are less visually distinct than architectural loci."
+      },
+      "use_when": ["ordered lists of ≤12 items (steps, a dozen, a small taxonomy)", "field encoding with no pen, screen, or quiet room available"],
+      "avoid_when": ["lists >12 (use a route palace)", "items needing visually rich, sharply distinct loci — joints blur together"],
+      "failure_modes": "- Joint confusion: adjacent joints are too similar, images migrate.\n- Traversal-direction drift: reversing the walk corrupts the order.",
+      "composes_with": [
+        {"target": "method-of-loci", "relation": "special-case-of", "note": "a body palace with a fixed, pre-learned route"},
+        {"target": "elaborative-imagery", "relation": "depends-on", "note": "the placed image does the binding; the joint only orders it"}
+      ],
+      "contrasts_with": [],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "The 12 Earthly Branches cycle laid across the 12 finger joints — the classical 掐指一算 map; a modern equivalent: the OSI model's 7 layers pinched onto the first 7 joints in stack order."
+      }
+    },
+    {
+      "id": "no-repeat-imagery-rule",
+      "name": "No-Repeat Imagery Rule",
+      "aliases": ["千字文 Constraint (Thousand Character Classic)", "Distinctiveness Discipline", "One Image, One Anchor"],
+      "tier": "encoding",
+      "definition": "Within one palace, verse, or peg set, every anchor image must be unique — no repeated shapes, characters, or dominant colors — enforced as a hard authoring constraint.",
+      "mechanism": "Distinctiveness is the engine of cue-based retrieval: duplicate images create cue overload (one cue → two targets) and fan-effect interference. The 千字文 (Thousand Character Classic, ~6th c.) was composed from exactly 1,000 non-repeating characters — uniqueness as a compositional law, millennia before the lab named it.",
+      "how_to": "1. Keep a running inventory of images already used in the set.\n2. Before placing a new image, diff it against the inventory on shape, dominant color, and action.\n3. If two images collide, mutate the new one on at least one axis (scale, material, species, era).\n4. Audit the finished set as a gallery walk — any two you'd confuse at a glance get regenerated.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.85,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "von Restorff", "year": 1933, "finding": "Distinctive items in a homogeneous series are recalled 2–3x better — and distinctiveness collapses as soon as oddities repeat", "source_class": "cogpsych"},
+          {"authors": "Anderson", "year": 1974, "finding": "Fan effect: each additional fact tied to one cue slows and weakens retrieval of all of them", "source_class": "cogpsych"}
+        ],
+        "caveats": "The constraint raises authoring cost; applied dogmatically it can also ban *useful* repetition (deliberate callbacks must mutate the quoted image, not clone it)."
+      },
+      "use_when": ["any multi-item image set: palaces, peg lists, verse imagery", "auditing an existing palace for retrieval failures"],
+      "avoid_when": ["single standalone images (nothing to collide with)"],
+      "failure_modes": "- Near-duplicates slip in (two fires, two giants, two breaking objects) and cross-fire at recall.\n- Over-correction: images mutated so far the fact mapping is lost.",
+      "composes_with": [
+        {"target": "bizarreness-exaggeration", "relation": "guards", "note": "bizarreness only works if each bizarre item stays unique"},
+        {"target": "method-of-loci", "relation": "guards", "note": "palace images are the classic collision site"}
+      ],
+      "contrasts_with": [],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "A palace for HTTP methods already has 'a giant stamping hand' for PUT; POST cannot be another stamping hand — mutate it to a postal worker hurling a parcel through a mail slot."
+      }
+    },
+    {
+      "id": "etymology-decomposition",
+      "name": "Etymology Decomposition",
+      "aliases": ["说文解字 Style (Shuowen Jiezi)", "Component Decomposition", "Radical Story Method"],
+      "tier": "encoding",
+      "definition": "Decompose an abstract term into its concrete historical components (roots, radicals, affixes), then bind the meaning by composing the components into one story image.",
+      "mechanism": "The term's opaque label is unpacked into 2–4 already-meaningful parts, so the label itself becomes a retrieval cue for the meaning (elaborative encoding + a built-in keyword structure). 说文解字 (~100 CE) analyzed characters into radicals + phonetics and glossed each with a compositional story — the same move as the Keyword Method, but the 'keyword' is the term's own components instead of a soundalike.",
+      "how_to": "1. Split the term into its components (Greek/Latin roots, morphemes, or character radicals); verify the split, don't invent folk etymology.\n2. Give each component a concrete stand-in image.\n3. Compose ONE bizarre scene where the components interact to act out the modern meaning.\n4. Recall path: term → components → scene → meaning. Rebuild it before every use until fluent.",
+      "evidence": {
+        "grade": "established",
+        "confidence": 0.75,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Pressley, Levin & Delaney", "year": 1982, "finding": "Keyword-type decompositions robustly beat rote for vocabulary — etymology decomposition is the keyword method with semantic instead of acoustic links", "source_class": "cogpsych"},
+          {"authors": "Bowers, Kirby & Deacon", "year": 2010, "finding": "Morphological instruction (teaching words via their roots/affixes) improved vocabulary and reading across grades", "source_class": "cogpsych"}
+        ],
+        "caveats": "Etymology is not meaning: components cue the sense, they don't define it (folk etymologies mislead). Decomposition costs research time; skip it when the term is already transparent."
+      },
+      "use_when": ["opaque technical or scientific terms (crypto-, -ectomy, ortho-)", "jargon whose roots recur across a field — one decomposition pays off on many terms"],
+      "avoid_when": ["terms whose historical components no longer relate to the current meaning", "when a soundalike keyword is faster and equally imageable"],
+      "failure_modes": "- Invented etymology: a plausible-but-false split encodes a false fact.\n- Decomposition without composition: parts listed, no scene, nothing sticks.",
+      "composes_with": [
+        {"target": "keyword-method", "relation": "generalizes", "note": "same term→image→meaning path, semantic links instead of acoustic"},
+        {"target": "elaborative-imagery", "relation": "depends-on", "note": "the component scene is an interactive image"},
+        {"target": "concrete-examples", "relation": "multiplies-with", "note": "attach the decomposed term to a worked case"}
+      ],
+      "contrasts_with": ["rote-rehearsal"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "Cryptography = kryptós ('hidden') + gráphein ('to write') → a hooded scribe writing with invisible ink under a cloak. Term → hidden + writing → the cloaked scribe → 'secret writing'."
+      }
+    },
+    {
+      "id": "master-exemplar",
+      "name": "Master Exemplar",
+      "aliases": ["永字八法 (Eight Principles of Yong)", "Canonical Exemplar", "One-Character Curriculum"],
+      "tier": "encoding",
+      "definition": "Teach an entire skill category through ONE carefully chosen exemplar that contains every case of the category, mastered to fluency before any variant is introduced.",
+      "mechanism": "A single artifact that embeds all the category's cases gives the learner one rich, integrated memory trace instead of N disconnected ones — each later variant is encoded as a delta against the exemplar, not a new item. 永字八法: the character 永 ('eternity') contains all eight fundamental brush strokes of Chinese calligraphy, so one character carries the whole stroke curriculum.",
+      "how_to": "1. Survey the category and enumerate its cases (strokes, moves, patterns).\n2. Choose (or construct) the one exemplar that contains every case; if none exists, take the minimal pair that covers them.\n3. Drill the exemplar to fluency, naming each case as it appears.\n4. Introduce variants as explicit diffs from the exemplar ('same as 永's dot, but pressed').",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.7,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Sweller, van Merriënboer & Paas", "year": 1998, "finding": "Worked examples outperform problem-solving for novices — one well-structured exemplar carries a whole procedure", "source_class": "cogpsych"},
+          {"authors": "Gick & Holyoak", "year": 1983, "finding": "Schema abstraction from analogs: variants are learned as mappings against a known source case", "source_class": "cogpsych"}
+        ],
+        "caveats": "The exemplar must genuinely contain every case — a partial exemplar teaches a partial category with false confidence. Fluency on one exemplar does not guarantee transfer; variants must still be practiced."
+      },
+      "use_when": ["procedures and skill categories (strokes, patterns, moves)", "worked-example teaching where one artifact can embed every case"],
+      "avoid_when": ["categories with no common structure (a forced exemplar distorts)", "declarative facts — use imagery/verse instead"],
+      "failure_modes": "- Exemplar gaps: a case the exemplar lacks is never learned.\n- Exemplar worship: the learner reproduces the exemplar but cannot diff variants against it.",
+      "composes_with": [
+        {"target": "worked-examples", "relation": "special-case-of", "note": "one maximally-informative worked example"},
+        {"target": "concrete-examples", "relation": "multiplies-with", "note": "variants taught as deltas are concrete examples"},
+        {"target": "interleaving", "relation": "then-drill", "note": "mix variants after the exemplar is fluent"}
+      ],
+      "contrasts_with": [],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "永字八法: the side dot, horizontal, vertical, hook, rising, left-falling, and right-falling strokes all live in 永. Master the one character; every other character is a recombination."
+      }
+    },
+    {
+      "id": "two-part-allegorical-encoding",
+      "name": "Two-Part Allegorical Encoding",
+      "aliases": ["歇后语 (Xiēhòuyǔ)", "Scene-Punchline Encoding", "Enigmatic Folk Simile"],
+      "tier": "encoding",
+      "definition": "Encode a meaning as a two-part saying: a vivid concrete mini-scene first, then the punchline that states the meaning — the scene is the retrieval cue, the punchline the fact.",
+      "mechanism": "A concrete scene does the encoding work and the punchline does the decoding, so recall runs scene → meaning without rote pairing (elaborative imagery plus a self-contained hint). 歇后语 institutionalizes it: 'a mud bodhisattva crosses the river — it can't even save itself' (泥菩萨过河 — 自身难保); the image guarantees the meaning. It is the folk version of the metaphorAnchor pattern: a concrete scene that points without needing the answer stated first.",
+      "how_to": "1. Take the abstract fact and find a concrete scene whose PHYSICS enact it (dissolving mud = helplessness).\n2. Compress the scene to one clause — pictureable in under a second.\n3. Attach the punchline: the plain meaning, stated after a dash.\n4. Drill recall scene-first: hear the scene, produce the meaning; then reverse.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.65,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bower", "year": 1972, "finding": "Imagery with the meaning supplied (vs. discovered or absent) produces the strongest paired-associate recall", "source_class": "cogpsych"},
+          {"authors": "Paivio", "year": 1971, "finding": "Concreteness effect: imageable phrases recalled far better than abstract ones", "source_class": "cogpsych"}
+        ],
+        "caveats": "Mostly tradition + mechanism-extension evidence; few controlled studies on xiehouyu per se. Culture-bound scenes don't transfer; the scene must enact the meaning, not merely co-occur with it."
+      },
+      "use_when": ["abstract principles, warnings, and characterizations that need a portable one-liner", "meanings a learner must generate from a hint (pre-reveal cue design)"],
+      "avoid_when": ["precision-critical facts (the punchline paraphrases)", "cross-cultural audiences who don't share the scene's conventions"],
+      "failure_modes": "- Scene recalled, punchline forgotten — the two halves were never drilled as a pair.\n- Decorative scene: vivid but not enacting the meaning, so it cues nothing.",
+      "composes_with": [
+        {"target": "elaborative-imagery", "relation": "depends-on", "note": "the scene half is an interactive image"},
+        {"target": "dual-coding", "relation": "multiplies-with", "note": "scene (visual) + punchline (verbal) is dual coding in one saying"},
+        {"target": "concrete-examples", "relation": "cousin-of", "note": "the scene is a miniature concrete example"}
+      ],
+      "contrasts_with": [],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "泥菩萨过河 — 自身难保: 'a mud bodhisattva crosses the river — it can't even save itself'. The dissolving clay IS the meaning; you cannot hold the image without the helplessness."
+      }
+    },
+    {
+      "id": "acrostic-verse",
+      "name": "Acrostic Verse",
+      "aliases": ["藏头诗 (Cángtóushī)", "Head-Hiding Verse", "First-Letter Mnemonic Verse"],
+      "tier": "encoding",
+      "definition": "Compose a verse whose line-initial characters (or words) spell out, in order, the hidden key term or ordered list to be memorized — the verse is the carrier, the initials are the payload.",
+      "mechanism": "The verse's meter and meaning hold the lines in order, and each line's first character is the retrieval cue for one item — a double scaffold (narrative order + orthographic cue). 藏头诗 is the classical Chinese form, predating the Western first-letter mnemonic (ROYGBIV-type acrostics) by roughly a millennium.",
+      "how_to": "1. Write the key term or ordered list vertically; each item becomes one line's initial.\n2. Draft lines that both fit the meter and make the initial natural — never force a wrong initial for smoothness.\n3. Prefer lines whose content also relates to the item (double coding).\n4. Recall by reading down the initials; drill list → verse and verse → list.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.65,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bellezza", "year": 1981, "finding": "Mnemonic devices as organizers: first-letter cues reliably support ordered serial recall", "source_class": "cogpsych"},
+          {"authors": "Bower", "year": 1970, "finding": "Organizational factors in memory: imposed structure (including acronym/acrostic structure) improves list recall", "source_class": "cogpsych"}
+        ],
+        "caveats": "Works for the FIRST item per line only — mid-line content isn't cued. Composition cost is high; a forced acrostic produces verse so strained it competes with the payload."
+      },
+      "use_when": ["a key term or short ordered list that must come back verbatim and in order", "ordered lists where a narrative carrier helps (the items alone are arid)"],
+      "avoid_when": ["long lists (verse balloons)", "lists whose items share initial characters — the cue stops discriminating"],
+      "failure_modes": "- Initials recalled, items not: the cue → item link was never drilled.\n- Strained verse: the carrier is so unnatural it is forgotten before the payload.",
+      "composes_with": [
+        {"target": "rhymed-formula-verse", "relation": "special-case-of", "note": "a verse whose initials carry the payload"},
+        {"target": "peg-system", "relation": "cousin-of", "note": "the line initials act as ordered pegs"}
+      ],
+      "contrasts_with": ["western-first-letter-acrostic"],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "Encoding the OSI layers bottom-up with an English acrostic: 'People Do Need To See Packets Arrive' (Physical, Data-link, Network, Transport, Session, Presentation, Application) — the 藏头诗 move with first letters as the payload."
+      }
+    },
+    {
+      "id": "shape-rhyme",
+      "name": "Shape Rhyme",
+      "aliases": ["八卦 Trigram Rhymes (Bāguà)", "Visual-Shape Verse", "Depictive Chant"],
+      "tier": "encoding",
+      "definition": "A short verse that verbally describes the VISUAL SHAPE of the thing memorized (a diagram, symbol, structure, or notation), so reciting the verse redraws the picture in the mind.",
+      "mechanism": "The verse runs in the phonological loop while its content reconstructs the image — the two codes cue each other, a self-contained dual-coding loop. The 八卦 trigram rhymes are the canonical form: 乾三连、坤六断、震仰盂、艮覆碗… ('Qián: three unbroken; Kūn: six broken; Zhèn: an upturned bowl; Gèn: an overturned bowl') — eight lines that verbally redraw all eight trigram figures.",
+      "how_to": "1. Look at the figure and name its salient shape features as concrete objects (bowls, breaks, stacks).\n2. Fix a meter and make each line depict one element, in reading order.\n3. Recite while tracing/drawing the figure until the verse alone suffices.\n4. Drill both directions: verse → sketch, and sketch → verse.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.7,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Paivio", "year": 1971, "finding": "Dual coding: verbal and imaginal traces with referential links give two retrieval routes", "source_class": "cogpsych"},
+          {"authors": "Baddeley", "year": 1986, "finding": "Working memory model: the phonological loop can maintain and replay verbal descriptions that reconstruct visuospatial content", "source_class": "cogpsych"}
+        ],
+        "caveats": "Only works when the shape is simple enough to verbalize losslessly; complex diagrams need a real diagram. The verse describes appearance, not meaning — pair it with the concept separately."
+      },
+      "use_when": ["diagrams, symbols, structures, and notation that must be redrawn from memory", "small fixed visual sets (trigrams, circuit symbols, notation glyphs)"],
+      "avoid_when": ["figures too detailed for a line-per-feature verse", "when the MEANING rather than the shape is the target"],
+      "failure_modes": "- Verse fluent, figure wrong: the descriptions were too vague to constrain the drawing.\n- Shape without sense: the learner redraws the figure but can't say what it means.",
+      "composes_with": [
+        {"target": "dual-coding", "relation": "instantiates", "note": "phonological loop + visuospatial sketchpad in one artifact"},
+        {"target": "rhymed-formula-verse", "relation": "special-case-of", "note": "verse whose content is depictive rather than narrative"},
+        {"target": "elaborative-interrogation", "relation": "then-drill", "note": "ask WHY the figure has that shape to attach meaning"}
+      ],
+      "contrasts_with": [],
+      "worked_example": {
+        "domain": "procedure-syntax",
+        "text": "乾三连、坤六断、震仰盂、艮覆碗、离中虚、坎中满、兑上缺、巽下断 — each line verbally redraws one trigram; recite all eight and the full 八卦 figure set is reconstructed."
+      }
+    },
+    {
+      "id": "antithetical-parallel-pairing",
+      "name": "Antithetical Parallel Pairing",
+      "aliases": ["对仗 (Duìzhàng)", "笠翁对韵 Style (Lǐ Wēng's Rhyme Pairs)", "Parallelism Drill"],
+      "tier": "encoding",
+      "definition": "Learn contrasts, opposites, and complementary pairs by drilling them in strict parallel form — matched length, matched structure, antithetical content — so each half cues the other.",
+      "mechanism": "The parallel syntax is a relational scaffold: once the structure is fixed, recalling one member reinstates the slot its partner must fill, and the antithesis supplies the semantic direction (relational structure as retrieval cue). 对仗 and the primer 笠翁对韵 drill it at scale: 天对地，雨对风，大陆对长空 ('sky pairs earth, rain pairs wind, broad land pairs the long sky').",
+      "how_to": "1. Identify the pairs in the material (opposites, complements, cause/effect).\n2. Phrase each pair in matched structure — same length, same grammar, antithetical content.\n3. Chain the pairs rhythmically and drill them as call-and-response.\n4. Test one direction only (given A, produce B), then reverse.",
+      "evidence": {
+        "grade": "promising",
+        "confidence": 0.65,
+        "source_class": "cogpsych",
+        "citations": [
+          {"authors": "Bower", "year": 1970, "finding": "Associative symmetry and structure: organized pairs are recalled better than unorganized ones", "source_class": "cogpsych"},
+          {"authors": "Tulving & Thomson", "year": 1973, "finding": "Encoding specificity: a cue reinstates its encoding context — the parallel slot reinstates the partner", "source_class": "cogpsych"}
+        ],
+        "caveats": "Suited only to genuinely pairable content; forcing unpairable material into antithesis creates false symmetries. Tradition evidence is strong (centuries of primer use), controlled evidence is by mechanism extension."
+      },
+      "use_when": ["contrasts, opposites, and complementary pairs (synonyms/antonyms, dual concepts, trade-offs)", "taxonomies that decompose into binary distinctions"],
+      "avoid_when": ["unpairable or many-member sets (use chunking or a palace)", "when the relationship between members is not actually antithetical"],
+      "failure_modes": "- False symmetry: a forced parallel implies a contrast that doesn't exist.\n- Half-learned pairs: A cues B but B doesn't cue A (drilled one direction only).",
+      "composes_with": [
+        {"target": "dual-coding", "relation": "verbal-analog-of", "note": "structure, not imagery, is the second code"},
+        {"target": "chunking", "relation": "built-on", "note": "each pair is a two-item relational chunk"},
+        {"target": "elaborative-interrogation", "relation": "multiplies-with", "note": "asking why the pair contrasts deepens the link"}
+      ],
+      "contrasts_with": ["rote-rehearsal"],
+      "worked_example": {
+        "domain": "abstract-concept",
+        "text": "天对地，雨对风，大陆对长空 — 'sky/earth, rain/wind, broad land/long sky': each strictly parallel pair is self-cueing; hear the first member and the slot demands its opposite."
+      }
     }
   ],
   "batch_2_retrieval_scheduling_metacognitive": [
@@ -869,7 +1217,7 @@
   ],
   "taxonomy": {
     "description": "How the techniques relate by function. Encoding gets material in; retrieval and generative strategies strengthen and integrate it; scheduling decides when practice happens; metacognitive strategies decide what to practice and govern the rest.",
-    "encoding": ["method-of-loci", "link-story-method", "major-system", "pao-system", "dominic-system", "number-shape", "number-rhyme", "peg-system", "mind-mapping", "elaborative-imagery", "bizarreness-exaggeration", "keyword-method", "chunking", "dual-coding"],
+    "encoding": ["method-of-loci", "link-story-method", "major-system", "pao-system", "dominic-system", "number-shape", "number-rhyme", "peg-system", "mind-mapping", "elaborative-imagery", "bizarreness-exaggeration", "keyword-method", "chunking", "dual-coding", "rhymed-formula-verse", "trisyllabic-chunking", "number-homophone-pegs", "hand-loci", "no-repeat-imagery-rule", "etymology-decomposition", "master-exemplar", "two-part-allegorical-encoding", "acrostic-verse", "shape-rhyme", "antithetical-parallel-pairing"],
     "retrieval": ["retrieval-practice", "generation-effect", "pretesting", "elaborative-interrogation", "self-explanation", "feynman-technique", "concrete-examples", "worked-examples"],
     "scheduling": ["spaced-practice", "interleaving", "successive-relearning"],
     "metacognitive": ["metacognition-calibration", "desirable-difficulties"]

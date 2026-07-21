@@ -89,6 +89,13 @@ renders the recall ladder; grades flow to the SM-2 gradebook.
   invent a near-duplicate spelling.
 - **Budget the bizarreness across the whole walk** — one striking element per
   locus, not a surreal blur. If every room screams, nothing is distinctive.
+- **NO REPEATED IMAGERY (千字文 rule).** Every anchor image in the palace must
+  be UNIQUE — no two loci may share a dominant shape, color family, creature,
+  or action. Duplicate images create cue overload (one cue → two targets) and
+  cross-fire at recall. Diff each new scene against the loci already placed;
+  if two collide, mutate the new one on scale, material, species, or era.
+  Callbacks are the exception — and they must *mutate* the quoted image, not
+  clone it.
 
 ## Checklist — before emitting a ```` ```palace ````
 
@@ -102,6 +109,8 @@ renders the recall ladder; grades flow to the SM-2 gradebook.
 [ ] caption states the element->fact MAPPING (shown post-recall)
 [ ] ≥1 callbackTo, whose scene visually quotes the referenced locus
 [ ] densest loci at first/last; middle loci most vivid
+[ ] every anchor image UNIQUE across the palace — no shared shape, color,
+    creature, or action between loci (callbacks mutate, never clone)
 [ ] conceptTaught/topic match the learner's gradebook topic
 [ ] raw JSON only inside the fence — no prose, no nested markdown
 ```
