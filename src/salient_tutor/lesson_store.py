@@ -4,10 +4,11 @@ import hashlib
 import json
 import sqlite3
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Final
 
-SCHEMA_VERSION: Final = 2
+SCHEMA_VERSION: Final = 3
 
 
 class LessonStoreError(RuntimeError):
@@ -34,10 +35,102 @@ def canonical_custom_skill(slug: str) -> str:
     return f"custom:{slug.strip().lower().replace(' ', '-')}"
 
 
+def derive_mastery_stage(session: dict | None, latest_attempt: dict | None = None) -> str:
+    """Compute a session's mastery stage read-only from its latest attempt.
+
+    Replaces the written ``sessions.mastery_stage`` column so there is a single
+    authority for cross-session/topic mastery (the KG SM-2 gradebook) and this
+    per-session derivation for attempt outcomes. Returns one of:
+    ``unstarted`` / ``provisional_mastery`` / ``durable_mastery`` /
+    ``remediation_queued``."""
+    if not session or not latest_attempt:
+        return "unstarted"
+    passed = latest_attempt.get("scoring_status") == "pass"
+    is_delayed = session.get("session_kind") == "delayed_retrieval"
+    if passed and is_delayed:
+        return "durable_mastery"
+    if passed:
+        return "provisional_mastery"
+    if is_delayed:
+        return "remediation_queued"
+    return "unstarted"
+
+
+# ── Schema migrations ──────────────────────────────────────────────────────
+# A fresh db (version 0) is created at the current shape by CREATE-IF-NOT-EXISTS,
+# so only pre-existing DBs at version >= 1 are walked forward through these steps.
+# Each step is (from_version, to_version, description, apply(db)).
+
+_MigrationStep = tuple[int, int, str, Callable[[sqlite3.Connection], None]]
+
+
+def _migrate_v1_to_v2(db: sqlite3.Connection) -> None:
+    """v1 carried UNIQUE(session_id, item_id, item_version) on attempts, which
+    made a post-fail retry impossible: the correct resubmit collided and
+    save_attempt returned the stale failed row, trapping the learner in an
+    unwinnable drill loop. attempts is append-only and idempotency is enforced
+    by session_events(idempotency_key), so rebuild the table without the
+    constraint, preserving history."""
+    db.executescript(
+        """
+        ALTER TABLE attempts RENAME TO attempts_legacy_v1;
+        CREATE TABLE attempts (
+            attempt_id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL REFERENCES sessions(session_id),
+            item_id TEXT NOT NULL,
+            item_version INTEGER NOT NULL,
+            response TEXT NOT NULL,
+            hints_used INTEGER NOT NULL DEFAULT 0,
+            score_by_criterion TEXT NOT NULL,
+            scoring_status TEXT NOT NULL,
+            scorer_version TEXT NOT NULL,
+            feedback TEXT NOT NULL,
+            next_action TEXT NOT NULL,
+            created_at REAL NOT NULL
+        );
+        INSERT INTO attempts SELECT * FROM attempts_legacy_v1;
+        DROP TABLE attempts_legacy_v1;
+        """
+    )
+
+
+def _migrate_v2_to_v3(db: sqlite3.Connection) -> None:
+    """v2 stored per-session ``mastery_stage`` as a written column, which
+    drifted from the KG SM-2 gradebook and the curriculum-list derivation.
+    Mastery is now derived read-only from attempt outcomes (see
+    ``derive_mastery_stage``), so drop the column. Idempotent: a no-op if the
+    column is already gone (e.g. a fresh db created at the v3 shape)."""
+    columns = {row[1] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
+    if "mastery_stage" in columns:
+        db.execute("ALTER TABLE sessions DROP COLUMN mastery_stage")
+
+
+_MIGRATION_STEPS: Final[tuple[_MigrationStep, ...]] = (
+    (
+        1,
+        2,
+        "drop UNIQUE(session_id,item_id,item_version) on attempts so post-fail retries can append",
+        _migrate_v1_to_v2,
+    ),
+    (
+        2,
+        3,
+        "drop sessions.mastery_stage (now derived read-only from attempt outcomes)",
+        _migrate_v2_to_v3,
+    ),
+)
+
+
 class LessonStore:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        # Default (no migration applied yet); _migrate overwrites on initialize.
+        self._migration_info: dict = {
+            "from_version": 0,
+            "to_version": SCHEMA_VERSION,
+            "applied": [],
+        }
         self._initialize()
 
     def _connect(self) -> sqlite3.Connection:
@@ -70,7 +163,6 @@ class LessonStore:
                     phase TEXT NOT NULL,
                     phase_version INTEGER NOT NULL DEFAULT 0,
                     active_item_id TEXT,
-                    mastery_stage TEXT NOT NULL DEFAULT 'unstarted',
                     created_at REAL NOT NULL,
                     updated_at REAL NOT NULL
                 );
@@ -160,37 +252,20 @@ class LessonStore:
 
     def _migrate(self, db: sqlite3.Connection, from_version: int) -> None:
         """Apply ordered, idempotent migrations from an existing db's version up
-        to SCHEMA_VERSION. A fresh db (version 0) is already at the current shape
-        via the CREATE-IF-NOT-EXISTS script above, so only pre-existing versions
-        need work."""
-        if 1 <= from_version < 2:
-            # v1 carried UNIQUE(session_id, item_id, item_version) on attempts,
-            # which made a post-fail retry impossible: the correct resubmit
-            # collided and save_attempt returned the stale failed row, trapping
-            # the learner in an unwinnable drill loop. attempts is append-only
-            # and idempotency is enforced by session_events(idempotency_key), so
-            # rebuild the table without the constraint, preserving history.
-            db.executescript(
-                """
-                ALTER TABLE attempts RENAME TO attempts_legacy_v1;
-                CREATE TABLE attempts (
-                    attempt_id TEXT PRIMARY KEY,
-                    session_id TEXT NOT NULL REFERENCES sessions(session_id),
-                    item_id TEXT NOT NULL,
-                    item_version INTEGER NOT NULL,
-                    response TEXT NOT NULL,
-                    hints_used INTEGER NOT NULL DEFAULT 0,
-                    score_by_criterion TEXT NOT NULL,
-                    scoring_status TEXT NOT NULL,
-                    scorer_version TEXT NOT NULL,
-                    feedback TEXT NOT NULL,
-                    next_action TEXT NOT NULL,
-                    created_at REAL NOT NULL
-                );
-                INSERT INTO attempts SELECT * FROM attempts_legacy_v1;
-                DROP TABLE attempts_legacy_v1;
-                """
-            )
+        to SCHEMA_VERSION, recording what was applied. A fresh db (version 0) is
+        already at the current shape via the CREATE-IF-NOT-EXISTS script above,
+        so only pre-existing versions (>= 1) are walked forward."""
+        applied: list[dict] = []
+        if from_version >= 1:
+            for step_from, step_to, description, apply_fn in _MIGRATION_STEPS:
+                if step_from >= from_version and step_to <= SCHEMA_VERSION:
+                    apply_fn(db)
+                    applied.append({"from": step_from, "to": step_to, "description": description})
+        self._migration_info = {
+            "from_version": from_version,
+            "to_version": SCHEMA_VERSION,
+            "applied": applied,
+        }
 
     @staticmethod
     def _json(value: dict | list) -> str:
@@ -217,7 +292,7 @@ class LessonStore:
         now = time.time()
         with self._connect() as db:
             db.execute(
-                "INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     session["session_id"],
                     session["status"],
@@ -232,7 +307,6 @@ class LessonStore:
                     session["phase"],
                     0,
                     None,
-                    "unstarted",
                     now,
                     now,
                 ),
@@ -244,9 +318,22 @@ class LessonStore:
 
     def get_session(self, session_id: str) -> dict | None:
         with self._connect() as db:
-            return self._row(
-                db.execute("SELECT * FROM sessions WHERE session_id=?", (session_id,)).fetchone()
-            )
+            row = db.execute("SELECT * FROM sessions WHERE session_id=?", (session_id,)).fetchone()
+            if row is None:
+                return None
+            session = self._row(row)
+            # mastery_stage is derived read-only from the latest attempt (the
+            # written column was dropped in v3) — inject it so the session dict
+            # keeps its contract for callers that read session["mastery_stage"].
+            # rowid tiebreak: created_at is time.time(), so two quick attempts
+            # can share a timestamp — insertion order must break the tie.
+            latest = db.execute(
+                "SELECT * FROM attempts WHERE session_id=? "
+                "ORDER BY created_at DESC, rowid DESC LIMIT 1",
+                (session_id,),
+            ).fetchone()
+            session["mastery_stage"] = derive_mastery_stage(session, self._row(latest))
+            return session
 
     def current_session(self) -> dict | None:
         with self._connect() as db:
@@ -301,15 +388,6 @@ class LessonStore:
             if cursor.rowcount != 1:
                 raise SessionConflict(f"session {session_id} changed concurrently")
             self._event(db, session_id, event_type, payload or {"phase": phase}, None)
-        return self.get_session(session_id) or {}
-
-    def set_mastery_stage(self, session_id: str, stage: str) -> dict:
-        with self._connect() as db:
-            db.execute(
-                "UPDATE sessions SET mastery_stage=?, updated_at=? WHERE session_id=?",
-                (stage, time.time(), session_id),
-            )
-            self._event(db, session_id, "mastery_stage_changed", {"mastery_stage": stage}, None)
         return self.get_session(session_id) or {}
 
     def set_active_item(
@@ -407,6 +485,97 @@ class LessonStore:
             return self._row(
                 db.execute("SELECT * FROM attempts WHERE attempt_id=?", (attempt_id,)).fetchone()
             )
+
+    def record_attempt_and_transition(
+        self,
+        attempt: dict,
+        *,
+        idempotency_key: str,
+        next_phase: str,
+        event_type: str = "assessment_scored",
+        event_payload: dict | None = None,
+    ) -> dict:
+        """Record a scored attempt, its idempotency event, and the phase
+        transition in ONE transaction.
+
+        Previously these were three independent connections (save_attempt →
+        _event → transition), so a crash between the attempt INSERT and the
+        idempotency-event INSERT left a committed attempt with no replay guard
+        — a same-key retry would re-score and append a duplicate. Folding all
+        three writes into one connection's transaction makes the turn atomic:
+        on any failure the context manager rolls everything back. Returns the
+        updated session. Raises SessionConflict if the phase_version changed
+        concurrently (compare-and-swap loser), and IdempotencyConflict if the
+        idempotency key was already recorded — the OR-IGNORE alone would
+        silently drop the replay marker while still committing a duplicate
+        attempt, so a zero rowcount aborts (and rolls back) the whole turn."""
+        now = time.time()
+        with self._connect() as db:
+            db.execute(
+                """INSERT INTO attempts VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    attempt["attempt_id"],
+                    attempt["session_id"],
+                    attempt["item_id"],
+                    attempt["item_version"],
+                    attempt["response"],
+                    attempt.get("hints_used", 0),
+                    self._json(attempt.get("score_by_criterion", {})),
+                    attempt["scoring_status"],
+                    attempt.get("scorer_version", "deterministic-v1"),
+                    attempt.get("feedback", ""),
+                    attempt.get("next_action", "retry"),
+                    now,
+                ),
+            )
+            # Idempotency guard: a same-key event already on record means this
+            # is a replay that slipped past the controller's read-guard (e.g.
+            # two concurrent submits). Abort so the attempt INSERT above rolls
+            # back — otherwise it would commit unguarded, with no event row
+            # pointing at it.
+            inserted = self._event(
+                db,
+                attempt["session_id"],
+                "attempt_recorded",
+                {"attempt_id": attempt["attempt_id"]},
+                idempotency_key,
+            )
+            if inserted == 0:
+                raise IdempotencyConflict(
+                    f"idempotency key already recorded for session {attempt['session_id']}"
+                )
+            current = db.execute(
+                "SELECT * FROM sessions WHERE session_id=?", (attempt["session_id"],)
+            ).fetchone()
+            if current is None:
+                raise LessonStoreError(f"unknown session: {attempt['session_id']}")
+            base_version = current["phase_version"]
+            new_version = base_version + 1
+            # Compare-and-swap: the WHERE re-checks phase_version so two
+            # concurrent writers serialize — the loser's UPDATE matches zero
+            # rows and raises instead of a silent lost update.
+            cursor = db.execute(
+                "UPDATE sessions SET phase=?, status=?, phase_version=?, updated_at=? "
+                "WHERE session_id=? AND phase_version=?",
+                (
+                    next_phase,
+                    current["status"],
+                    new_version,
+                    now,
+                    attempt["session_id"],
+                    base_version,
+                ),
+            )
+            if cursor.rowcount != 1:
+                raise SessionConflict(f"session {attempt['session_id']} changed concurrently")
+            self._event(
+                db,
+                attempt["session_id"],
+                event_type,
+                event_payload or {"phase": next_phase},
+                None,
+            )
+        return self.get_session(attempt["session_id"]) or {}
 
     def save_review_application(self, application: dict) -> dict:
         with self._connect() as db:
@@ -510,6 +679,9 @@ class LessonStore:
         return {
             "database": str(self.path),
             "schema_version": self.schema_version(),
+            "from_version": self._migration_info["from_version"],
+            "to_version": self._migration_info["to_version"],
+            "migrations_applied": self._migration_info["applied"],
             "tables": counts,
         }
 
@@ -586,12 +758,21 @@ class LessonStore:
             hints = int(
                 db.execute("SELECT COALESCE(SUM(hints_used), 0) FROM attempts").fetchone()[0]
             )
-            sessions = {
-                row["mastery_stage"]: row["count"]
-                for row in db.execute(
-                    "SELECT mastery_stage, COUNT(*) AS count FROM sessions GROUP BY mastery_stage"
+            # mastery_stage is derived read-only (no column since v3): join each
+            # session to its latest attempt and bucket the derived stage in
+            # Python. Single correlated-subquery join — no N+1.
+            stages: dict[str, int] = {}
+            for row in db.execute(
+                "SELECT s.session_kind, a.scoring_status FROM sessions s "
+                "LEFT JOIN attempts a ON a.attempt_id = ("
+                " SELECT attempt_id FROM attempts WHERE session_id = s.session_id "
+                " ORDER BY created_at DESC, rowid DESC LIMIT 1)"
+            ).fetchall():
+                latest = (
+                    {"scoring_status": row["scoring_status"]} if row["scoring_status"] else None
                 )
-            }
+                stage = derive_mastery_stage({"session_kind": row["session_kind"]}, latest)
+                stages[stage] = stages.get(stage, 0) + 1
             run_status = {
                 row["status"]: row["count"]
                 for row in db.execute(
@@ -602,7 +783,7 @@ class LessonStore:
         return {
             "attempts": attempts,
             "hint_usage": hints,
-            "sessions": {"total": total_sessions, "mastery_stages": sessions},
+            "sessions": {"total": total_sessions, "mastery_stages": stages},
             "agent_runs": run_status,
         }
 
@@ -613,11 +794,15 @@ class LessonStore:
         event_type: str,
         payload: dict,
         idempotency_key: str | None,
-    ) -> None:
-        db.execute(
+    ) -> int:
+        """Insert a session event. Returns the insert rowcount: 0 means an
+        event with this idempotency key already exists (OR IGNORE swallowed
+        the row) — callers enforcing replay protection must check it."""
+        cursor = db.execute(
             "INSERT OR IGNORE INTO session_events(session_id,event_type,payload,created_at,idempotency_key) VALUES (?,?,?,?,?)",
             (session_id, event_type, self._json(payload), time.time(), idempotency_key),
         )
+        return cursor.rowcount
 
     def _event_for_controller(
         self, session_id: str, event_type: str, payload: dict, idempotency_key: str | None

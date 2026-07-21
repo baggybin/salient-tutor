@@ -4,11 +4,14 @@ import pytest
 
 from salient_tutor.lesson import LessonController
 from salient_tutor.lesson_store import (
+    SCHEMA_VERSION,
+    IdempotencyConflict,
     LessonStore,
     SessionConflict,
     canonical_curriculum_skill,
     canonical_custom_skill,
     canonical_study_skill,
+    derive_mastery_stage,
 )
 
 
@@ -18,6 +21,41 @@ def test_canonical_skill_ids_are_stable() -> None:
     )
     assert canonical_study_skill("p1", "s2") == "study:p1:sec:s2"
     assert canonical_custom_skill("DNS Lookup") == "custom:dns-lookup"
+
+
+def test_derive_mastery_stage_pure_logic() -> None:
+    # No attempt (or no session) → never started.
+    assert derive_mastery_stage(None, None) == "unstarted"
+    assert derive_mastery_stage({"session_kind": "lesson"}, None) == "unstarted"
+    lesson = {"session_kind": "lesson"}
+    delayed = {"session_kind": "delayed_retrieval"}
+    pass_att = {"scoring_status": "pass"}
+    fail_att = {"scoring_status": "fail"}
+    assert derive_mastery_stage(lesson, fail_att) == "unstarted"
+    assert derive_mastery_stage(lesson, pass_att) == "provisional_mastery"
+    assert derive_mastery_stage(delayed, pass_att) == "durable_mastery"
+    assert derive_mastery_stage(delayed, fail_att) == "remediation_queued"
+
+
+def test_mastery_stage_is_derived_not_stored(tmp_path) -> None:
+    # The sessions table must NOT carry a mastery_stage column (dropped in v3);
+    # the value on get_session is computed from the latest attempt.
+
+    store = LessonStore(tmp_path / "lessons.db")
+    with store._connect() as db:
+        cols = {row[1] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
+    assert "mastery_stage" not in cols
+
+    controller = LessonController(store)
+    session = controller.create_session("custom:m", session_kind="delayed_retrieval")
+    controller.advance(session["session_id"])
+    controller.advance(session["session_id"])
+    issued = controller.issue_item(session["session_id"])
+    # No attempt yet → unstarted.
+    assert store.get_session(session["session_id"])["mastery_stage"] == "unstarted"
+    controller.record_attempt(session["session_id"], issued["item"]["item_id"], 1, "custom:m", "k1")
+    # A pass on a delayed_retrieval session derives to durable_mastery.
+    assert store.get_session(session["session_id"])["mastery_stage"] == "durable_mastery"
 
 
 def test_session_reopen_preserves_pending_server_owned_item(tmp_path) -> None:
@@ -56,7 +94,95 @@ def test_duplicate_attempt_is_idempotent_and_chat_cannot_advance(tmp_path) -> No
     )
     assert first["attempt"]["attempt_id"] == second["attempt"]["attempt_id"]
     assert second["session"]["phase"] == "anchor"
-    assert len(controller.store.events(session["session_id"])) == 7
+    # created + 2×phase_changed + item_issued + attempt_recorded + assessment_scored
+    # (mastery_stage is now derived on read, so its written event is gone).
+    assert len(controller.store.events(session["session_id"])) == 6
+
+
+def test_record_attempt_and_transition_rolls_back_on_mid_txn_failure(tmp_path) -> None:
+    # The attempt INSERT, idempotency event, and phase transition must be one
+    # atomic unit. Inject a failure AFTER the attempt row is written (during the
+    # event step) and confirm nothing committed — no attempt, no event, and the
+    # phase is unchanged (the connection's context manager rolled everything back).
+    from unittest import mock
+
+    store = LessonStore(tmp_path / "lessons.db")
+    controller = LessonController(store)
+    session = controller.create_session("custom:atomic")
+    controller.advance(session["session_id"])
+    controller.advance(session["session_id"])
+    issued = controller.issue_item(session["session_id"])
+    item_id = issued["item"]["item_id"]
+
+    original_event = store._event
+
+    def boom(db, session_id, event_type, payload, idempotency_key):
+        if event_type == "attempt_recorded":
+            raise RuntimeError("simulated mid-transaction failure")
+        return original_event(db, session_id, event_type, payload, idempotency_key)
+
+    with mock.patch.object(store, "_event", side_effect=boom):
+        with pytest.raises(RuntimeError, match="simulated"):
+            store.record_attempt_and_transition(
+                {
+                    "attempt_id": "a-atomic",
+                    "session_id": session["session_id"],
+                    "item_id": item_id,
+                    "item_version": 1,
+                    "response": "x",
+                    "hints_used": 0,
+                    "score_by_criterion": {},
+                    "scoring_status": "pass",
+                    "scorer_version": "deterministic-v1",
+                    "feedback": "",
+                    "next_action": "advance",
+                },
+                idempotency_key="key-atomic",
+                next_phase="anchor",
+            )
+
+    assert store.get_attempt("a-atomic") is None
+    events = store.events(session["session_id"])
+    assert not any(e.get("idempotency_key") == "key-atomic" for e in events)
+    assert store.get_session(session["session_id"])["phase"] == "awaiting_attempt"
+
+
+def test_record_attempt_and_transition_rejects_replayed_key(tmp_path) -> None:
+    # A same-key call that slips past the controller's read-guard (e.g. two
+    # concurrent submits) must NOT commit a second attempt: the store aborts —
+    # rolling back the attempt INSERT — instead of silently OR-IGNOREing the
+    # duplicate event row and leaving an unguarded duplicate attempt behind.
+    store = LessonStore(tmp_path / "lessons.db")
+    controller = LessonController(store)
+    session = controller.create_session("custom:replay")
+    controller.advance(session["session_id"])
+    controller.advance(session["session_id"])
+    issued = controller.issue_item(session["session_id"])
+
+    def attempt_payload(attempt_id: str) -> dict:
+        return {
+            "attempt_id": attempt_id,
+            "session_id": session["session_id"],
+            "item_id": issued["item"]["item_id"],
+            "item_version": 1,
+            "response": "x",
+            "hints_used": 0,
+            "score_by_criterion": {},
+            "scoring_status": "pass",
+            "scorer_version": "deterministic-v1",
+            "feedback": "",
+            "next_action": "advance",
+        }
+
+    store.record_attempt_and_transition(
+        attempt_payload("a-first"), idempotency_key="key-replay", next_phase="anchor"
+    )
+    with pytest.raises(IdempotencyConflict):
+        store.record_attempt_and_transition(
+            attempt_payload("a-second"), idempotency_key="key-replay", next_phase="anchor"
+        )
+    assert store.get_attempt("a-second") is None  # rolled back, no duplicate
+    assert store.get_session(session["session_id"])["phase"] == "anchor"  # first commit stands
 
 
 def test_review_application_is_idempotent(tmp_path) -> None:
@@ -262,7 +388,8 @@ def test_v1_to_v2_migration_drops_attempts_unique_and_preserves_rows(tmp_path) -
     con.close()
 
     store = LessonStore(path)
-    assert store.schema_version() == 2
+    # v1 is walked forward through every step to the current schema version.
+    assert store.schema_version() == SCHEMA_VERSION
     assert store.get_attempt("a1")["scoring_status"] == "fail"  # legacy row preserved
     # The dropped constraint now allows a second attempt for the same tuple.
     store.save_attempt(
@@ -281,3 +408,44 @@ def test_v1_to_v2_migration_drops_attempts_unique_and_preserves_rows(tmp_path) -
         }
     )
     assert store.get_attempt("a2")["scoring_status"] == "pass"
+
+
+def test_migration_report_tracks_applied_migrations(tmp_path) -> None:
+    # A fresh db is created at the current shape, so no migrations are applied.
+    store = LessonStore(tmp_path / "lessons.db")
+    report = store.migration_report()
+    assert report["from_version"] == 0
+    assert report["to_version"] == SCHEMA_VERSION
+    assert report["migrations_applied"] == []
+
+
+def test_migration_report_records_v1_to_v2_jump(tmp_path) -> None:
+    # A legacy v1 db is walked forward to v2; the report must show that step.
+    import sqlite3
+
+    path = tmp_path / "lessons.db"
+    con = sqlite3.connect(path)
+    con.executescript("""
+        CREATE TABLE sessions (session_id TEXT PRIMARY KEY, status TEXT, session_kind TEXT,
+            skill_id TEXT, srs_topic TEXT, track_id TEXT, module_id TEXT, topic_id TEXT,
+            study_project_id TEXT, section_id TEXT, phase TEXT, phase_version INTEGER,
+            active_item_id TEXT, mastery_stage TEXT, created_at REAL, updated_at REAL);
+        CREATE TABLE attempts (attempt_id TEXT PRIMARY KEY, session_id TEXT, item_id TEXT,
+            item_version INTEGER, response TEXT, hints_used INTEGER, score_by_criterion TEXT,
+            scoring_status TEXT, scorer_version TEXT, feedback TEXT, next_action TEXT,
+            created_at REAL, UNIQUE(session_id, item_id, item_version));
+        PRAGMA user_version = 1;
+    """)
+    con.commit()
+    con.close()
+
+    store = LessonStore(path)
+    report = store.migration_report()
+    assert report["from_version"] == 1
+    assert report["to_version"] == SCHEMA_VERSION
+    applied = report["migrations_applied"]
+    assert len(applied) >= 1
+    step = applied[0]
+    assert step["from"] == 1
+    assert step["to"] == 2
+    assert "attempts" in step["description"]

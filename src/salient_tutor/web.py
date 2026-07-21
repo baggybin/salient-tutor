@@ -367,9 +367,23 @@ async def ws_tutor(ws: WebSocket) -> None:
         gated: bool = False,
         strictness: str = "socratic",
         attempt_pending: bool = False,
+        run_handle: dict | None = None,
     ) -> None:
+        recorded = False
         try:
             result_job = await fut
+            # Record the agent_run itself (raw LLM output, pre-judge) — WS turns
+            # previously bypassed daemon.prompt and logged NO agent_runs at all.
+            # The judge filter's revised text is a separate learner-facing concern.
+            if run_handle is not None:
+                status = "failed" if result_job.error else "completed"
+                await daemon._finish_turn_run(
+                    run_handle,
+                    status=status,
+                    output=result_job.result or "",
+                    error=result_job.error,
+                )
+                recorded = True
             draft = result_job.result or ""
             hinted = False
             awaiting = None
@@ -401,7 +415,21 @@ async def ws_tutor(ws: WebSocket) -> None:
                 "awaiting": awaiting,
                 "session_id": state["session_id"],
             }
+        except asyncio.CancelledError:
+            # Socket closed mid-turn: CancelledError is a BaseException, so the
+            # handler below never sees it — without this the telemetry row
+            # stays a zombie "started" run forever. Shield the write so the
+            # in-flight cancellation can't kill it, then re-raise.
+            if run_handle is not None and not recorded:
+                with suppress(Exception):
+                    await asyncio.shield(
+                        daemon._finish_turn_run(run_handle, status="failed", error="turn cancelled")
+                    )
+            raise
         except Exception as e:  # noqa: BLE001 — surface any failure to the client
+            if run_handle is not None and not recorded:
+                with suppress(Exception):
+                    await daemon._finish_turn_run(run_handle, status="failed", error=str(e))
             payload = {"kind": "error", "agent": agent, "job_id": job_id, "text": str(e)}
         finally:
             if state["gated_job"] == job_id:
@@ -448,7 +476,7 @@ async def ws_tutor(ws: WebSocket) -> None:
             if not text:
                 continue
             agent = msg.get("agent") if msg.get("agent") in tutor_names else state["agent"]
-            runner = await ensure(agent)
+            await ensure(agent)  # pre-warm; _submit_turn re-fetches the cached runner
             state["agent"] = agent
             # Reviewed turn: gate a real (non-sentinel) tutor turn through the
             # judge leakage filter when a judge is configured.
@@ -481,24 +509,29 @@ async def ws_tutor(ws: WebSocket) -> None:
             ]
             submit_text = "\n\n".join([*parts, text]) if parts else text
             attached_session = msg.get("session_id") or state["session_id"]
-            if attached_session:
-                try:
-                    snapshot = await asyncio.to_thread(daemon.get_session, attached_session)
-                except Exception as error:
-                    await ws.send_json(
-                        {"kind": "conflict", "session_id": attached_session, "text": str(error)}
-                    )
-                    continue
-                state["session_id"] = attached_session
-                submit_text = (
-                    f"SERVER SESSION STATE: phase={snapshot['phase']}; skill_id={snapshot['skill_id']}; "
-                    "Only structured assessment actions advance the lesson.\n\n" + submit_text
+            # Shared submit path: builds the session preamble, starts the
+            # agent_runs telemetry row, and submits — identical to the CLI path
+            # (daemon.prompt). A bad session id raises here, before any telemetry
+            # or submit, so surface it as a conflict frame and keep the socket up.
+            # Infrastructure failures (runner construction/start) are NOT session
+            # conflicts — clients treat "conflict" as a re-sync signal, so those
+            # go out as plain error frames instead.
+            try:
+                handle = await daemon._submit_turn(
+                    agent, submit_text, session_id=attached_session or None
                 )
-            loop = asyncio.get_running_loop()
-            fut: asyncio.Future = loop.create_future()
-            # cfg max_turns as the per-job budget — arms the runner's hard cap
-            # for backend-seam providers (codex) with no native turn limit.
-            job = runner.submit(submit_text, future=fut, max_turns_hint=runner.cfg.get("max_turns"))
+            except (SessionConflict, LessonStoreError) as error:
+                await ws.send_json(
+                    {"kind": "conflict", "session_id": attached_session, "text": str(error)}
+                )
+                continue
+            except Exception as error:  # noqa: BLE001 — surface any failure to the client
+                await ws.send_json({"kind": "error", "agent": agent, "text": str(error)})
+                continue
+            if attached_session:
+                state["session_id"] = attached_session
+            fut: asyncio.Future = handle["future"]
+            job = handle["job"]
             state["job"] = job.id
             state["gated_job"] = job.id if gated else None
             waiters.append(
@@ -511,6 +544,7 @@ async def ws_tutor(ws: WebSocket) -> None:
                         gated=gated,
                         strictness=strictness,
                         attempt_pending=was_pending,
+                        run_handle=handle,
                     )
                 )
             )

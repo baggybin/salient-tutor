@@ -209,6 +209,14 @@ what's currently in memory so the operator can decide what to unload.
 |---|---|---|
 | ![Coach workspace](docs/screenshots/coach.jpg) | ![Library](docs/screenshots/library.jpg) | ![Settings](docs/screenshots/settings.jpg) |
 
+## Domain-Agnostic Curricula
+
+`salient-tutor` is built to teach any subject. We've recently expanded the default security tracks to include entirely new domains:
+
+| Modern Red & Purple Teaming | Neuroscience Fundamentals | AI Foundations |
+|---|---|---|
+| ![Modern Red & Purple Teaming](docs/assets/red_purple_team_banner.jpg) | ![Neuroscience Fundamentals](docs/assets/neuroscience_banner.jpg) | ![AI Foundations](docs/assets/ai_foundations_banner.jpg) |
+
 ## The pedagogy KG
 
 The tutor ships with a knowledge graph of *how to teach*, spanning both

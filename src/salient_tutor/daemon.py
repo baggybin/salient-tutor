@@ -1289,16 +1289,30 @@ class TutorDaemon:
             task.cancel()
         _log.info("tutor daemon stopped")
 
-    async def prompt(
-        self, agent: str, message: str, *, timeout: float = 120.0, session_id: str | None = None
-    ) -> str:
-        """Send a prompt to an agent and wait for the response."""
+    @staticmethod
+    def _session_preamble(session: dict[str, Any]) -> str:
+        """The SERVER SESSION STATE prefix that constrains a turn to the active
+        lesson phase. Shared by the CLI and WS submit paths so the wording can't
+        drift between them (the web handler previously carried a divergent copy)."""
+        return (
+            f"SERVER SESSION STATE: phase={session['phase']}; skill_id={session['skill_id']}; "
+            "Only structured assessment actions advance the lesson."
+        )
+
+    async def _submit_turn(
+        self, agent: str, message: str, *, session_id: str | None = None
+    ) -> dict[str, Any]:
+        """Shared submit path for both the blocking ``prompt`` and the streaming
+        WebSocket turn.
+
+        Builds the session preamble (when a session is attached), starts the
+        ``agent_runs`` telemetry row, and hands the message to the runner.
+        Returns a handle ``{future, run, store, job}``: the caller awaits
+        ``future`` (with its own timeout/error policy) and then calls
+        :meth:`_finish_turn_run` to record the outcome — so WS turns now record
+        the same telemetry the CLI path always has."""
         if session_id:
-            session = self.get_session(session_id)
-            message = (
-                f"SERVER SESSION STATE: phase={session['phase']}; skill_id={session['skill_id']}; "
-                "Structured assessment actions, not prose, advance the lesson.\n\n" + message
-            )
+            message = self._session_preamble(self.get_session(session_id)) + "\n\n" + message
         runner = self._make_runner(agent)
         if runner.status not in ("running", "idle"):
             await runner.start()
@@ -1316,32 +1330,52 @@ class TutorDaemon:
             if store is not None
             else None
         )
-
         future: asyncio.Future = asyncio.get_running_loop().create_future()
         # cfg max_turns as the per-job budget: claude backends enforce it via
         # ClaudeAgentOptions, but backend-seam providers (codex) have no
         # native turn cap — the hint arms the runner's wire-level hard cap.
-        runner.submit(message, future=future, max_turns_hint=runner.cfg.get("max_turns"))
         try:
-            result_job = await asyncio.wait_for(future, timeout=timeout)
-        except TimeoutError:
-            if store is not None and run is not None:
-                await asyncio.to_thread(
-                    store.finish_agent_run, run["run_id"], "timeout", error="agent timeout"
-                )
-            raise
+            job = runner.submit(message, future=future, max_turns_hint=runner.cfg.get("max_turns"))
         except Exception as error:
+            # The telemetry row is already started — close it here or it stays
+            # a zombie "started" run forever (no caller ever gets the handle).
             if store is not None and run is not None:
                 await asyncio.to_thread(
                     store.finish_agent_run, run["run_id"], "failed", error=str(error)
                 )
             raise
+        return {"future": future, "run": run, "store": store, "job": job}
+
+    async def _finish_turn_run(
+        self, handle: dict[str, Any], *, status: str, output: str = "", error: str | None = None
+    ) -> None:
+        """Record the ``agent_runs`` telemetry row for a turn submitted via
+        :meth:`_submit_turn`. No-op when no store/run was started."""
+        store = handle.get("store")
+        run = handle.get("run")
+        if store is None or run is None:
+            return
+        await asyncio.to_thread(
+            store.finish_agent_run, run["run_id"], status, output=output, error=error
+        )
+
+    async def prompt(
+        self, agent: str, message: str, *, timeout: float = 120.0, session_id: str | None = None
+    ) -> str:
+        """Send a prompt to an agent and wait for the response (blocking)."""
+        handle = await self._submit_turn(agent, message, session_id=session_id)
+        future: asyncio.Future = handle["future"]
+        try:
+            result_job = await asyncio.wait_for(future, timeout=timeout)
+        except TimeoutError:
+            await self._finish_turn_run(handle, status="timeout", error="agent timeout")
+            raise
+        except Exception as error:
+            await self._finish_turn_run(handle, status="failed", error=str(error))
+            raise
         output = result_job.result or ""
         status = "failed" if result_job.error else "completed"
-        if store is not None and run is not None:
-            await asyncio.to_thread(
-                store.finish_agent_run, run["run_id"], status, output=output, error=result_job.error
-            )
+        await self._finish_turn_run(handle, status=status, output=output, error=result_job.error)
         return output or result_job.error or "(no response)"
 
     async def second_opinion(self, question: str, *, timeout: float = 180.0) -> dict[str, Any]:
@@ -2009,15 +2043,19 @@ class TutorDaemon:
                     topic_id = str(topic["id"])
                     skill_id = f"curriculum:track:{track['id']}:module:{module_id}:topic:{topic_id}"
                     state = self.kg.learner_review_state(LEARNER_SUBJECT, skill_id)
+                    if state is None:
+                        mastery_stage = "unstarted"
+                    elif state.get("mastery", 0.0) >= STRONG_THRESHOLD:
+                        mastery_stage = "durable_mastery"
+                    else:
+                        mastery_stage = "provisional_mastery"
                     topics.append(
                         {
                             "id": topic_id,
                             "title": str(topic.get("title") or topic_id),
                             "skill_id": skill_id,
                             "difficulty": module.get("difficulty"),
-                            "mastery_stage": "durable_mastery"
-                            if state and state.get("mastery", 0.0) >= STRONG_THRESHOLD
-                            else "unstarted",
+                            "mastery_stage": mastery_stage,
                             "available": True,
                         }
                     )

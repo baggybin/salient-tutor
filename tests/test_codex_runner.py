@@ -39,6 +39,9 @@ class _RunnerShell:
     _load_prompt = TutorDaemon._load_prompt
     _agent_endpoint_for = TutorDaemon._agent_endpoint_for
     _runtime_for = TutorDaemon._runtime_for
+    _session_preamble = TutorDaemon._session_preamble
+    _submit_turn = TutorDaemon._submit_turn
+    _finish_turn_run = TutorDaemon._finish_turn_run
     add_question = TutorDaemon.add_question
 
     def __init__(self, tmp_path) -> None:
@@ -266,3 +269,28 @@ class TestSubmitTurnBudget:
         reply = asyncio.run(TutorDaemon.prompt(shell, "librarian", "hi"))
         assert reply == "ok"
         assert fake.submit_kwargs == {"max_turns_hint": 20}
+
+    def test_prompt_records_agent_run_telemetry(self, tmp_path):
+        # prompt (and the WS path that shares _submit_turn) must write an
+        # agent_runs row — previously WS turns logged nothing.
+        from salient_tutor.lesson_store import LessonStore
+
+        shell = _RunnerShell(tmp_path)
+        shell.lesson_store = LessonStore(Path(tmp_path) / "lessons.db")
+
+        class _FakeJob:
+            result = "answer"
+            error = None
+
+        class _FakeRunner:
+            status = "idle"
+            cfg = shell.agent_configs["librarian"]
+
+            def submit(self, message, *, future, **kwargs):
+                future.set_result(_FakeJob())
+
+        shell._make_runner = lambda agent: _FakeRunner()  # type: ignore[method-assign]
+        reply = asyncio.run(TutorDaemon.prompt(shell, "librarian", "hi"))
+        assert reply == "answer"
+        runs = shell.lesson_store.analytics()["agent_runs"]
+        assert runs.get("completed") == 1

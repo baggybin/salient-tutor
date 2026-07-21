@@ -6,8 +6,10 @@ import argparse
 import asyncio
 import json
 import sys
+from pathlib import Path
 
 from salient_tutor.daemon import TutorDaemon
+from salient_tutor.lesson_store import LessonStore
 
 
 def main() -> None:
@@ -42,8 +44,11 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.analytics or args.migration_report:
-        daemon = TutorDaemon(work_root=args.work_root)
-        result = daemon.analytics() if args.analytics else daemon.migration_report()
+        # Read-only reports touch only lessons.db — open the store directly
+        # instead of constructing a full TutorDaemon (which would open three
+        # other databases, parse/migrate agent config, and seed providers).
+        store = LessonStore(Path(args.work_root) / "lessons.db")
+        result = store.analytics() if args.analytics else store.migration_report()
         print(json.dumps(result, indent=2, sort_keys=True))
         return
     if not args.message:

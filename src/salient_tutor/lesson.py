@@ -4,7 +4,7 @@ import re
 import uuid
 from typing import Final
 
-from salient_tutor.lesson_store import LessonStore, LessonStoreError
+from salient_tutor.lesson_store import IdempotencyConflict, LessonStore, LessonStoreError
 
 PHASES: Final[tuple[str, ...]] = (
     "diagnose",
@@ -170,54 +170,59 @@ class LessonController:
         judge_result: dict | None = None,
     ) -> dict:
         session = self.get_session(session_id)
-        for event in self.store.events(session_id):
-            if event.get("idempotency_key") == idempotency_key:
-                attempt_id = event.get("payload", {}).get("attempt_id")
-                if attempt_id:
-                    attempt = self.store.get_attempt(attempt_id)
-                    if attempt:
-                        return {"attempt": attempt, "session": session}
+        replayed = self._replayed_attempt(session_id, idempotency_key)
+        if replayed is not None:
+            return {"attempt": replayed, "session": session}
         if session["phase"] != "awaiting_attempt" or session["active_item_id"] != item_id:
             raise LessonStoreError("the submitted item is not the active assessment")
         item = self.store.get_item(item_id, item_version)
         if item is None:
             raise LessonStoreError("unknown assessment item version")
         score = self._score(item, response, judge_result)
-        attempt = self.store.save_attempt(
-            {
-                "attempt_id": uuid.uuid4().hex,
-                "session_id": session_id,
-                "item_id": item_id,
-                "item_version": item_version,
-                "response": response,
-                "hints_used": hints_used,
-                **score,
-            }
-        )
-        self.store._event_for_controller(
-            session_id, "attempt_recorded", {"attempt_id": attempt["attempt_id"]}, idempotency_key
-        )
-        passed = attempt["scoring_status"] == "pass"
+        passed = score["scoring_status"] == "pass"
         next_phase = "anchor" if passed else "drill"
-        snapshot = self.store.transition(
-            session_id,
-            next_phase,
-            event_type="assessment_scored",
-            payload={"status": attempt["scoring_status"]},
-        )
-        stage = (
-            "durable_mastery"
-            if passed and session["session_kind"] == "delayed_retrieval"
-            else (
-                "provisional_mastery"
-                if passed
-                else "remediation_queued"
-                if session["session_kind"] == "delayed_retrieval"
-                else "unstarted"
+        attempt_id = uuid.uuid4().hex
+        # Atomic: attempt row + idempotency event + phase transition commit in a
+        # single transaction, so a crash between writes can't leave a duplicate
+        # attempt or a wedged phase.
+        try:
+            snapshot = self.store.record_attempt_and_transition(
+                {
+                    "attempt_id": attempt_id,
+                    "session_id": session_id,
+                    "item_id": item_id,
+                    "item_version": item_version,
+                    "response": response,
+                    "hints_used": hints_used,
+                    **score,
+                },
+                idempotency_key=idempotency_key,
+                next_phase=next_phase,
+                event_type="assessment_scored",
+                event_payload={"status": score["scoring_status"]},
             )
-        )
-        snapshot = self.store.set_mastery_stage(session_id, stage)
+        except IdempotencyConflict:
+            # A concurrent same-key submit won the race between our read-guard
+            # above and the transaction: return its attempt, not a duplicate.
+            replayed = self._replayed_attempt(session_id, idempotency_key)
+            if replayed is not None:
+                return {"attempt": replayed, "session": self.get_session(session_id)}
+            raise
+        attempt = self.store.get_attempt(attempt_id)
+        # mastery_stage is derived read-only from this attempt on read
+        # (get_session injects it); no written column to update.
         return {"attempt": attempt, "session": snapshot}
+
+    def _replayed_attempt(self, session_id: str, idempotency_key: str) -> dict | None:
+        """The attempt already recorded under this idempotency key, if any."""
+        for event in self.store.events(session_id):
+            if event.get("idempotency_key") == idempotency_key:
+                attempt_id = event.get("payload", {}).get("attempt_id")
+                if attempt_id:
+                    attempt = self.store.get_attempt(attempt_id)
+                    if attempt:
+                        return attempt
+        return None
 
     @staticmethod
     def _learner_item(item: dict) -> dict:
