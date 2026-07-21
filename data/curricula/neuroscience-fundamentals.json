@@ -1,0 +1,251 @@
+{
+  "track": "neuroscience-fundamentals",
+  "title": "Neuroscience Fundamentals",
+  "description": "Introduction to the structure and function of the nervous system, spanning from cellular neurobiology (action potentials, synapses) to systems (sensory processing, learning, and memory).",
+  "modules": [
+    {
+      "id": "cellular-molecular-foundations",
+      "title": "Cellular & Molecular Foundations",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Understand the basic building blocks of the nervous system, including the structure of neurons and how electrical and chemical signals are generated and transmitted.",
+      "topics": [
+        {
+          "id": "anatomy-nervous-system",
+          "title": "Anatomy of the Nervous System",
+          "concepts": [
+            "Neurons: The primary signaling cells of the nervous system (soma, dendrites, axon, axon terminal).",
+            "Glia: Support cells including astrocytes (blood-brain barrier), oligodendrocytes (CNS myelin), and Schwann cells (PNS myelin).",
+            "Central Nervous System (CNS) vs. Peripheral Nervous System (PNS).",
+            "Gray matter (cell bodies) vs. White matter (myelinated axons)."
+          ],
+          "key_facts": [
+            "Neurons are specialized for the reception, conduction, and transmission of electrochemical signals.",
+            "Myelin sheaths created by glial cells dramatically increase the speed of action potential conduction.",
+            "The CNS consists of the brain and spinal cord, while the PNS connects the CNS to the rest of the body."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Draw a neuron and label the soma, dendrites, axon, myelin sheath, and axon terminal.",
+            "Compare and contrast the functions of oligodendrocytes and Schwann cells."
+          ],
+          "common_mistakes": [
+            "Thinking neurons are the only important cells in the brain; glia are critical for support and signaling.",
+            "Confusing the CNS and PNS divisions."
+          ]
+        },
+        {
+          "id": "bioelectricity-action-potentials",
+          "title": "Bioelectricity & Action Potentials",
+          "concepts": [
+            "Resting Membrane Potential: Usually around -70mV, maintained by the Na+/K+ pump and leak channels.",
+            "Action Potential: A rapid, all-or-nothing change in membrane potential used for long-distance signaling.",
+            "Depolarization (Na+ rushing in) and Repolarization (K+ rushing out).",
+            "Saltatory Conduction: The jumping of action potentials from node to node in myelinated axons."
+          ],
+          "key_facts": [
+            "Action potentials are triggered when the membrane depolarization reaches a specific threshold (e.g., -55mV).",
+            "The Na+/K+ pump uses ATP to actively transport 3 Na+ ions out for every 2 K+ ions in, maintaining the concentration gradients.",
+            "Action potentials do not degrade in strength as they travel down the axon."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Graph an action potential over time, labeling the resting state, threshold, depolarization, repolarization, and hyperpolarization phases.",
+            "Explain what would happen to an action potential if voltage-gated sodium channels were blocked by a toxin (e.g., TTX)."
+          ],
+          "common_mistakes": [
+            "Believing an action potential can be 'stronger' or 'weaker' (it's all-or-nothing; stimulus intensity is coded by frequency).",
+            "Confusing the direction of ion flow during depolarization vs. repolarization."
+          ]
+        },
+        {
+          "id": "synaptic-transmission",
+          "title": "Synaptic Transmission",
+          "concepts": [
+            "Synapse: The junction between two neurons.",
+            "Chemical Synapses: Use neurotransmitters released from vesicles into the synaptic cleft.",
+            "Electrical Synapses: Direct cytoplasmic connections via gap junctions (faster, less modifiable).",
+            "Excitatory (EPSP) vs. Inhibitory (IPSP) postsynaptic potentials."
+          ],
+          "key_facts": [
+            "Calcium (Ca2+) influx at the axon terminal is the critical trigger for neurotransmitter vesicle fusion and release.",
+            "Neurotransmitters bind to specific receptors (ionotropic or metabotropic) on the postsynaptic membrane.",
+            "A single neuron integrates thousands of EPSPs and IPSPs to determine if it will fire an action potential."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Sequence the steps of chemical synaptic transmission from action potential arrival to neurotransmitter clearance.",
+            "Differentiate between spatial summation and temporal summation of synaptic inputs."
+          ],
+          "common_mistakes": [
+            "Thinking neurotransmitters enter the postsynaptic cell (they usually only bind to receptors on the surface).",
+            "Assuming all synapses are chemical."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sensory-motor-systems",
+      "title": "Sensory & Motor Systems",
+      "difficulty": "intermediate",
+      "prerequisites": ["cellular-molecular-foundations"],
+      "objective": "Explore how the nervous system detects environmental stimuli and generates coordinated physical responses.",
+      "topics": [
+        {
+          "id": "sensory-transduction",
+          "title": "Sensory Transduction & Processing",
+          "concepts": [
+            "Sensory Transduction: The process of converting physical stimuli (light, sound waves, pressure) into electrical neural signals.",
+            "Photoreceptors (rods and cones) in the retina for vision.",
+            "Hair cells in the cochlea for audition (hearing).",
+            "Topographic mapping: How sensory surfaces are mapped onto the cortex (e.g., retinotopic map, somatosensory homunculus)."
+          ],
+          "key_facts": [
+            "Rods are highly sensitive to light (night vision), while cones process color and detail (daylight vision).",
+            "The thalamus acts as the major sensory relay station for all senses except olfaction (smell).",
+            "Sensory pathways often cross over (decussate) to the opposite side of the brain."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Trace the visual pathway from the retina to the primary visual cortex (V1).",
+            "Explain how the basilar membrane in the cochlea distinguishes between high and low-frequency sounds."
+          ],
+          "common_mistakes": [
+            "Thinking the image on the retina is exactly what the brain 'sees' (the brain actively constructs visual perception).",
+            "Forgetting that smell bypasses the thalamus."
+          ]
+        },
+        {
+          "id": "motor-control",
+          "title": "Motor Control",
+          "concepts": [
+            "Upper Motor Neurons (in the brain) vs. Lower Motor Neurons (in the spinal cord).",
+            "The Neuromuscular Junction (NMJ): The synapse between a motor neuron and a muscle fiber using acetylcholine (ACh).",
+            "Basal Ganglia: Involved in the initiation and smooth execution of voluntary movements.",
+            "Cerebellum: Responsible for motor learning, coordination, and balance."
+          ],
+          "key_facts": [
+            "Damage to the basal ganglia leads to movement disorders like Parkinson's disease (hypokinesia) or Huntington's disease (hyperkinesia).",
+            "A motor unit consists of a single lower motor neuron and all the muscle fibers it innervates.",
+            "Reflex arcs can operate entirely within the spinal cord, without requiring brain input."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Map the corticospinal tract from the primary motor cortex to a muscle in the hand.",
+            "Compare the roles of the basal ganglia and the cerebellum in motor control."
+          ],
+          "common_mistakes": [
+            "Confusing the roles of the upper and lower motor neurons.",
+            "Thinking all movement is consciously controlled by the cortex (ignoring spinal reflexes and cerebellar automation)."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "systems-behavioral-neuroscience",
+      "title": "Systems & Behavioral Neuroscience",
+      "difficulty": "intermediate",
+      "prerequisites": ["cellular-molecular-foundations"],
+      "objective": "Understand the neural circuits underlying complex behaviors, including basic survival drives, emotion, and memory formation.",
+      "topics": [
+        {
+          "id": "homeostasis-motivation",
+          "title": "Homeostasis & Motivation",
+          "concepts": [
+            "Homeostasis: Maintaining internal biological stability (temperature, energy levels, hydration).",
+            "Hypothalamus: The master regulator of homeostasis and the endocrine system.",
+            "Circadian Rhythms: The ~24-hour biological clock driven by the suprachiasmatic nucleus (SCN).",
+            "Dopaminergic reward pathway: The Ventral Tegmental Area (VTA) and Nucleus Accumbens involved in motivation and addiction."
+          ],
+          "key_facts": [
+            "The hypothalamus controls the pituitary gland, bridging the nervous and endocrine (hormone) systems.",
+            "Light suppresses melatonin production via a pathway from the retina to the SCN to the pineal gland.",
+            "Drugs of abuse hijack the brain's natural reward system by artificially spiking dopamine levels."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Diagram the feedback loop that regulates blood osmolarity (thirst) involving the hypothalamus.",
+            "Explain how blue light exposure before bed disrupts sleep cycles."
+          ],
+          "common_mistakes": [
+            "Viewing dopamine strictly as a 'pleasure' chemical rather than a signal of 'reward prediction error' and motivation.",
+            "Confusing the hypothalamus (homeostasis) with the hippocampus (memory)."
+          ]
+        },
+        {
+          "id": "emotion-learning-memory",
+          "title": "Emotion, Learning & Memory",
+          "concepts": [
+            "Limbic System: A network of structures (including amygdala and hippocampus) involved in emotion and memory.",
+            "Amygdala: Critical for processing emotions, particularly fear, and emotional associative learning.",
+            "Hippocampus: Essential for the consolidation of short-term memory into long-term declarative memory.",
+            "Long-Term Potentiation (LTP): The cellular basis of learning; 'cells that fire together, wire together'."
+          ],
+          "key_facts": [
+            "Patient H.M., who had his bilateral hippocampus removed, suffered from profound anterograde amnesia (inability to form new declarative memories).",
+            "Memory is not stored in a single 'box' but distributed across the cortex.",
+            "LTP involves the strengthening of synaptic connections, often mediated by NMDA and AMPA glutamate receptors."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "N/A",
+          "defense_pairing": {
+            "what_blue_sees": "N/A",
+            "logs": [],
+            "detections": [],
+            "controls": []
+          },
+          "drills": [
+            "Describe the molecular mechanisms of LTP involving NMDA and AMPA receptors.",
+            "Differentiate between declarative (explicit) memory and procedural (implicit) memory, noting which brain structures are involved."
+          ],
+          "common_mistakes": [
+            "Thinking memories are perfectly recorded like a video camera (they are reconstructive and prone to error).",
+            "Believing the hippocampus is where long-term memories are permanently stored."
+          ]
+        }
+      ]
+    }
+  ]
+}
