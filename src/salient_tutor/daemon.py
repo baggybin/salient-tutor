@@ -1139,6 +1139,51 @@ class TutorDaemon:
         bare = True  # always --bare for non-Anthropic endpoints (skip startup prefetch)
         return (base_url, model, api_key, auth_style, bare, provider, effort)
 
+    def _make_safeguard_check(self, agent: str):
+        """Prohibited-intent check for a codex tool call.
+
+        The one PreToolUse rung that makes sense here. `approve_before` does
+        NOT: the tutor has no approval-answer surface, so blocking on an inbox
+        future would hang the turn with nobody able to release it — the same
+        reason `_make_codex_approval_handler` declines rather than asks.
+
+        The kernel ships the MECHANISM with an empty default denylist (the
+        offensive content lives in salient-security, which the tutor does not
+        install), so what actually fires here is whatever the deployment adds
+        under `safeguards.extra_patterns` — per-tool by qualified name, or the
+        friendly `delegation` key that covers `bus.ask_agent` / `bus.ask_agents`
+        without naming internals. An empty config is an honest no-op, not a
+        pretend gate.
+        """
+        from salient_core.policy.decision import InvocationNameError, mcp_identity
+        from salient_core.policy.safeguards import check_intent, resolve_config
+
+        async def check(input_data, _tool_use_id, _ctx):
+            tool_name = (input_data or {}).get("tool_name") or ""
+            tool_input = (input_data or {}).get("tool_input") or {}
+            try:
+                qualified = mcp_identity(tool_name, agent).qualified_name
+            except InvocationNameError:
+                # Unparseable wire name: nothing to key a lookup on. The gate
+                # still ran; there is simply no pattern set to consult.
+                return {}
+            allowed, reason = check_intent(
+                qualified,
+                dict(tool_input),
+                config=resolve_config(self.agent_configs.get(agent, {}), self.profile),
+            )
+            if allowed:
+                return {}
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": reason or "prohibited by safeguards",
+                }
+            }
+
+        return check
+
     def _make_codex_backend_factory(self, agent: str) -> tuple[Any, Any]:
         """Zero-arg backend factory producing a salient-core CodexBackend for
         `agent`, plus the bus tool bundle it hands codex over the MCP gateway.
@@ -1150,6 +1195,7 @@ class TutorDaemon:
         from salient_core import ProviderName, ToolBundle, get_provider_registry
         from salient_core.bus import make_bus_tool_bundle
         from salient_core.codex import CodexProvider
+        from salient_core.runtime import gate_tool_bundle
 
         from salient_tutor.providers import codex_effort, codex_model_for
 
@@ -1158,6 +1204,23 @@ class TutorDaemon:
         tool_bundle = ToolBundle()
         if cfg.get("bus_tools", True):
             tool_bundle, _wires = make_bus_tool_bundle(self, agent)
+            # Codex executes ToolBundle handlers directly through its MCP
+            # gateway, so it gets none of the Claude-SDK PreToolUse hooks —
+            # exactly the hole salient-core closed for its own daemon. We do not
+            # compose `AgentRunnerFactory`, so we apply the kernel's shared
+            # wrapper ourselves rather than reimplementing the seam.
+            #
+            # `bus_tool_names` is load-bearing, not decoration: bus tools
+            # canonicalize to `bus.<name>`, and omitting them silently costs
+            # every pattern keyed on `bus.*` — including the delegation
+            # denylist. Every tool here IS a bus tool.
+            tool_bundle = gate_tool_bundle(
+                tool_bundle,
+                agent_name=agent,
+                server=agent,
+                checks=[self._make_safeguard_check(agent)],
+                bus_tool_names=frozenset(t.name for t in tool_bundle.tools),
+            )
         provider = get_provider_registry().get(ProviderName("codex"))
         if not isinstance(provider, CodexProvider):
             raise TypeError("registered codex provider has an incompatible implementation")

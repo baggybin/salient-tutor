@@ -3,6 +3,9 @@
 .env.*
 *.key
 
+# Local-only notes (private memos, never tracked)
+*.local.md
+
 # Editor / OS
 .vscode/
 .idea/
