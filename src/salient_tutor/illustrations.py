@@ -41,7 +41,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from salient_tutor import image_cloud
+from salient_tutor import image_cloud, state_paths
 
 _log = logging.getLogger(__name__)
 
@@ -118,7 +118,8 @@ _DEADLINE = 240.0  # hard cap (s); a hung box must not wedge the GPU semaphore
 # (identical spec → identical hash), a wiped cache also self-heals: reopening an
 # old thread re-renders its ```image fences and regenerates the same files. Set
 # TUTOR_IMAGE_CACHE to override. Nothing in this module ever deletes cached PNGs.
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+# Writable output — never site-packages. See salient_tutor.state_paths.
+_REPO_ROOT = state_paths.state_root()
 _CACHE_DIR = (
     Path(os.environ["TUTOR_IMAGE_CACHE"]).resolve()
     if os.environ.get("TUTOR_IMAGE_CACHE")

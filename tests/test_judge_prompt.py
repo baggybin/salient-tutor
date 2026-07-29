@@ -1,8 +1,8 @@
 """Substring tests for the judge (consensus reconciliation) system prompt."""
 
-from pathlib import Path
+from salient_tutor import resource_paths
 
-PROMPT = (Path(__file__).resolve().parent.parent / "prompts" / "judge.md").read_text()
+PROMPT = (resource_paths.PROMPTS / "judge.md").read_text()
 
 
 class TestJudgeContract:

@@ -157,7 +157,8 @@ async def render_assets(palace, *, model: str, limit: int) -> None:
     import os
 
     os.environ["TUTOR_IMAGES"] = "1"
-    from salient_tutor.illustrations import _CACHE_DIR, render as gpu_render
+    from salient_tutor.illustrations import _CACHE_DIR
+    from salient_tutor.illustrations import render as gpu_render
 
     assets = Path("docs/assets")
     assets.mkdir(parents=True, exist_ok=True)

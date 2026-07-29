@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "description": "Private curriculum tracks for salient-tutor. Each file is a self-contained track with modules and topics mapped to MITRE ATT&CK. Kept private — excluded from the public mirror via .gitattributes export-ignore.",
+  "tracks": [
+    {
+      "id": "cyber-fundamentals",
+      "file": "cyber-fundamentals.json",
+      "title": "Cyber Fundamentals",
+      "difficulty": "beginner–intermediate",
+      "modules": 15,
+      "topics": 50,
+      "description": "Foundational knowledge: networking, cryptography, OS internals, IAM, security principles, risk, compliance, web, cloud, scripting, malware, social engineering."
+    },
+    {
+      "id": "red-team",
+      "file": "red-team.json",
+      "title": "Red Team — Offensive Security",
+      "difficulty": "beginner–advanced",
+      "modules": 11,
+      "topics": 46,
+      "description": "Full attack lifecycle: methodology, recon, initial access, exploitation, web attacks, AD/credentials, privesc, persistence, lateral movement, cloud/wireless, exfiltration."
+    },
+    {
+      "id": "blue-team",
+      "file": "blue-team.json",
+      "title": "Blue Team — Defensive Security",
+      "difficulty": "beginner–advanced",
+      "modules": 12,
+      "topics": 47,
+      "description": "Defensive operations: SIEM, detection engineering, NSM, SOC, IR, threat hunting, forensics, vuln management, cloud security, CTI, zero trust, deception."
+    },
+    {
+      "id": "purple-team",
+      "file": "purple-team.json",
+      "title": "Purple Team — The Unicorn Curriculum",
+      "difficulty": "intermediate–advanced",
+      "modules": 10,
+      "topics": 35,
+      "description": "Offense-defense fusion: every ATT&CK tactic taught with its detection counterpart. Attack steps paired with exact logs, Sigma rules, and controls. The unicorn rule in practice."
+    },
+    {
+      "id": "modern-red-purple-team",
+      "file": "modern-red-purple-team.json",
+      "title": "Modern Red & Purple Teaming Excellence",
+      "difficulty": "intermediate–advanced",
+      "modules": 3,
+      "topics": 6,
+      "description": "Excellence in adversarial simulation: moving from point-in-time pentests to continuous, collaborative validation. Covers agentic AI, identity-centric attacks, and open-book purple teaming."
+    },
+    {
+      "id": "neuroscience-fundamentals",
+      "file": "neuroscience-fundamentals.json",
+      "title": "Neuroscience Fundamentals",
+      "difficulty": "beginner–intermediate",
+      "modules": 3,
+      "topics": 7,
+      "description": "Introduction to the structure and function of the nervous system, spanning from cellular neurobiology (action potentials, synapses) to systems (sensory processing, learning, and memory)."
+    },
+    {
+      "id": "ai-foundations",
+      "file": "ai-foundations.json",
+      "title": "AI Foundations — From Math to Modern Red Teaming",
+      "difficulty": "beginner–advanced",
+      "modules": 12,
+      "topics": 73,
+      "description": "A spiral curriculum that takes a curious learner from a one-sentence mental model of an LLM, through the math behind gradients and transformers, into the engineering of building and serving frontier models, and onward into the adversarial art of breaking them. Every theoretical concept is paired with its production application and its failure mode — the unicorn rule, generalized beyond cyber. Pedagogy: hybrid spiral (project-first hook + thresholds re-encountered at increasing depth), with deliberate practice, retrieval, and dual-coding. Built around 6 threshold concepts: tokens not words, embeddings as coordinates, attention as soft lookup, the loss is the model, training is search, the base model is not the assistant."
+    },
+    {
+      "id": "memory-craft",
+      "file": "memory-craft.json",
+      "title": "Memory Craft — Chinese, Bizarre & Western Mnemonics",
+      "difficulty": "beginner–advanced",
+      "modules": 7,
+      "topics": 23,
+      "description": "A complete course on mnemonic technique in three strands: the classical Chinese canon (口诀 verse, 三字经 chunking, 谐音 homophone pegs, 掐指一算 hand loci, 千字文 no-repeat imagery, 说文解字 decomposition, 永字八法 master exemplar, 歇后语 scene-punchline, 藏头诗 acrostic, 八卦 shape rhyme, 对仗 pairing), the fantastic/bizarre-visual layer (Von Restorff, bizarreness, six memory-multiplier properties, metaphorAnchor bridges), and the Western canon (method of loci, link/story, pegs, Major, PAO, Dominic, number-shape/rhyme, keyword method, mind mapping, dual coding, spaced retrieval). Every topic references its learning-catalog technique id (catalog:<id>) so the pedagogy KG resolves the evidence; worked examples reuse the security domain (kill chain, OSI, HTTP status families). Progression: foundations → fantastic layer → spatial → verbal/rhythmic → symbolic/number → decomposition → integration & spaced retrieval."
+    }
+  ],
+  "total_modules": 73,
+  "total_topics": 287
+}

@@ -8,8 +8,7 @@ apart again.
 
 from __future__ import annotations
 
-from pathlib import Path
-
+from salient_tutor import resource_paths
 from salient_tutor.daemon import _PROVIDER_ENV, _build_agent_configs
 
 
@@ -23,7 +22,7 @@ def test_websearch_in_default_roster():
 
 
 def test_websearch_prompt_file_matches_roster_contract():
-    prompt = Path(__file__).resolve().parent.parent / "prompts" / "websearch.md"
+    prompt = resource_paths.PROMPTS / "websearch.md"
     text = prompt.read_text()
     # The output shape the tutor consumes verbatim.
     assert "## Answer" in text
@@ -34,7 +33,7 @@ def test_websearch_prompt_file_matches_roster_contract():
 def test_tutor_prompt_delegation_target_is_real():
     # tutor.md tells the tutor to ask_agent("websearch", ...) — the named
     # target must exist in the default roster.
-    tutor_prompt = Path(__file__).resolve().parent.parent / "prompts" / "tutor.md"
+    tutor_prompt = resource_paths.PROMPTS / "tutor.md"
     assert 'ask_agent("websearch"' in tutor_prompt.read_text()
     assert "websearch" in _build_agent_configs()
 

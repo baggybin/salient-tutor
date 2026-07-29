@@ -5,11 +5,11 @@ prompt-compression pass or careless edit destroys one, this test breaks before
 the operator's experience does.
 """
 
-from pathlib import Path
-
 import pytest
 
-PROMPT = (Path(__file__).resolve().parent.parent / "prompts" / "tutor.md").read_text()
+from salient_tutor import resource_paths
+
+PROMPT = (resource_paths.PROMPTS / "tutor.md").read_text()
 
 
 class TestLessonLoopPhases:

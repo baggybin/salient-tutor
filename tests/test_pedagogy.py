@@ -1,13 +1,12 @@
 """Tests for the pedagogy KG ingestion — mnemonic techniques seeded into the KG."""
 
-from pathlib import Path
-
 import pytest
 from salient_core.memory.kg import KnowledgeGraph
 
+from salient_tutor import resource_paths
 from salient_tutor.pedagogy import NAMESPACE, import_bundle, purge, subject_for
 
-_BUNDLE = Path(__file__).resolve().parent.parent / "data" / "pedagogy_bundle.json"
+_BUNDLE = resource_paths.DATA / "pedagogy_bundle.json"
 
 
 @pytest.fixture

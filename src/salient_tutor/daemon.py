@@ -35,6 +35,7 @@ from salient_core import (
     make_bus,
 )
 
+from salient_tutor import resource_paths
 from salient_tutor.lesson import LessonController
 from salient_tutor.lesson_store import LessonStore
 from salient_tutor.pedagogy import import_bundle
@@ -42,7 +43,9 @@ from salient_tutor.providers import PROVIDERS, resolve_thinking
 
 _log = logging.getLogger(__name__)
 
-_PROMPTS_DIR = Path(__file__).resolve().parent.parent.parent / "prompts"
+# Read-only resources bundled in the distribution — see resource_paths.
+_ASSETS = resource_paths.RESOURCES
+_PROMPTS_DIR = _ASSETS / "prompts"
 # Full image-authoring rubric appended to image-authoring agents' system prompts
 # only when illustrations are enabled — occasional feature, so it's off the
 # always-on path when disabled (the tutor prompt keeps a compressed floor).
@@ -52,8 +55,8 @@ _IMAGE_SKILL_PATH = _PROMPTS_DIR / "skills" / "image_authoring.md"
 # renders one loci image per locus.
 _PALACE_SKILL_PATH = _PROMPTS_DIR / "skills" / "palace_authoring.md"
 _IMAGE_SKILL_AGENTS: frozenset[str] = frozenset({"tutor", "tutor_alt", "judge"})
-_BUNDLE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "pedagogy_bundle.json"
-_CURRICULA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "curricula"
+_BUNDLE_PATH = _ASSETS / "data" / "pedagogy_bundle.json"
+_CURRICULA_DIR = _ASSETS / "data" / "curricula"
 _CURRICULUM_AGENT = "curriculum"
 
 

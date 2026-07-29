@@ -4,12 +4,13 @@ a prose source file the ingest slices. Re-runnable: strips prior additions
 (marked by source_file) before re-appending, so it never duplicates."""
 import json, sys
 from pathlib import Path
+from salient_tutor import resource_paths
 
 ROOT = Path(__file__).resolve().parent.parent
-CATALOG = ROOT / "data" / "learning_methods_catalog.json"
-BUNDLE = ROOT / "data" / "pedagogy_bundle.json"
+CATALOG = resource_paths.DATA / "learning_methods_catalog.json"
+BUNDLE = resource_paths.DATA / "pedagogy_bundle.json"
 PROSE_REL = "extracted/learning-methods.txt"           # relative to data/ (source_root)
-PROSE_ABS = ROOT / "data" / PROSE_REL
+PROSE_ABS = resource_paths.DATA / PROSE_REL
 
 TIER_COMMUNITY = {
     "encoding":      (100, "Encoding & Mnemonic Techniques"),

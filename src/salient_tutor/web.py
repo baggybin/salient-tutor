@@ -41,36 +41,33 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from salient_core import semantic_recall
 
-from salient_tutor import diagrams, illustrations, image_cloud, minimax_tts
+from salient_tutor import (
+    diagrams,
+    illustrations,
+    image_cloud,
+    minimax_tts,
+    resource_paths,
+    state_paths,
+)
 from salient_tutor.daemon import TutorDaemon
 from salient_tutor.lesson_store import LessonStoreError, SessionConflict
 
 _log = logging.getLogger(__name__)
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-_STATIC_DIR = _REPO_ROOT / "web" / "static"
-
-
-# Pointer to the last-used workspace (autoload). Lives at the repo root, outside
-# any single workspace since it points across them; gitignored.
-_LAST_WS_FILE = _REPO_ROOT / ".salient-tutor-workspace"
+# Bundled UI. See resource_paths (read-only) vs state_paths (writable).
+_STATIC_DIR = resource_paths.WEB_STATIC
 
 
 def _read_last_workspace() -> Path | None:
     """The workspace remembered from the previous run, or None if never set /
     unreadable. Best-effort — a missing or corrupt pointer just falls through to
-    the default."""
-    try:
-        raw = _LAST_WS_FILE.read_text().strip()
-    except OSError:
-        return None
-    return Path(raw).resolve() if raw else None
+    the default. Adopts a legacy repo-root pointer once; see state_paths."""
+    return state_paths.read_last_workspace()
 
 
 def _remember_workspace(path: Path) -> None:
     """Persist ``path`` as the last-used workspace so the next plain launch
     autoloads it. Best-effort; failure to write is non-fatal."""
-    with suppress(OSError):
-        _LAST_WS_FILE.write_text(str(path))
+    state_paths.remember_workspace(path)
 
 
 def _resolve_work_root() -> Path:
@@ -84,14 +81,13 @@ def _resolve_work_root() -> Path:
     across two locations by a different launch cwd. Whichever is chosen is
     persisted at startup (see :func:`_remember_workspace`), so an explicit
     ``--work-root`` also becomes the new autoload target."""
-    env = os.environ.get("TUTOR_WORK_ROOT")
-    if env:
-        p = Path(env).expanduser()
-        return p.resolve() if p.is_absolute() else (_REPO_ROOT / p).resolve()
+    env = state_paths.resolve_env_work_root()
+    if env is not None:
+        return env
     last = _read_last_workspace()
     if last is not None:
         return last
-    return _REPO_ROOT / "work"
+    return state_paths.default_work_root()
 
 
 # Machine-turn markers (contract with prompts/tutor.md + web/static/js/tutor.js).

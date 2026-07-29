@@ -19,6 +19,10 @@ dependencies = [
     "uvicorn[standard]>=0.27",
     "websockets>=12",   # /ws/tutor streaming bridge (also in uvicorn[standard])
     "json-repair>=0.30",  # last-resort recovery of malformed model JSON (librarian extractions)
+    # User-data dir for workspaces + the last-workspace pointer. Writing those
+    # under site-packages (what the old repo-root default becomes once
+    # installed) is wrong and often impossible — see salient_tutor.state_paths.
+    "platformdirs>=4.0",
 ]
 
 [project.optional-dependencies]
@@ -52,6 +56,19 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# Ship the read-only assets INSIDE the wheel. `packages.find` only collects
+# Python packages, so before this the prompts, curricula, pedagogy bundle and
+# web UI lived at the repo root and were never installed at all — a non-editable
+# `pip install salient-tutor` produced a build that raised FileNotFoundError on
+# its own prompts and refused to mount its own static dir. Invisible until now
+# because CI and the HOWTO both use `pip install -e`.
+[tool.setuptools.package-data]
+salient_tutor = [
+    "resources/prompts/**/*",
+    "resources/data/**/*",
+    "resources/web/**/*",
+]
 
 [tool.ruff]
 target-version = "py311"

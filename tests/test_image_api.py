@@ -13,7 +13,7 @@ import asyncio
 
 from fastapi.testclient import TestClient
 
-from salient_tutor import illustrations, web
+from salient_tutor import illustrations, state_paths, web
 
 
 # ── a fake imagegen backend (no ComfyUI, no network) ─────────────────────────
@@ -248,10 +248,20 @@ def test_config_exposes_images(monkeypatch, tmp_path):
 
 
 # ── workspaces ("schoolbags") ────────────────────────────────────────────────
+def _isolated_state(monkeypatch, tmp_path):
+    """Redirect ALL writable state under tmp_path.
+
+    The pointer and the default workspace both derive from `state_root()`, so
+    patching that one seam isolates the test from the user's real state dir —
+    and from any legacy repo-root pointer a previous run left behind.
+    """
+    monkeypatch.setattr(state_paths, "state_root", lambda: tmp_path)
+    monkeypatch.setattr(state_paths, "_LEGACY_POINTER", tmp_path / "nope" / "legacy")
+
+
 def _no_pointer(monkeypatch, tmp_path):
-    """Point the autoload pointer at a nonexistent file so tests don't read the
-    real repo-root pointer a running server may have written."""
-    monkeypatch.setattr(web, "_LAST_WS_FILE", tmp_path / "nope" / "ptr")
+    """No remembered workspace: isolated state, nothing written yet."""
+    _isolated_state(monkeypatch, tmp_path / "empty")
 
 
 def test_work_root_default_is_absolute_repo_work(monkeypatch, tmp_path):
@@ -262,13 +272,16 @@ def test_work_root_default_is_absolute_repo_work(monkeypatch, tmp_path):
     assert wr.name == "work"
 
 
-def test_work_root_env_relative_resolves_under_repo(monkeypatch, tmp_path):
+def test_work_root_env_relative_resolves_under_state_root(monkeypatch, tmp_path):
+    """Relative TUTOR_WORK_ROOT resolves against the state root, not cwd, so its
+    meaning does not change with the launch directory."""
     monkeypatch.setenv("TUTOR_WORK_ROOT", "work/schoolbag-bob")
-    _no_pointer(monkeypatch, tmp_path)
+    _isolated_state(monkeypatch, tmp_path)
     wr = web._resolve_work_root()
     assert wr.is_absolute()
     assert wr.name == "schoolbag-bob"
     assert wr.parent.name == "work"
+    assert wr.is_relative_to(tmp_path)
 
 
 def test_work_root_env_absolute_is_honored(monkeypatch, tmp_path):
@@ -280,21 +293,21 @@ def test_work_root_env_absolute_is_honored(monkeypatch, tmp_path):
 # ── autoload the last-used workspace ─────────────────────────────────────────
 def test_autoload_uses_remembered_workspace(monkeypatch, tmp_path):
     monkeypatch.delenv("TUTOR_WORK_ROOT", raising=False)
-    monkeypatch.setattr(web, "_LAST_WS_FILE", tmp_path / "ptr")
+    _isolated_state(monkeypatch, tmp_path)
     # a previous run remembered work/bob
     web._remember_workspace((tmp_path / "work" / "bob").resolve())
     assert web._resolve_work_root() == (tmp_path / "work" / "bob").resolve()
 
 
 def test_explicit_env_overrides_remembered(monkeypatch, tmp_path):
-    monkeypatch.setattr(web, "_LAST_WS_FILE", tmp_path / "ptr")
+    _isolated_state(monkeypatch, tmp_path)
     web._remember_workspace((tmp_path / "bob").resolve())
     monkeypatch.setenv("TUTOR_WORK_ROOT", str(tmp_path / "alice"))
     assert web._resolve_work_root() == (tmp_path / "alice").resolve()
 
 
 def test_remember_roundtrip_and_missing_pointer(monkeypatch, tmp_path):
-    monkeypatch.setattr(web, "_LAST_WS_FILE", tmp_path / "ptr")
+    _isolated_state(monkeypatch, tmp_path)
     assert web._read_last_workspace() is None  # nothing written yet
     web._remember_workspace((tmp_path / "carol").resolve())
     assert web._read_last_workspace() == (tmp_path / "carol").resolve()

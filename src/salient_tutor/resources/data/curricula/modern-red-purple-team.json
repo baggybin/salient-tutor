@@ -1,0 +1,220 @@
+{
+  "track": "modern-red-purple-team",
+  "title": "Modern Red & Purple Teaming Excellence",
+  "description": "Excellence in adversarial simulation: moving from point-in-time pentests to continuous, collaborative validation. Covers agentic AI, identity-centric attacks, and open-book purple teaming.",
+  "modules": [
+    {
+      "id": "foundations-of-excellence",
+      "title": "The Foundations of Excellence",
+      "difficulty": "intermediate",
+      "prerequisites": [],
+      "objective": "Understand the strategic difference between penetration testing, red teaming, and purple teaming, and learn how to properly prepare and scope an engagement for maximum business value.",
+      "topics": [
+        {
+          "id": "beyond-pentesting",
+          "title": "Beyond Pentesting: Red vs. Pentest vs. Purple",
+          "concepts": [
+            "Penetration Testing: Point-in-time assessment focused on finding as many vulnerabilities as possible.",
+            "Red Teaming: Goal-oriented adversarial simulation focusing on testing detection and response capabilities (the SOC/Blue Team).",
+            "Purple Teaming: Collaborative, open-book exercise where red and blue work together to validate and tune detections in real-time.",
+            "Testing the triad: People, Process, and Technology, rather than just technical flaws."
+          ],
+          "key_facts": [
+            "A penetration test finds flaws; a red team engagement tests the organization's resilience and incident response.",
+            "Excellent red teaming focuses on emulation of specific, relevant threat actors (TTPs) rather than ad-hoc exploitation.",
+            "Purple teaming is iterative and aims to replace assumptions about security posture with data."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "planning",
+          "defense_pairing": {
+            "what_blue_sees": "Blue teams should experience a red team engagement exactly as a real attack, testing their full incident response playbook.",
+            "logs": ["Incident response tickets", "SOC alerts"],
+            "detections": ["Detection efficacy metrics"],
+            "controls": ["Incident Response Plan", "Security Operations Center"]
+          },
+          "drills": [
+            "Draft a comparative table showing the goals, scope, and deliverables of a pentest vs a red team engagement.",
+            "Identify an appropriate scenario where a company should choose a purple team exercise over a red team engagement."
+          ],
+          "common_mistakes": [
+            "Treating a red team engagement as an extended penetration test.",
+            "Focusing only on 'winning' (getting Domain Admin) rather than measuring how long it takes to be detected."
+          ]
+        },
+        {
+          "id": "strategic-preparation",
+          "title": "Strategic Preparation & Rules of Engagement",
+          "concepts": [
+            "Defining clear, actionable objectives (flags) based on real-world business risks.",
+            "Rules of Engagement (RoE): Documenting scope, off-limits assets, and emergency escalation paths.",
+            "White Cell oversight: The control team that monitors the engagement, ensures safety, and provides 'leg ups' if needed.",
+            "Executive Buy-in: Ensuring stakeholders are aligned while keeping the broader organization unaware to maintain realism."
+          ],
+          "key_facts": [
+            "Success is determined during the planning phase, not just execution.",
+            "The White Cell acts as a referee, ensuring the red team stays in scope and the blue team is tested fairly.",
+            "Explicit RoE prevents accidental service disruption and ensures legal authorization."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "planning",
+          "defense_pairing": {
+            "what_blue_sees": "Ideally, nothing out of the ordinary until the red team begins execution. If discovered early, the White Cell manages communication.",
+            "logs": ["N/A"],
+            "detections": ["N/A"],
+            "controls": ["Change management", "Authorization documents", "White Cell communication channels"]
+          },
+          "drills": [
+            "Design a realistic 'flag' for a financial institution that goes beyond simple network access.",
+            "Draft a White Cell escalation matrix for a scenario where a production database goes offline during testing."
+          ],
+          "common_mistakes": [
+            "Setting generic goals like 'test our security' instead of specific, measurable objectives.",
+            "Failing to establish a dedicated, out-of-band communication channel for the White and Red cells."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modern-adversary-ttps",
+      "title": "Modern Adversary TTPs & Engineering",
+      "difficulty": "advanced",
+      "prerequisites": ["foundations-of-excellence"],
+      "objective": "Explore how modern adversaries operate, focusing on identity-centric attacks and the emerging use of AI and automation in red teaming.",
+      "topics": [
+        {
+          "id": "identity-centric-attacks",
+          "title": "Identity-Centric Attacks",
+          "concepts": [
+            "Shift from exploiting software vulnerabilities to compromising identities and access.",
+            "OAuth token abuse, consent phishing, and SSO (Single Sign-On) manipulation.",
+            "Cloud IAM (Identity and Access Management) escalation and misconfigurations.",
+            "Human-in-the-loop exploitation (e.g., social engineering helpdesks for MFA resets)."
+          ],
+          "key_facts": [
+            "Modern breaches frequently start with identity compromise rather than zero-day exploits.",
+            "Adversaries target the trust relationships between cloud services, exploiting excessive IAM permissions.",
+            "Helpdesks are prime targets for social engineering to bypass strong authentication."
+          ],
+          "attack_techniques": ["T1550", "T1528", "T1098", "T1556"],
+          "killchain_stage": "exploitation",
+          "defense_pairing": {
+            "what_blue_sees": "Authentication logs showing anomalous access patterns, impossible travel, or unusual OAuth consent grants.",
+            "logs": ["Azure AD Sign-in logs", "Okta System Log", "AWS CloudTrail"],
+            "detections": ["MFA fatigue alerts", "Suspicious OAuth app installations", "Anomalous IAM policy changes"],
+            "controls": ["Conditional Access Policies", "FIDO2/Hardware Security Keys", "Privileged Access Management (PAM)"]
+          },
+          "drills": [
+            "Analyze a scenario where an attacker uses consent phishing to gain access to a user's Office 365 mailbox.",
+            "Map out the attack path for a helpdesk social engineering attack leading to a full domain compromise."
+          ],
+          "common_mistakes": [
+            "Relying solely on MFA without considering MFA bypass techniques like AiTM (Adversary-in-the-Middle) or fatigue attacks.",
+            "Ignoring third-party application permissions in cloud environments."
+          ]
+        },
+        {
+          "id": "agentic-ai-automated-red-teaming",
+          "title": "Agentic AI & Automated Red Teaming",
+          "concepts": [
+            "Agentic AI: Autonomous software agents capable of reasoning, planning, and executing attack paths without human intervention.",
+            "Continuous Automated Red Teaming (CART): Integrating red team testing into CI/CD pipelines for continuous validation.",
+            "Automated Progressive Red Teaming (APRT): Adapting strategies over time to test AI models against advanced threats like multi-turn jailbreaks.",
+            "Adversarial Machine Learning: Techniques like context poisoning and prompt injection."
+          ],
+          "key_facts": [
+            "CART allows organizations to validate defenses continuously as their environment changes, rather than annually.",
+            "Agentic AI can rapidly explore complex attack graphs that would take human operators significantly longer.",
+            "Securing LLMs requires automated progressive testing to handle evolving jailbreak techniques."
+          ],
+          "attack_techniques": ["T1562", "T1588"],
+          "killchain_stage": "execution",
+          "defense_pairing": {
+            "what_blue_sees": "Continuous, low-level probing that mimics automated scanning or agentic behavior, often focused on newly deployed assets.",
+            "logs": ["API gateway logs", "LLM interaction logs", "CI/CD pipeline logs"],
+            "detections": ["High-frequency anomalous requests", "Detection of known prompt injection patterns"],
+            "controls": ["Rate limiting", "LLM input/output filtering", "Immutable infrastructure"]
+          },
+          "drills": [
+            "Compare the benefits of a CART platform versus a traditional quarterly penetration test.",
+            "Develop a basic prompt injection payload to test an LLM's guardrails."
+          ],
+          "common_mistakes": [
+            "Replacing human red teams entirely with automated tools; automation handles breadth, humans handle depth and novel paths.",
+            "Deploying CART without fine-tuning, leading to alert fatigue for the SOC."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "purple-teaming-exposure-validation",
+      "title": "Purple Teaming & Exposure Validation",
+      "difficulty": "advanced",
+      "prerequisites": ["foundations-of-excellence", "modern-adversary-ttps"],
+      "objective": "Master the collaborative approach of purple teaming to iteratively improve detection engineering and validate security controls.",
+      "topics": [
+        {
+          "id": "purple-team-paradigm",
+          "title": "The Purple Team Paradigm",
+          "concepts": [
+            "Open-book collaboration: Red and blue teams sitting together (virtually or physically) during the execution of attacks.",
+            "Replacing assumptions with data: Validating if existing security controls actually stop or detect specific behaviors.",
+            "Focus on TTPs (Tactics, Techniques, and Procedures) rather than just IOCs (Indicators of Compromise).",
+            "Fostering a culture of learning and continuous improvement between offensive and defensive teams."
+          ],
+          "key_facts": [
+            "Purple teaming is an exercise type, not a separate team.",
+            "The primary outcome is improved resilience and tuned detections, not just a list of vulnerabilities.",
+            "It bridges the communication gap that often exists after traditional red team engagements."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "all",
+          "defense_pairing": {
+            "what_blue_sees": "Blue team actively monitors their SIEM and EDR while the red team executes, correlating actions to telemetry in real-time.",
+            "logs": ["EDR telemetry", "Network flow logs", "Active Directory logs"],
+            "detections": ["Validation of existing alerting logic"],
+            "controls": ["Defense-in-depth architecture", "SIEM/SOAR platforms"]
+          },
+          "drills": [
+            "Outline an agenda for a one-day purple team exercise focusing on lateral movement techniques.",
+            "Describe how to handle a scenario where a red team technique generates no telemetry on the blue team's side."
+          ],
+          "common_mistakes": [
+            "Conducting the exercise adversarially (trying to 'beat' the other team) instead of collaboratively.",
+            "Failing to capture and document the exact telemetry generated by each executed technique."
+          ]
+        },
+        {
+          "id": "iterative-detection-tuning",
+          "title": "Iterative Detection Tuning & Telemetry",
+          "concepts": [
+            "The feedback loop: Execute technique -> Check telemetry -> Check detection -> Tune rule -> Re-execute.",
+            "Mapping coverage using the MITRE ATT&CK framework (e.g., ATT&CK Navigator).",
+            "Identifying telemetry gaps (blind spots) vs. detection gaps (data exists, but no alert).",
+            "Writing and deploying Sigma rules or specific SIEM queries based on the purple team findings."
+          ],
+          "key_facts": [
+            "A missing detection is often a telemetry problem (the right logs aren't being collected).",
+            "Tuning reduces false positives and ensures high-fidelity alerts for the SOC.",
+            "Iterative testing proves that a newly written detection rule actually works against the specific attack tool."
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "all",
+          "defense_pairing": {
+            "what_blue_sees": "The evolution of an alert from non-existent, to noisy, to highly tuned and actionable.",
+            "logs": ["Sysmon", "Windows Event Logs", "Zeek/Suricata"],
+            "detections": ["Newly created or refined Sigma rules", "YARA rules"],
+            "controls": ["Log forwarding infrastructure", "Detection Engineering lifecycle"]
+          },
+          "drills": [
+            "Write a simple detection rule for a simulated attack technique and describe the process of tuning it to reduce false positives.",
+            "Use the ATT&CK Navigator to visually represent the improvement in detection coverage after a purple team exercise."
+          ],
+          "common_mistakes": [
+            "Tuning detections based only on the specific tool the red team used, rather than the underlying behavior.",
+            "Not re-testing the technique after the detection rule has been implemented."
+          ]
+        }
+      ]
+    }
+  ]
+}

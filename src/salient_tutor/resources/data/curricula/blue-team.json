@@ -1,0 +1,2058 @@
+{
+  "track": "blue-team",
+  "title": "Blue Team — Defensive Security",
+  "description": "Comprehensive defensive security curriculum covering detection engineering, incident response, threat hunting, and security operations.",
+  "modules": [
+    {
+      "id": "siem-foundations-and-log-analysis",
+      "title": "SIEM Foundations and Log Analysis",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Navigate a SIEM platform, write search queries, and analyze Windows and Linux security logs to identify suspicious activity.",
+      "topics": [
+        {
+          "id": "siem-platforms-overview",
+          "title": "SIEM Platform Architecture and Use Cases",
+          "concepts": [
+            "What a SIEM does: centralized log aggregation, correlation, alerting, and dashboards",
+            "Major platforms: Splunk (Enterprise Security), Microsoft Sentinel (cloud-native, KQL), Elastic/ELK Stack (open-source, EQL/KQL), IBM QRadar (UCF correlation engine)",
+            "Data ingestion pipeline: forwarders → indexer/search head → dashboards/alerts",
+            "Parsing, normalization, and field extraction (Splunk props.conf/transforms.conf, Elastic ingest pipelines)",
+            "Licensing models: Splunk by ingest volume (GB/day), Sentinel by data retained + analytics, ELK self-hosted open-source"
+          ],
+          "key_facts": [
+            "Splunk Enterprise Security is the market leader but costs per GB of daily ingest",
+            "Microsoft Sentinel is fully cloud-native and uses Kusto Query Language (KQL) for all detection logic",
+            "Elastic Stack (ELK) is the primary open-source SIEM alternative",
+            "IBM QRadar uses a Universal Correlation Engine that normalizes all logs to QID mappings"
+          ],
+          "attack_techniques": [
+            "T1070"
+          ],
+          "killchain_stage": "defense-evasion",
+          "offense_pairing": {
+            "what_red_does": "Attackers attempt to operate below SIEM visibility by disabling logging (clearing Windows Security Event Log, stopping the Sysmon service), using living-off-the-land tools that blend into normal admin activity, or avoiding logs entirely with in-memory execution.",
+            "attacker_perspective": "When an attacker encounters SIEM coverage they cannot disable, they experience a race condition — every action creates forensic artifacts. They must either blind the sensors (T1562 Impair Defenses) or move so quickly that detection and response cannot keep up (speed as defense bypass).",
+            "bypass_attempts": [
+              "Clearing Windows Event Logs (Event ID 1102) to cover tracks",
+              "Stopping or disabling the Sysmon service (T1562.001)",
+              "Using legitimate admin tools (PowerShell, WMI) to blend with baseline activity",
+              "Injecting into trusted processes to avoid process-level logging"
+            ]
+          },
+          "drills": [
+            "Set up Splunk Free or Elastic and ingest Windows Security Event Logs — build a dashboard showing top 10 source IPs for Event ID 4625 (failed logons)",
+            "Compare Splunk SPL and Microsoft Sentinel KQL by writing equivalent queries for 'show all process creation events in the last 24 hours'"
+          ],
+          "common_mistakes": [
+            "Ingesting everything without filtering — leads to noise and excessive licensing costs (Splunk)",
+            "Not setting up proper field extraction at ingestion time, making searches slow and unreliable",
+            "Treating the SIEM as an archive rather than a detection engine"
+          ]
+        },
+        {
+          "id": "windows-event-log-analysis",
+          "title": "Windows Security Event Log Analysis",
+          "concepts": [
+            "Critical Security Event IDs: 4624 (successful logon), 4625 (failed logon), 4688 (process creation), 4648 (explicit credential logon), 4672 (special privileges assigned), 4720 (account created), 4726 (account deleted), 4732 (member added to security group), 4738 (user account changed), 1102 (audit log cleared), 7045 (service installed in System log)",
+            "Logon types in Event 4624: Type 2 (Interactive), Type 3 (Network), Type 4 (Batch), Type 5 (Service), Type 7 (Unlock), Type 8 (NetworkCleartext), Type 9 (NewCredentials), Type 10 (RemoteInteractive/RDP), Type 11 (CachedInteractive)",
+            "Enabling advanced auditing via Group Policy: Computer Configuration → Windows Settings → Security Settings → Advanced Audit Policy",
+            "Command-line process auditing (Event 4688 with command line) requires enabling Audit Process Creation"
+          ],
+          "key_facts": [
+            "Event ID 4624 with Logon Type 3 (Network) from an unexpected internal host may indicate lateral movement",
+            "Event ID 4624 with Logon Type 10 indicates an RDP session — unusual for servers that should not have interactive users",
+            "Event ID 4720 (user account created) outside of normal IT provisioning hours is a high-signal indicator of attacker persistence",
+            "Event ID 1102 (audit log cleared) is itself a critical security event that should trigger immediate investigation",
+            "Event ID 7045 in System log (service installed) is critical for detecting attacker-installed services for persistence"
+          ],
+          "attack_techniques": [
+            "T1078",
+            "T1136",
+            "T1021"
+          ],
+          "killchain_stage": "persistence",
+          "offense_pairing": {
+            "what_red_does": "Attackers create new accounts (Event 4720, T1136), use stolen credentials for lateral movement via SMB/RDP (Event 4624 Type 3/10, T1021), clear audit logs to cover tracks (Event 1102, T1070.001), and install services for persistence (Event 7045, T1543.003).",
+            "attacker_perspective": "The attacker sees Windows as a rich logging environment that, if properly configured, records nearly every action. They must decide between speed (accept detection) and stealth (spend time disabling logs, which itself generates events). Clearing logs creates Event 1102 — an immediate red flag.",
+            "bypass_attempts": [
+              "Using living-off-the-land binaries instead of custom malware to avoid process-creation anomalies",
+              "Clearing only specific event records rather than the entire log",
+              "Operating under context of legitimate service accounts to blend in with baseline activity"
+            ]
+          },
+          "drills": [
+            "In Splunk/Sentinel, write a query to detect Event ID 4720 (user creation) outside business hours, then correlate with subsequent 4624 logons by the new account",
+            "Build an alert for Event ID 4624 Logon Type 3 (network logon) from a user who has never logged into that host before"
+          ],
+          "common_mistakes": [
+            "Only monitoring Event ID 4624 (successful logon) and ignoring 4625 patterns (brute-force detection)",
+            "Not enabling command-line logging (Event 4688) — missing critical context for process investigations",
+            "Focusing on individual events instead of correlating event sequences (e.g., 4720 followed by 4732 followed by 4624)"
+          ]
+        },
+        {
+          "id": "sysmon-endpoint-telemetry",
+          "title": "Sysmon for Enhanced Endpoint Telemetry",
+          "concepts": [
+            "Sysmon (System Monitor) is a free Sysinternals tool providing detailed process, network, and file telemetry beyond native Windows logging",
+            "Key Sysmon Event IDs: 1 (Process Creation with command line + parent process + hash), 3 (Network Connection), 7 (Image Loaded / DLL loaded), 8 (CreateRemoteThread — process injection indicator), 10 (Process Access — LSASS access detection), 11 (File Creation), 13 (Registry Value Set), 22 (DNS Query), 23 (File Delete Archived), 25 (Process Tampering)",
+            "Sysmon configuration via XML config file — defining include/exclude rules for process creation, network connections, file creations",
+            "Popular configurations: SwiftOnSecurity config (beginner), Olaf Hartong's sysmon-modular (advanced threat hunting)",
+            "Sysmon events go to Microsoft-Windows-Sysmon/Operational event log channel"
+          ],
+          "key_facts": [
+            "Sysmon Event ID 1 provides full command-line, parent process, and process hash — more detail than native Event 4688",
+            "Sysmon Event ID 8 (CreateRemoteThread) and Event ID 10 (Process Access with TargetImage containing lsass.exe) are key for detecting credential dumping (T1003.001)",
+            "Sysmon Event ID 7 (Image Loaded) detects DLL side-loading and injection via unsigned DLLs loaded into trusted processes",
+            "Sysmon Event ID 22 (DNS Query) enables detection of DNS-based C2 communication and data exfiltration",
+            "Sysmon is NOT an EDR — it has no prevention/blocking capability, only logging"
+          ],
+          "attack_techniques": [
+            "T1003",
+            "T1055",
+            "T1547"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers dump LSASS memory for credentials (triggers Sysmon EID 10 with lsass.exe as TargetImage), inject code into remote processes (triggers Sysmon EID 8 CreateRemoteThread), create files for persistence (triggers Sysmon EID 11), register DNS lookups for C2 communication (triggers Sysmon EID 22).",
+            "attacker_perspective": "An attacker on a Sysmon-monitored host realizes that every process spawn, network connection, file write, and DLL load is logged with rich metadata. The only ways to evade are: (1) operate entirely in memory without spawning processes (fileless), (2) tamper with the Sysmon service itself (EID 4 service state change), or (3) use a process already running with legitimate network connections.",
+            "bypass_attempts": [
+              "Killing or stopping the Sysmon service (triggers EID 4/5 — itself a detection)",
+              "Using direct syscalls to avoid ETW and user-mode hooks that Sysmon relies on",
+              "Process doppelgänging to execute code from legitimate-looking process images",
+              "Blending into legitimate parent-child process trees (e.g., svchost.exe → powershell.exe)"
+            ]
+          },
+          "drills": [
+            "Deploy Sysmon with SwiftOnSecurity config on a lab VM. Trigger a simulated credential dump and identify the Sysmon Event ID 10 with lsass.exe access",
+            "Write a Splunk/Sentinel query for Sysmon EID 1 detecting suspicious parent-child relationships (e.g., winword.exe → cmd.exe or winword.exe → powershell.exe)"
+          ],
+          "common_mistakes": [
+            "Running Sysmon with default config (which captures almost nothing) instead of a curated configuration",
+            "Not ingesting Sysmon logs into the SIEM — collecting them locally but never centralizing",
+            "Generating too many events with overly broad config rules, creating a data volume and noise problem"
+          ]
+        },
+        {
+          "id": "splunk-spl-query-language",
+          "title": "Splunk Search Processing Language (SPL)",
+          "concepts": [
+            "SPL pipeline structure: search command | transforming commands | formatting commands",
+            "Core search syntax: index=main sourcetype=WinEventLog:Security EventCode=4624 | stats count by user, src_ip",
+            "Key commands: search, stats (aggregation), eval (field computation), where (filtering), table, chart, timechart, tstats (metadata acceleration), rex (regex extraction), lookup (enrichment)",
+            "Transaction command for correlating events across time (e.g., a full attack sequence)",
+            "Subsearches for complex correlations"
+          ],
+          "key_facts": [
+            "Use index= and sourcetype= at the start of every search for optimal performance",
+            "tstats is much faster than stats for indexed fields because it queries tsidx metadata files instead of raw events",
+            "Common SOC SPL pattern: index=* EventCode=4720 | stats count by Account_Name, ComputerName | sort -count",
+            "datamodel command enables CIM (Common Information Model) compliance for portable searches across data sources"
+          ],
+          "attack_techniques": [
+            "T1059"
+          ],
+          "killchain_stage": "discovery",
+          "offense_pairing": {
+            "what_red_does": "Attackers execute discovery commands (whoami, net user, ipconfig, systeminfo) that get logged as process creations — the defender uses SPL to search for these command patterns across the environment.",
+            "attacker_perspective": "If the attacker's discovery commands are logged and searchable in Splunk, the defender can retroactively find the entire chain of attacker activity by pivoting from one suspicious event. The attacker cannot see what the defender searches, but any log they leave is a permanent forensic trail.",
+            "bypass_attempts": [
+              "Using obfuscated or encoded commands to avoid SPL string matching",
+              "Operating via RDP or interactive sessions where commands aren't logged as process creation events",
+              "Clearing logs after discovery phase"
+            ]
+          },
+          "drills": [
+            "Write an SPL query to find all instances of PowerShell launching from Microsoft Office applications: index=main sourcetype=*sysmon* EventCode=1 ParentImage=*winword.exe Image=*powershell.exe",
+            "Use the transaction command to correlate a phishing email click with subsequent process execution and network connections within a 5-minute window"
+          ],
+          "common_mistakes": [
+            "Not restricting searches to specific indexes/sourcetypes, causing extremely slow searches",
+            "Using stats without proper groupby fields, producing meaningless aggregations",
+            "Over-relying on exact string matching instead of using wildcards or regex for flexibility"
+          ]
+        },
+        {
+          "id": "kql-and-sentinel-queries",
+          "title": "Kusto Query Language (KQL) for Microsoft Sentinel",
+          "concepts": [
+            "KQL syntax: tabular data model with pipe-delimited operators",
+            "Basic structure: SecurityEvent | where EventID == 4624 | summarize count() by Account, Computer",
+            "Key operators: where (filter), summarize (aggregation), project (select columns), join (correlate tables), extend (computed columns), parse (extract fields), make-series (time series)",
+            "Sentinel analytics rules: scheduled (KQL query on a schedule), Microsoft security (from other Microsoft products), fusion (ML-based correlation)",
+            "KQL for hunting: SecurityAlert | where Severity == 'High' | join kind=inner SecurityEvent on Computer"
+          ],
+          "key_facts": [
+            "KQL is read-only — it cannot modify data, only query and transform",
+            "Use '_GetWatchlist()' function to integrate threat intelligence watchlists into queries",
+            "Sentinel stores data in a Log Analytics workspace — retention and query costs are per-GB",
+            "KQL supports let statements for variable definition: let suspicious_users = SecurityEvent | where ... | distinct Account;"
+          ],
+          "attack_techniques": [
+            "T1078"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers use stolen valid credentials (T1078) to authenticate — the defender uses KQL to detect anomalous logon patterns such as impossible travel, unusual logon hours, or first-time access to specific resources.",
+            "attacker_perspective": "An attacker using valid credentials looks legitimate in individual events. But when the defender correlates across time and geography using KQL, patterns emerge — a user logging in from New York and London within 30 minutes (impossible travel) is immediately suspicious.",
+            "bypass_attempts": [
+              "Using VPNs or proxies that match the victim's typical geographic location",
+              "Logging in during the user's typical working hours to blend with baseline",
+              "Avoiding mass downloads or unusual access patterns that might trigger volume-based alerts"
+            ]
+          },
+          "drills": [
+            "Write a KQL query to detect impossible travel: SecurityEvent | where EventID == 4624 | summarize min(TimeGenerated), max(TimeGenerated), makeset(IPAddress) by Account | extend time_diff = datetime_diff('minute', max_TimeGenerated, min_TimeGenerated)",
+            "Build a Sentinel analytics rule for detecting first-time execution of PowerShell encoded commands on a host"
+          ],
+          "common_mistakes": [
+            "Writing KQL queries without time bounds, leading to full-workspace scans and slow performance",
+            "Not using summarize and project to reduce result set size before joining tables",
+            "Confusing KQL syntax with SQL — KQL uses pipe syntax, not SELECT/FROM/WHERE"
+          ]
+        },
+        {
+          "id": "elasticsearch-eql-kibana",
+          "title": "Elastic Security: KQL, EQL, and Kibana",
+          "concepts": [
+            "Kibana Query Language (KQL): lightweight filter syntax for Elasticsearch documents, e.g., event.action:\"process_started\" and process.name:powershell.exe",
+            "Event Query Language (EQL): sequence-based detection for time-ordered events, e.g., sequence [process where process.name:\"winword.exe\"][process where process.name:\"cmd.exe\" and process.parent.name:\"winword.exe\"]",
+            "Elastic Security detection rules: pre-built rules from elastic/detection-rules repository, plus custom rules using KQL or EQL",
+            "Elastic Common Schema (ECS): standardized field naming (process.name, host.hostname, event.category) for cross-source normalization",
+            "Beats/Elastic Agent for data collection: Winlogbeat for Windows events, Packetbeat for network, Auditbeat for Linux"
+          ],
+          "key_facts": [
+            "EQL is powerful for detecting attack sequences — e.g., 'word document spawns PowerShell' as a parent-child process sequence",
+            "Elastic Security includes pre-built detection rules mapped to MITRE ATT&CK techniques",
+            "ECS (Elastic Common Schema) is the foundation — all data sources map to the same field names",
+            "Winlogbeat collects Windows Event Logs including Security, Application, System, Sysmon, and PowerShell operational logs"
+          ],
+          "attack_techniques": [
+            "T1055"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers inject code into legitimate processes (T1055) to evade process-based detection — EQL sequence queries can still detect the anomalous parent-child relationships and thread creation patterns.",
+            "attacker_perspective": "When an attacker encounters Elastic Security with well-tuned EQL rules, the sequence-based detection is hard to evade because it models the entire attack chain, not just individual events. Even if individual actions look benign, the sequence 'Office app → cmd.exe → network connection' is inherently suspicious.",
+            "bypass_attempts": [
+              "Breaking the process chain by using process injection into unrelated running processes",
+              "Using WMI/DCOM for process execution instead of direct parent-child spawning",
+              "Operating via scheduled tasks where the parent process is the Task Scheduler service"
+            ]
+          },
+          "drills": [
+            "Write an EQL sequence query to detect credential dumping: any process accessing lsass.exe with suspicious access rights within a window after a suspicious process launch",
+            "Use KQL in Kibana Discover to filter for PowerShell ScriptBlock logging events containing encoded commands (base64 patterns)"
+          ],
+          "common_mistakes": [
+            "Confusing KQL (Kibana filter syntax) with EQL (event sequence language) — they serve different detection needs",
+            "Not mapping data sources to ECS before writing detection rules, leading to inconsistent field references",
+            "Using KQL for sequence-based detections when EQL is purpose-built for event correlation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "detection-engineering",
+      "title": "Detection Engineering and Detection-as-Code",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis"
+      ],
+      "objective": "Write, test, and deploy vendor-neutral detection rules using Sigma and YARA, and build a detection-as-code pipeline with version control and CI/CD.",
+      "topics": [
+        {
+          "id": "sigma-rules",
+          "title": "Sigma Rules — Vendor-Neutral Detection Format",
+          "concepts": [
+            "Sigma is a generic, open YAML-based format for writing detection rules that can be converted to any SIEM's native query language",
+            "Sigma rule structure: title, id, status, description, author, date, logsource, detection (selection + condition), falsepositives, level, tags (including MITRE ATT&CK technique IDs)",
+            "logsource defines the data source: category (process_creation, network_connection, etc.), product (windows, linux), service",
+            "detection uses field modifiers: contains, startswith, endswith, all of them, 1 of selection*, regex",
+            "Sigma Converter (sigmac/pySigma) translates rules to Splunk SPL, Sentinel KQL, Elastic EQL, QRadar AQL, and more"
+          ],
+          "key_facts": [
+            "Sigma is to detection rules what Snort/Suricata is to network IDS — a shared community standard",
+            "The SigmaHQ repository contains thousands of community-maintained rules on GitHub",
+            "Sigma tags follow MITRE ATT&CK: attack.t1003, attack.credential_access, attack.t1059.001",
+            "Rule levels: informational, low, medium, high, critical — maps to alert severity in the SOC",
+            "Sigma rules should focus on behavior, not specific tool names — detect the activity, not the malware"
+          ],
+          "attack_techniques": [
+            "T1003"
+          ],
+          "killchain_stage": "credential-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers attempt credential dumping (T1003) using tools like mimikatz, procdump, or taskmgr to access LSASS memory. The Sigma rule detects the behavioral pattern — any process accessing lsass.exe with suspicious access rights (e.g., PROCESS_VM_READ | PROCESS_QUERY_INFORMATION).",
+            "attacker_perspective": "The attacker cannot see the Sigma rules deployed by the defender. But when their LSASS access triggers an alert, they realize the defender has behavior-based detection, not just signature-based. This means renaming mimikatz.exe won't help — the detection targets the behavior of accessing lsass.exe, not the tool name.",
+            "bypass_attempts": [
+              "Using indirect LSASS access via custom tools that don't match known tool signatures",
+              "Abusing legitimate diagnostic tools (procdump.exe from Sysinternals, Task Manager) that may be whitelisted",
+              "Reading LSASS via kernel-mode drivers that bypass user-mode hooks",
+              "Using DCSync to extract credentials from Active Directory instead of LSASS"
+            ]
+          },
+          "drills": [
+            "Write a Sigma rule detecting procdump.exe or mimikatz accessing lsass.exe (EID 10 TargetImage contains lsass.exe), then convert it to Splunk SPL and Sentinel KQL using sigmac",
+            "Browse the SigmaHQ repository and find 5 rules for detecting PowerShell encoded commands — analyze their detection logic"
+          ],
+          "common_mistakes": [
+            "Writing overly specific rules that break when the attacker renames a tool — focus on behavior, not tool name",
+            "Not using filters (falsepositives field) — rules that alert on every instance of a process are useless",
+            "Not testing converted rules — sigmac conversion can produce syntactically correct but logically broken SIEM queries"
+          ]
+        },
+        {
+          "id": "yara-rules",
+          "title": "YARA Rules — Malware Pattern Matching",
+          "concepts": [
+            "YARA (Yet Another Recursive Acronym) is a pattern-matching tool for identifying and classifying malware based on textual or binary patterns",
+            "YARA rule structure: meta (metadata: description, author, date, reference), strings (text strings, hex strings, regex), condition (boolean logic referencing strings)",
+            "String types: $a = \"text string\", $b = { AA BB CC DD }, $c = /regex pattern/, $d = \"wide ascii nocase\"",
+            "Condition operators: and, or, not, of, any/all, filesize, pe.imports (for PE files), pe.imphash()",
+            "YARA scanning: on files, directories, memory dumps (via Volatility integration), or running processes"
+          ],
+          "key_facts": [
+            "YARA was created by Victor Alvarez (VirusTotal/Google) and is the de facto standard for malware family classification",
+            "YARA-X is the Rust-based rewrite offering faster scanning and better performance",
+            "The Neo23x0 YARA-Style-Guide is the community best-practice reference for writing maintainable rules",
+            "YARA rules can be integrated with EDR/AV products, SIEM platforms, and forensic tools for automated scanning",
+            "Common mistake: using overly broad strings that match legitimate software, causing massive false positives"
+          ],
+          "attack_techniques": [
+            "T1027"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers deploy custom malware or modified known malware (obfuscated to evade signatures, T1027 Obfuscated Files). YARA rules detect malware families by matching characteristic code patterns, strings, or byte sequences even when the malware is partially modified.",
+            "attacker_perspective": "When an attacker's malware is scanned by a YARA rule, the rule matches specific byte patterns or strings that the attacker may not know exist in their binary. Unlike hash-based detection, YARA catches modified/obfuscated versions because it targets structural patterns. The attacker must fundamentally alter their code's characteristics — not just rename or recompile — to evade YARA.",
+            "bypass_attempts": [
+              "Polymorphic/metamorphic code that changes byte patterns on each compilation",
+              "String encryption — encrypting all identifiable strings and decrypting at runtime",
+              "Using packers/crypters (UPX, custom) to alter the binary structure",
+              "Living-off-the-land entirely (no custom malware) to avoid any YARA-matchable artifact"
+            ]
+          },
+          "drills": [
+            "Write a YARA rule to detect a known malware family by combining 3 unique strings with a condition: 2 of ($a, $b, $c) and filesize < 1MB",
+            "Use YARA to scan a sample directory and classify files, then analyze false positives to improve rule specificity"
+          ],
+          "common_mistakes": [
+            "Using single-byte or very short hex patterns that match legitimate binaries",
+            "Not testing rules against a corpus of known-good files to measure false positive rate",
+            "Including strings that are common across many different malware families (e.g., generic Windows API function names)"
+          ]
+        },
+        {
+          "id": "detection-as-code-pipeline",
+          "title": "Detection-as-Code (DaC) and CI/CD",
+          "concepts": [
+            "Detection-as-Code treats detection rules as software artifacts: version controlled, tested, peer-reviewed, and deployed via CI/CD",
+            "Pipeline components: Git repository → CI testing (rule validation, false positive testing, unit tests) → deployment to SIEM (via API) → monitoring and feedback",
+            "Tools: Sigma rules as source, pySigma for validation, GitHub Actions/GitLab CI for pipeline, SIEM APIs for deployment",
+            "Rule lifecycle: development → review → testing (against attack and benign datasets) → deployment → tuning → retirement",
+            "Detection Engineering Maturity Model: ad-hoc → documented → versioned → automated → measured"
+          ],
+          "key_facts": [
+            "Every detection rule should have a defined lifecycle: creation, deployment, monitoring (performance metrics), tuning, and eventual retirement",
+            "CI/CD for detections should include: YAML linting, Sigma schema validation, false positive testing against known-good log samples, and true positive testing against known attack datasets",
+            "SOC Prime, splunk/security_content, and SigmaHQ provide rule repositories that can be consumed in DaC pipelines",
+            "Rule metrics to track: true positive rate, false positive rate, mean time to detect (MTTD), rule coverage across ATT&CK techniques"
+          ],
+          "attack_techniques": [
+            "T1562"
+          ],
+          "killchain_stage": "defense-evasion",
+          "offense_pairing": {
+            "what_red_does": "Attackers impair defenses (T1562) by disabling AV, EDR, or security logging. Detection-as-Code ensures the defender has version-controlled, tested, and rapidly deployable rules — so when a new evasion technique is discovered, a new detection can be pushed within hours instead of weeks.",
+            "attacker_perspective": "A mature DaC pipeline means the defender can iterate detection coverage quickly. An attacker who discovers a new bypass technique knows that once the technique is reported, the community will rapidly create and share Sigma/YARA rules. The attacker's window of opportunity shrinks with every rule deployed.",
+            "bypass_attempts": [
+              "Developing novel techniques that no existing rule covers (zero-day evasion)",
+              "Rapidly rotating infrastructure and techniques to stay ahead of detection deployment",
+              "Targeting the DaC pipeline itself (compromising the Git repo or CI/CD to inject malicious rules)"
+            ]
+          },
+          "drills": [
+            "Set up a GitHub repository with Sigma rules, create a GitHub Actions workflow that validates rules using pySigma and deploys them to Splunk via the Splunk REST API on merge to main",
+            "Create a test dataset (attack logs + benign logs) and write automated tests that verify each Sigma rule fires on attack data but not on benign data"
+          ],
+          "common_mistakes": [
+            "Deploying rules without testing against benign traffic — leading to alert storms on first deployment",
+            "Not tracking rule performance metrics after deployment — stale rules with 99% false positive rates waste analyst time",
+            "Treating detection rules as 'set and forget' — rules decay as attacker techniques and legitimate tooling evolve"
+          ]
+        },
+        {
+          "id": "detection-tuning-and-fp-reduction",
+          "title": "Detection Tuning and False Positive Management",
+          "concepts": [
+            "False positive sources: legitimate admin activity, vulnerability scanners, approved software updates, scheduled tasks, third-party security tools",
+            "Tuning techniques: adding exclusion filters (Sigma filter rules), creating allowlists of known-good behaviors, adjusting thresholds, time-based filters, user/asset-based context",
+            "Alert fatigue: high false positive rates cause analysts to ignore alerts, missing real threats — target <50% FP rate for Tier 1 alerts",
+            "Rule analytics: track FP rate per rule, review rules with FP rate >90%, create suppression/exclusion lists",
+            "Contextual enrichment: enriching alerts with asset criticality, user role, threat intelligence, and historical baseline to improve triage accuracy"
+          ],
+          "key_facts": [
+            "Industry SOC false positive rates range from 40-90% — reducing this is a top SOC priority",
+            "Vulnerability scanners (Nessus, Qualys) are a top source of false positives — their scanning activity mimics attack patterns",
+            "Each tuning change should be documented and version-controlled in the DaC pipeline",
+            "Sigma supports separate 'filter' rules that suppress known-good behaviors from triggering detection rules"
+          ],
+          "attack_techniques": [
+            "T1059"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers deliberately generate noise (mass scanning, repeated failed logins, living-off-the-land commands) to blend their activity into the sea of alerts and false positives, hoping their real actions get lost in the noise.",
+            "attacker_perspective": "An attacker benefits directly from the defender's alert fatigue. If the SOC is overwhelmed with false positives, the attacker's real intrusion is just another alert in a queue of thousands. Well-tuned detections with low FP rates mean the attacker's actions stand out clearly.",
+            "bypass_attempts": [
+              "Mimicking legitimate vulnerability scanner activity patterns",
+              "Using admin tools and procedures that match the organization's baseline",
+              "Timing attacks to coincide with known periods of high alert volume (e.g., patch Tuesday)"
+            ]
+          },
+          "drills": [
+            "Take a detection rule with a high false positive rate and create a Sigma filter rule that excludes known-good processes and users, then measure the improvement",
+            "Build a dashboard showing false positive rate per rule over time, with automated alerts when any rule's FP rate exceeds 90%"
+          ],
+          "common_mistakes": [
+            "Blanket-suppressing alerts without investigating the root cause — may suppress true positives hiding in the noise",
+            "Not documenting tuning decisions — when a new analyst joins, they don't understand why certain behaviors are allowlisted",
+            "Tuning based on gut feel instead of data — use metrics to drive tuning decisions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "network-security-monitoring",
+      "title": "Network Security Monitoring",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis"
+      ],
+      "objective": "Deploy and analyze network security monitoring tools (Zeek, Suricata, NetFlow) to detect malicious network traffic and C2 communication.",
+      "topics": [
+        {
+          "id": "zeek-network-monitoring",
+          "title": "Zeek (Bro) for Network Security Monitoring",
+          "concepts": [
+            "Zeek is a powerful network analysis framework (formerly Bro) that performs deep protocol analysis and generates rich structured logs",
+            "Zeek generates 50+ log types: conn.log (connections), dns.log (DNS queries), http.log (HTTP requests), ssl.log (SSL/TLS handshakes), files.log (files extracted from traffic), x509.log (certificates), weird.log (protocol anomalies), notice.log (Zeek detections)",
+            "Zeek is a passive network monitor (not an IPS) — it observes and logs but does not block",
+            "Zeek script framework allows custom detection logic using the Zeek scripting language",
+            "Zeek can extract files from network traffic for malware analysis (files.log + file extraction framework)"
+          ],
+          "key_facts": [
+            "conn.log is the foundation — records every connection with UID, source/dest IP, ports, duration, bytes sent/received, protocol",
+            "dns.log captures every DNS query and response — critical for detecting DNS tunneling and C2 beaconing",
+            "http.log captures HTTP method, URI, user-agent, status codes — essential for detecting web-based attacks and C2",
+            "ssl.log captures the TLS SNI (Server Name Indication) — the domain the client is connecting to, even in encrypted traffic",
+            "Zeek 'notice' framework generates alerts for predefined suspicious patterns (e.g., SSL certificate validation failures)"
+          ],
+          "attack_techniques": [
+            "T1071",
+            "T1048"
+          ],
+          "killchain_stage": "command-and-control",
+          "offense_pairing": {
+            "what_red_does": "Attackers establish C2 channels (T1071 Application Layer Protocol) using HTTP, HTTPS, DNS, or custom protocols — Zeek logs all of these. Attackers also exfiltrate data via DNS tunneling (T1048.003) — Zeek dns.log captures the anomalous query patterns.",
+            "attacker_perspective": "When an attacker's C2 traffic flows through a Zeek-monitored network, every connection, DNS query, and TLS handshake is logged with rich metadata. Even if the payload is encrypted, the connection metadata (timing, frequency, destinations, SNI) reveals the C2 pattern. DNS-based exfiltration is particularly hard to hide because dns.log captures query length, frequency, and entropy — all anomalous for tunneling.",
+            "bypass_attempts": [
+              "Using domain-fronting to hide the true C2 destination behind CDN domains",
+              "Mimicking legitimate web traffic patterns (human-like timing, standard user-agents, common domains)",
+              "Using DNS-over-HTTPS (DoH) to hide DNS queries from Zeek's DNS monitoring",
+              "Piggybacking C2 data on existing legitimate connections"
+            ]
+          },
+          "drills": [
+            "Analyze conn.log to identify C2 beaconing: group connections by destination IP and calculate the time delta between connections — regular intervals (low jitter) indicate C2 beaconing",
+            "Analyze dns.log for DNS tunneling: look for long subdomain labels (>50 chars), high entropy, high frequency of queries to a single domain"
+          ],
+          "common_mistakes": [
+            "Only looking at conn.log and ignoring protocol-specific logs (dns.log, http.log, ssl.log)",
+            "Not correlating Zeek logs with endpoint data — network activity alone rarely tells the full story",
+            "Not tuning Zeek notice actions — default notice.log can generate excessive noise"
+          ]
+        },
+        {
+          "id": "suricata-ids-ips",
+          "title": "Suricata IDS/IPS — Rule-Based Network Detection",
+          "concepts": [
+            "Suricata is a high-performance open-source IDS/IPS that can both detect (IDS mode) and block (IPS mode) malicious network traffic",
+            "Suricata rule syntax: action protocol source_ip source_port -> dest_ip dest_port (rule_options)",
+            "Rule actions: alert, drop (IPS), reject (IPS — drop + send RST/ICMP), pass",
+            "Rule options: msg, content (pattern matching), pcre (regex), flow (direction, state), ttl, dsize, threshold, tag, reference, classtype, sid (signature ID), rev (revision)",
+            "Rule sets: Emerging Threats (ET) Open and ET Pro rulesets, custom rules for organization-specific threats",
+            "Suricata also provides protocol analysis logging (eve.json JSON output format for SIEM integration)"
+          ],
+          "key_facts": [
+            "Suricata rule header: alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"Suspicious HTTP\"; content:\"/malicious/path\"; sid:1000001; rev:1;)",
+            "IPS mode requires inline deployment (bridge/transparent mode or TAP with active response) — IDS mode works with passive SPAN/mirror ports",
+            "content matching is case-sensitive by default — use nocase modifier for case-insensitive matching",
+            "flow:established,to_server filters for established connections going to the server — reduces false positives",
+            "Suricata's eve.json provides JSON-formatted output for easy SIEM integration (alerts, flow, dns, http, tls events)"
+          ],
+          "attack_techniques": [
+            "T1190"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers exploit public-facing applications (T1190) such as web servers, VPN gateways, or databases — Suricata rules detect known exploit signatures, shellcode, and malicious payloads in network traffic. Suricata in IPS mode can also block these attacks in real-time.",
+            "attacker_perspective": "When an attacker attempts to exploit a service and Suricata is in IDS mode, the attack succeeds but generates an alert. In IPS mode, the malicious packet is dropped silently — the attacker may see a connection timeout but no explicit rejection. The attacker must then develop exploit code that doesn't match known signatures, or find a path that bypasses the IDS/IPS entirely.",
+            "bypass_attempts": [
+              "Fragmenting or encoding attack payloads to avoid content-based rule matching",
+              "Using encrypted channels (TLS) that Suricata cannot inspect without TLS interception (MITM proxy)",
+              "Developing novel exploit variants that don't match existing signatures",
+              "Routing traffic through allowed protocols or paths that aren't inspected"
+            ]
+          },
+          "drills": [
+            "Write a Suricata rule to detect HTTP requests to a known C2 URL path: alert http $HOME_NET any -> $EXTERNAL_NET any (msg:\"Known C2 Communication\"; content:\"/gate.php\"; http_uri; sid:20240001; rev:1;)",
+            "Deploy Suricata in IDS mode on a SPAN port and analyze the eve.json output in your SIEM for the top 10 alert signatures"
+          ],
+          "common_mistakes": [
+            "Not keeping ET rulesets updated — new rules are published daily for emerging threats",
+            "Running in IDS mode only when the organization actually needs IPS (blocking) capability",
+            "Not tuning rules — deploying the full ET ruleset generates thousands of alerts, most of which are noise for a specific environment"
+          ]
+        },
+        {
+          "id": "netflow-and-traffic-analysis",
+          "title": "NetFlow and Network Traffic Analysis",
+          "concepts": [
+            "NetFlow (Cisco) / IPFIX / sFlow: network flow records summarizing traffic between source and destination (IP, port, protocol, bytes, packets, duration) without full packet content",
+            "Flow analysis for beaconing detection: regular intervals between connections to the same destination, low data volume per connection",
+            "Baselining: establishing normal traffic patterns (top destinations, typical data volumes, peak hours) to identify anomalies",
+            "NetFlow collection tools: nfdump/nfsen, flow-tools, ELK with logstash NetFlow input, commercial NDR platforms",
+            "Full packet capture (PCAP): tools like Arkime (formerly Moloch), n2disk, or tshark for deep-dive investigation of suspicious flows"
+          ],
+          "key_facts": [
+            "NetFlow provides connection metadata without payload — low storage cost, useful for long-term baselining",
+            "Beaconing (regular C2 check-ins) appears in NetFlow as connections to the same destination at regular intervals (e.g., every 60 seconds ± jitter)",
+            "Data exfiltration appears as high-volume, one-way traffic flows to unusual external destinations",
+            "Arkime (formerly Moloch) indexes PCAP for fast searching by IP, port, protocol, and payload strings",
+            "Network Detection and Response (NDR) platforms (ExtraHop, Darktrace, Vectra) use ML on flow data to detect anomalies"
+          ],
+          "attack_techniques": [
+            "T1041",
+            "T1571"
+          ],
+          "killchain_stage": "exfiltration",
+          "offense_pairing": {
+            "what_red_does": "Attackers exfiltrate stolen data over C2 channels (T1041) or use non-standard ports/protocols (T1571) to hide traffic. NetFlow captures the flow metadata — data volume, timing, destination — even when payload is encrypted.",
+            "attacker_perspective": "NetFlow analysis can detect the attacker's traffic patterns even when encryption hides the payload. A sudden spike in outbound data to a previously-unseen external IP, or connections to a specific destination every 45 seconds, are detectable anomalies. The attacker's challenge is that moving data out of the network inevitably generates traffic metadata that deviates from the baseline.",
+            "bypass_attempts": [
+              "Exfiltrating data slowly over long periods ('low and slow') to avoid volume-based anomaly detection",
+              "Routing exfiltration through legitimate cloud services (AWS S3, Google Drive, Dropbox) that match normal traffic",
+              "Splitting data across multiple destinations and protocols to avoid correlation"
+            ]
+          },
+          "drills": [
+            "Use nfsen or Arkime to analyze NetFlow data — identify the top 10 destinations by total bytes transferred and flag any previously-unseen external destinations",
+            "Write a flow analysis query to detect beaconing: group connections by destination IP and calculate the standard deviation of inter-connection intervals"
+          ],
+          "common_mistakes": [
+            "Only looking at volume anomalies and missing low-and-slow exfiltration that doesn't spike",
+            "Not maintaining a baseline — without knowing normal traffic patterns, anomalies are impossible to identify",
+            "Ignoring internal-to-internal flows (east-west traffic) that may indicate lateral movement"
+          ]
+        },
+        {
+          "id": "c2-detection-and-beacon-analysis",
+          "title": "C2 Detection and Beaconing Analysis",
+          "concepts": [
+            "Command and Control (C2) frameworks: Cobalt Strike (Malleable C2 profiles), Metasploit (Meterpreter), Sliver, Mythic, Brute Ratel — each has distinctive network behaviors",
+            "Beaconing characteristics: regular check-in intervals (typically 30-120 seconds), configurable jitter (±10-30%), small payload per check-in, HTTP/HTTPS/DNS/ICMP channels",
+            "Cobalt Strike Malleable C2 profiles: customize HTTP request/response structure, URI patterns, user-agent, headers, and data encoding to mimic legitimate traffic",
+            "Detection approaches: statistical beaconing analysis, JA3/JA3S TLS fingerprinting, HTTP header anomaly detection, domain age/reputation analysis",
+            "JA3 fingerprint: hash of TLS client hello parameters — identifies malware C2 clients even with valid certificates"
+          ],
+          "key_facts": [
+            "Cobalt Strike is the most common C2 framework used by both red teams and threat actors — its default beacon profiles are well-documented",
+            "JA3/JA3S TLS fingerprinting identifies C2 clients by their unique TLS handshake characteristics regardless of the domain or certificate used",
+            "Beacon detection requires analyzing connection timing over extended periods (hours to days) — a single connection reveals nothing",
+            "The DFIR Report provides excellent real-world analysis of Cobalt Strike intrusions and C2 detection",
+            "Malleable C2 profiles can be identified by analyzing HTTP GET/POST structure, URI patterns, and custom headers"
+          ],
+          "attack_techniques": [
+            "T1071",
+            "T1573"
+          ],
+          "killchain_stage": "command-and-control",
+          "offense_pairing": {
+            "what_red_does": "Attackers establish C2 infrastructure using frameworks like Cobalt Strike with Malleable C2 profiles customized to mimic legitimate web traffic (T1071.001 Web Protocols). They may also use encrypted channels (T1573) to hide C2 communication.",
+            "attacker_perspective": "The attacker knows their C2 traffic is the lifeline of the operation. If C2 is detected and blocked, the entire foothold is lost. They invest heavily in making C2 traffic look legitimate — using real domains, valid TLS certificates, and traffic patterns that mimic browsing. But the statistical regularity of beaconing (even with jitter) and TLS fingerprint mismatches often betray them.",
+            "bypass_attempts": [
+              "Customizing Malleable C2 profiles to perfectly mimic the organization's common web traffic",
+              "Using domain-fronting via legitimate CDN services (Azure, AWS, CloudFront) to hide the true C2 server",
+              "Increasing beacon interval and jitter to reduce statistical detectability",
+              "Using legitimate cloud services (Slack, Discord, Telegram, GitHub) as C2 channels"
+            ]
+          },
+          "drills": [
+            "Analyze Zeek conn.log or NetFlow data for beaconing patterns — sort connections by destination and calculate inter-connection time deltas; any destination with regular intervals is a beaconing candidate",
+            "Use JA3 fingerprinting (via Zeek SSL log or custom script) to identify all TLS clients with unusual fingerprints not matching known browsers"
+          ],
+          "common_mistakes": [
+            "Looking only at individual connections and missing the beaconing pattern that only emerges over time",
+            "Ignoring DNS-based C2 — DNS traffic is often trusted and not deeply inspected",
+            "Focusing only on outbound traffic and missing C2 over internal infrastructure (compromised internal servers as C2 relays)"
+          ]
+        },
+        {
+          "id": "pcap-analysis-with-wireshark",
+          "title": "PCAP Analysis with Wireshark and tshark",
+          "concepts": [
+            "Wireshark: GUI-based packet analyzer for deep inspection of network traffic (PCAP files)",
+            "Key Wireshark filters: ip.addr, tcp.port, http.request, tls.handshake, dns.qry.name, frame contains, tcp.stream",
+            "tshark: command-line version for automated PCAP analysis: tshark -r capture.pcap -Y 'http.request' -T fields -e http.host -e http.request.uri",
+            "Stream reassembly: following TCP streams to reconstruct application-layer conversations",
+            "File extraction: extracting transferred files from PCAP using Wireshark 'Export Objects' or tshark"
+          ],
+          "key_facts": [
+            "Wireshark display filters use a different syntax than capture filters (BPF) — display: http.request.method == \"POST\", capture: tcp port 80",
+            "Following TCP streams (tcp.stream eq N) reconstructs the full application-layer conversation for investigation",
+            "TLS decryption requires the session keys (SSLKEYLOGFILE) — without keys, TLS traffic content is opaque",
+            "BPF (Berkeley Packet Filter) capture filters are applied during capture to reduce PCAP size: 'host 10.0.0.1 and port 443'"
+          ],
+          "attack_techniques": [
+            "T1071"
+          ],
+          "killchain_stage": "command-and-control",
+          "offense_pairing": {
+            "what_red_does": "Attackers communicate over the network using protocols that generate PCAP artifacts — HTTP requests, DNS queries, TLS handshakes. PCAP analysis allows deep inspection of the exact traffic, including payload patterns, timing, and protocol anomalies.",
+            "attacker_perspective": "When an attacker's traffic is captured in a PCAP, every byte is preserved for forensic analysis. Even encrypted traffic reveals metadata (SNI, certificate details, timing, packet sizes). The attacker cannot control what the defender captures on the network — only what the payload contains (via encryption).",
+            "bypass_attempts": [
+              "Using end-to-end encryption that prevents payload inspection even with TLS key capture",
+              "Piggybacking on legitimate, already-encrypted sessions where PCAP analysis only sees encrypted blobs",
+              "Minimizing network traffic to reduce the forensic footprint in PCAP captures"
+            ]
+          },
+          "drills": [
+            "Download a PCAP from Malware-Traffic-Analysis.net and use Wireshark to identify the C2 server, extract the malware payload, and document the attack chain",
+            "Use tshark to extract all HTTP POST requests from a PCAP and identify any with suspicious parameters"
+          ],
+          "common_mistakes": [
+            "Not using display filters effectively — scrolling through thousands of packets without filtering",
+            "Ignoring the 'Follow TCP Stream' feature for reconstructing full conversations",
+            "Not correlating PCAP findings with endpoint logs (Zeek logs, Sysmon events) for full context"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "soc-operations-and-triage",
+      "title": "Security Operations Center (SOC) Operations",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Operate within a SOC environment: triage alerts, escalate incidents, follow playbooks, and track performance metrics.",
+      "topics": [
+        {
+          "id": "soc-structure-and-tiers",
+          "title": "SOC Structure, Tiers, and Roles",
+          "concepts": [
+            "SOC tier structure: Tier 1 (alert triage, initial investigation, escalation), Tier 2 (deep investigation, threat hunting, tuning), Tier 3 (advanced forensics, IR, detection engineering)",
+            "SOC roles: SOC Analyst, Detection Engineer, Threat Hunter, Incident Responder, SOC Manager, Threat Intelligence Analyst",
+            "SOC models: in-house SOC, MSSP (Managed Security Service Provider), hybrid SOC, virtual SOC, SOC-as-a-Service (MDR)",
+            "SOC tools: SIEM, SOAR (Security Orchestration, Automation and Response), ticketing system (Jira, ServiceNow), threat intelligence platform, collaboration tools",
+            "Modern SOC evolution: AI-assisted triage, autonomous SOC, tier flattening (reducing handoff delays between tiers)"
+          ],
+          "key_facts": [
+            "Tier 1 analysts spend 60-80% of their time on alert triage — maximizing their efficiency is critical",
+            "SOCs should aim for a tier ratio of roughly 3:2:1 (Tier 1:Tier 2:Tier 3) to handle alert volume appropriately",
+            "MDR (Managed Detection and Response) and MSSP models are increasingly popular for organizations that cannot staff a 24/7 SOC",
+            "SOAR platforms automate repetitive triage steps, enrichment, and containment actions — reducing MTTD/MTTR"
+          ],
+          "attack_techniques": [
+            "T1566"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers launch mass phishing campaigns (T1566) generating thousands of alerts that flood the SOC queue — hoping to overwhelm Tier 1 analysts and slip through as false negatives.",
+            "attacker_perspective": "The attacker exploits SOC alert fatigue as a defense bypass. A well-staffed, well-tooled SOC with efficient triage processes can investigate each alert thoroughly. A fatigued SOC with high MTTD gives the attacker more dwell time. The attacker's ideal scenario is blending into the noise of legitimate alerts.",
+            "bypass_attempts": [
+              "Timing attacks during off-hours or weekends when SOC staffing is reduced",
+              "Generating decoy attacks to distract the SOC while the real attack proceeds on a different vector",
+              "Using slow, low-volume techniques that don't trigger individual alert thresholds"
+            ]
+          },
+          "drills": [
+            "Shadow or simulate Tier 1 triage: process 20 security alerts, classify each as true positive / false positive / needs investigation, and document your reasoning",
+            "Create a process flow diagram showing how an alert moves from detection → Tier 1 triage → Tier 2 investigation → escalation to IR"
+          ],
+          "common_mistakes": [
+            "Not documenting triage decisions — creating knowledge gaps when experienced analysts leave",
+            "Over-relying on escalation to higher tiers instead of developing Tier 1 capabilities",
+            "Not measuring SOC metrics (MTTD, MTTR, FP rate) — you cannot improve what you don't measure"
+          ]
+        },
+        {
+          "id": "alert-triage-workflow",
+          "title": "Alert Triage Workflow and Investigation",
+          "concepts": [
+            "Triage process: receive alert → validate (is data complete?) → contextualize (enrich with asset, user, threat intel) → investigate (query SIEM) → classify (TP, FP, benign TP) → respond or escalate",
+            "Key triage questions: What happened? Is it still happening? What systems/users are affected? What is the asset criticality? Have we seen this before?",
+            "Enrichment sources: threat intelligence (IP/domain/hash known-malicious?), asset inventory, user context, historical correlation",
+            "Alert classification: True Positive (TP), False Positive (FP), Benign True Positive (BTP — real but legitimate activity)",
+            "Escalation criteria: confirmed malware execution, credential compromise, lateral movement, data exfiltration, or impact to critical assets"
+          ],
+          "key_facts": [
+            "Effective triage requires 3 data sources: the alert itself, endpoint context (what process/user triggered it), and network context (what connections occurred)",
+            "The most common triage mistake is closing an alert as 'false positive' without full investigation — always verify before closing",
+            "Benign True Positives (legitimate activity that triggers detection) should be documented and used to tune detections",
+            "Triage SLAs define maximum time-to-acknowledge and time-to-resolve for each severity (Critical: acknowledge <15min, resolve <4hr)"
+          ],
+          "attack_techniques": [
+            "T1059"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers execute suspicious commands (T1059) that trigger alerts — the defender's triage process determines whether the alert is investigated promptly or buried in the queue. Attackers count on slow triage to extend their dwell time.",
+            "attacker_perspective": "When an attacker triggers an alert, they are in a race against the SOC triage time. If the SOC has a 30-minute average triage time, the attacker has 30 minutes to achieve their objective or move laterally. Efficient triage directly reduces attacker dwell time.",
+            "bypass_attempts": [
+              "Triggering numerous decoy alerts to delay triage of the real incident",
+              "Using techniques that generate ambiguous alerts (e.g., living off the land) that are harder to triage",
+              "Operating slowly to avoid triggering time-based alert thresholds"
+            ]
+          },
+          "drills": [
+            "Triage a simulated phishing alert: extract the URL/hash, check it against VirusTotal, determine if any user clicked, query SIEM for subsequent process executions",
+            "Build a triage checklist/playbook for a common alert type (e.g., 'unusual PowerShell execution') with step-by-step investigation questions"
+          ],
+          "common_mistakes": [
+            "Closing alerts based on the alert title alone without reading the full alert detail and supporting evidence",
+            "Not enriching alerts with asset criticality — treating a developer workstation alert the same as a Domain Controller alert",
+            "Inconsistent triage quality across analysts — no standardized process leads to some alerts being investigated properly and others being rubber-stamped"
+          ]
+        },
+        {
+          "id": "incident-response-playbooks",
+          "title": "Incident Response Playbooks and Runbooks",
+          "concepts": [
+            "Playbook: a documented step-by-step procedure for responding to specific incident types (phishing, ransomware, credential compromise, web application attack)",
+            "Runbook: a more granular, technical set of instructions for executing a specific task within a playbook (e.g., 'block an IP in the firewall', 'isolate a host')",
+            "SOAR (Security Orchestration, Automation, and Response): platforms like Splunk SOAR (Phantom), Palo Alto XSOAR, IBM Resilient, Swimlane that automate playbook execution",
+            "Key playbooks: Phishing Response, Ransomware Response, Credential Compromise, Insider Threat, Malware Infection, Data Exfiltration, DDoS, Business Email Compromise (BEC)",
+            "Playbook structure: trigger, triage steps, investigation steps, containment options, eradication steps, recovery steps, post-incident actions"
+          ],
+          "key_facts": [
+            "Playbooks standardize response — ensuring consistent quality regardless of which analyst handles the incident",
+            "SOAR automation can handle common playbook steps automatically: enriching alerts, containing threats, creating tickets",
+            "The most critical playbook is Ransomware Response — speed of containment directly impacts the number of systems encrypted",
+            "Playbooks should be living documents — updated after every incident based on lessons learned"
+          ],
+          "attack_techniques": [
+            "T1486"
+          ],
+          "killchain_stage": "impact",
+          "offense_pairing": {
+            "what_red_does": "Attackers deploy ransomware to encrypt data (T1486 Data Encrypted for Impact) — the ransomware playbook defines the rapid response: isolate affected hosts, identify patient zero, check for lateral movement, preserve evidence, assess backup integrity.",
+            "attacker_perspective": "Ransomware attackers operate on speed — the longer the defender takes to isolate affected systems, the more systems get encrypted. A well-executed ransomware playbook with automated host isolation (SOAR) can contain the blast radius in minutes instead of hours.",
+            "bypass_attempts": [
+              "Deploying ransomware simultaneously across all systems (mass detonation) to overwhelm the response",
+              "Disabling or deleting backups before deploying ransomware (removing the recovery option)",
+              "Using living-off-the-land tools for lateral movement so containment playbooks targeting malware are ineffective"
+            ]
+          },
+          "drills": [
+            "Walk through the Phishing Response playbook: receive a phishing report → analyze the email → identify affected users → check for payload execution → contain → eradicate → document",
+            "Create a runbook for 'how to isolate a host from the network' covering both EDR-based isolation and manual switch port disable"
+          ],
+          "common_mistakes": [
+            "Playbooks that are too theoretical — analysts cannot execute steps that lack concrete, actionable instructions",
+            "Not testing playbooks via tabletop exercises — discovering during a real incident that the playbook is outdated",
+            "Automating too much via SOAR — automated containment actions can cause outages if not properly scoped"
+          ]
+        },
+        {
+          "id": "soc-metrics-and-kpis",
+          "title": "SOC Metrics and KPIs",
+          "concepts": [
+            "MTTD (Mean Time to Detect): average time from incident start to detection — industry target: <24 hours for high-severity incidents",
+            "MTTR (Mean Time to Respond/Resolve): average time from detection to containment/resolution — industry target: <4 hours for critical incidents",
+            "False Positive Rate (FPR): percentage of alerts that are not real threats — industry average: 40-90%; high-performing SOCs target <50%",
+            "Dwell Time: total time an attacker is in the environment undetected — industry average (Mandiant M-Trends): ~10-16 days",
+            "Coverage metrics: ATT&CK technique coverage (% of ATT&CK techniques with at least one detection rule)",
+            "Analyst metrics: alerts handled per shift, average time per alert, escalation accuracy"
+          ],
+          "key_facts": [
+            "Dwell time is the ultimate blue-team metric — Mandiant M-Trends reports global median dwell time of ~10 days",
+            "A 90%+ false positive rate means analysts are spending 90% of their time on noise — this is the #1 SOC efficiency problem",
+            "MTTD and MTTR should be tracked by severity — Critical incidents need much faster detection/response than Low",
+            "Map detection rules to ATT&CK techniques — identify techniques with no detection coverage and prioritize creating rules"
+          ],
+          "attack_techniques": [
+            "T1078"
+          ],
+          "killchain_stage": "defense-evasion",
+          "offense_pairing": {
+            "what_red_does": "Attackers use valid accounts (T1078) to operate undetected — every hour of undetected activity extends the attacker's dwell time and increases damage. The defender's MTTD directly measures how quickly they catch this.",
+            "attacker_perspective": "Dwell time is the attacker's key metric too — the longer they remain undetected, the more objectives they can accomplish. The attacker's goal is to maximize dwell time; the defender's goal is to minimize MTTD. Every SOC metric is ultimately about shrinking the attacker's window of opportunity.",
+            "bypass_attempts": [
+              "Using legitimate credentials and tools to maximize dwell time without triggering detection thresholds",
+              "Moving slowly and deliberately to avoid creating anomalous patterns",
+              "Cleaning up artifacts to prevent retrospective detection"
+            ]
+          },
+          "drills": [
+            "Calculate MTTD and MTTR from a set of 10 simulated incidents — identify which incident types have the longest detection/response times",
+            "Map your detection rules to MITRE ATT&CK techniques and identify the top 5 techniques with no detection coverage"
+          ],
+          "common_mistakes": [
+            "Measuring only volume metrics (alerts per day) without quality metrics (FP rate, TP rate)",
+            "Not benchmarking against industry standards (Mandiant M-Trends, Verizon DBIR) for context",
+            "Vanity metrics — tracking metrics that look good but don't drive improvement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "incident-response",
+      "title": "Incident Response — Frameworks and Execution",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "soc-operations-and-triage"
+      ],
+      "objective": "Execute the full incident response lifecycle using NIST SP 800-61 and SANS PICERL frameworks, from preparation through lessons learned.",
+      "topics": [
+        {
+          "id": "nist-800-61-lifecycle",
+          "title": "NIST SP 800-61 Incident Response Lifecycle",
+          "concepts": [
+            "NIST SP 800-61 Rev 2 defines a 4-phase lifecycle: (1) Preparation, (2) Detection & Analysis, (3) Containment, Eradication & Recovery, (4) Post-Incident Activity",
+            "NIST SP 800-61 Rev 3 adds 'Coordination' as a cross-cutting activity — emphasizing communication with stakeholders, leadership, legal, and external parties",
+            "Preparation phase: IR plan, contact lists, toolkits (forensic, analysis), jump bags, training, tabletop exercises, communication plan",
+            "Detection & Analysis: alert triage, log analysis, scope determination, severity classification",
+            "Containment: short-term (isolate affected hosts) and long-term (remediate root cause) containment strategies",
+            "Eradication: remove malware, close vulnerability, rebuild compromised systems",
+            "Recovery: restore from backup, validate system integrity, monitor for reinfection",
+            "Post-Incident Activity: lessons learned, report writing, process improvement, evidence retention"
+          ],
+          "key_facts": [
+            "NIST SP 800-61r2 is the foundational US government incident response guidance, published in 2012",
+            "NIST SP 800-61r3 (2024) modernizes the guidance to include cloud incidents, supply chain attacks, and coordination frameworks",
+            "Incident severity levels: Low (limited impact), Medium (significant impact to non-critical systems), High (critical system compromise), Emergency (organization-wide threat)",
+            "The Preparation phase is the most important — 80% of IR effectiveness comes from preparation done before an incident occurs",
+            "Post-incident review (lessons learned) should be blameless — focused on process improvement, not individual fault"
+          ],
+          "attack_techniques": [
+            "T1486"
+          ],
+          "killchain_stage": "impact",
+          "offense_pairing": {
+            "what_red_does": "Attackers execute the full kill chain culminating in impact (T1486 ransomware) — the defender's IR lifecycle determines how quickly they can contain, eradicate, and recover.",
+            "attacker_perspective": "The attacker knows that their success depends on the defender's chaos. If the defender has no IR plan, unclear roles, and no tested procedures, the attacker has maximum time to operate. If the defender has a mature IR program (tested plans, clear roles, automated containment), the attacker's window is dramatically shorter.",
+            "bypass_attempts": [
+              "Deploying ransomware rapidly to minimize the defender's containment window",
+              "Disrupting communication channels to delay coordination during the incident",
+              "Targeting backup systems to impair the Recovery phase"
+            ]
+          },
+          "drills": [
+            "Map a real-world incident (from The DFIR Report) to the NIST 800-61 phases — document what happened in each phase and identify where the response could have been faster",
+            "Review your organization's IR plan and identify gaps: missing contact lists, no tested containment procedures, no defined severity classification"
+          ],
+          "common_mistakes": [
+            "Treating IR as a reactive activity — not investing in the Preparation phase",
+            "Skipping Post-Incident Activity because teams are exhausted — the lessons learned phase is what improves future responses",
+            "Blame-focused post-incident reviews — cause analysts to hide mistakes instead of sharing them"
+          ]
+        },
+        {
+          "id": "sans-picerl-framework",
+          "title": "SANS PICERL Framework",
+          "concepts": [
+            "SANS PICERL is a 6-phase incident response framework: (P)reparation, (I)dentification, (C)ontainment, (E)radication, (R)ecovery, (L)essons Learned",
+            "Preparation: policies, procedures, training, tools, communication channels, IR team roles",
+            "Identification: detecting the incident, determining scope, classifying severity, activating the IR team",
+            "Containment: isolating affected systems, stopping the spread — short-term (immediate isolation) and long-term (sustained containment with remediation)",
+            "Eradication: removing the threat — malware removal, vulnerability patching, account resets, credential rotation",
+            "Recovery: restoring systems to normal operation — from backup, rebuilt systems, monitoring for reinfection",
+            "Lessons Learned: post-incident review, report, improvement actions, updating IR plans and detections"
+          ],
+          "key_facts": [
+            "PICERL is the SANS Institute's IR framework — widely used in industry and taught in SANS SEC504",
+            "The 'C' (Containment) is often the most critical and time-sensitive phase — especially for ransomware",
+            "Lessons Learned should be scheduled within 1-2 weeks of incident closure while details are fresh — use a blameless format",
+            "Containment decisions should be documented and pre-authorized — during an incident, you don't want to wait for approval to isolate a compromised host",
+            "PICERL maps directly to NIST 800-61 phases — the frameworks are complementary, not competing"
+          ],
+          "attack_techniques": [
+            "T1021"
+          ],
+          "killchain_stage": "lateral-movement",
+          "offense_pairing": {
+            "what_red_does": "Attackers move laterally using remote services like SMB, RDP, WinRM (T1021) — each new system they reach expands the containment scope. The defender's Containment phase must cut off all attacker access points, not just the initial compromise.",
+            "attacker_perspective": "The attacker's lateral movement directly complicates the defender's Containment phase. Each new system the attacker compromises is another system the defender must identify, isolate, and clean. The attacker's strategy is to maximize lateral spread before the defender enters the Containment phase.",
+            "bypass_attempts": [
+              "Rapidly spreading to many systems before the defender begins containment",
+              "Using legitimate credentials so containment requires account disabling (disrupting business)",
+              "Establishing multiple independent persistence mechanisms so eradication is incomplete"
+            ]
+          },
+          "drills": [
+            "Run a tabletop exercise using PICERL: given a ransomware scenario, walk through each phase and document actions, responsible parties, and tools needed",
+            "Create a Lessons Learned template: incident summary, timeline, what went well, what went wrong, root cause analysis, action items with owners"
+          ],
+          "common_mistakes": [
+            "Rushing to Eradication before Containment is complete — removing malware while the attacker still has access leads to reinfection",
+            "Not conducting Lessons Learned sessions — repeating the same mistakes on the next incident",
+            "Inadequate scoping during Identification — missing compromised systems during containment leads to recurring incidents"
+          ]
+        },
+        {
+          "id": "containment-and-eradication-strategies",
+          "title": "Containment and Eradication Strategies",
+          "concepts": [
+            "Containment methods: host isolation (EDR network isolation, switch port disable, firewall rules), account suspension, credential reset, firewall blocking (IP, domain, port), email quarantine, DNS sinkholing",
+            "Short-term containment: immediate actions to stop the bleeding (isolate the infected host, block the C2 IP)",
+            "Long-term containment: sustained measures while eradication is planned (segmented VLAN, monitoring-only mode, temporary firewall rules)",
+            "Eradication: malware removal, vulnerability patching, removing persistence mechanisms (scheduled tasks, services, registry Run keys, WMI subscriptions), rebuilding from known-good images",
+            "Decision factors for containment: business impact of isolating the system, risk of lateral movement, evidence preservation needs"
+          ],
+          "key_facts": [
+            "EDR-based host isolation is the fastest containment method — network-isolating a host via EDR takes seconds vs. minutes for manual switch port disable",
+            "Always preserve forensic evidence (memory dump, disk image) BEFORE eradicating — once the system is rebuilt, artifacts are lost",
+            "Credential rotation is mandatory during eradication — the attacker likely has credentials; if you don't reset them, they will regain access",
+            "Rebuilding from a known-good image is the gold standard for eradication — cleaning an infected system is risky",
+            "Containment scope must cover ALL compromised systems — missing one leads to reinfection (the most common cause of incident recurrence)"
+          ],
+          "attack_techniques": [
+            "T1547",
+            "T1136"
+          ],
+          "killchain_stage": "persistence",
+          "offense_pairing": {
+            "what_red_does": "Attackers establish persistence using multiple mechanisms (T1547 Boot/Logon Autostart Execution, T1136 Create Account) — eradication must find and remove ALL persistence mechanisms or the attacker returns.",
+            "attacker_perspective": "The attacker's persistence mechanisms are their insurance policy. If the defender removes one mechanism but misses another (e.g., removes the malicious service but misses the WMI subscription), the attacker can regain access. The attacker deliberately creates multiple independent persistence paths to survive eradication.",
+            "bypass_attempts": [
+              "Creating multiple independent persistence mechanisms (scheduled tasks, services, registry, WMI, COM objects)",
+              "Using credential-based persistence (creating new admin accounts) that survives system rebuilds if AD wasn't cleaned",
+              "Establishing persistence in infrastructure the defender might not check (network devices, IoT, cloud)"
+            ]
+          },
+          "drills": [
+            "Create a containment decision tree: 'if system is a Domain Controller → do NOT isolate, use monitoring + credential reset; if workstation → EDR isolate immediately'",
+            "List all common Windows persistence locations and create a forensic checklist for eradication: Run/RunOnce keys, Services, Scheduled Tasks, WMI Event Subscriptions, COM hijacking, AppInit_DLLs, Startup folder"
+          ],
+          "common_mistakes": [
+            "Not preserving forensic evidence before eradication — destroying the crime scene makes post-incident analysis impossible",
+            "Partial eradication — missing persistence mechanisms leads to incident recurrence within days",
+            "Not rotating credentials — the attacker returns with stolen credentials even after all malware is removed"
+          ]
+        },
+        {
+          "id": "tabletop-exercises",
+          "title": "Tabletop Exercises and Purple Teaming",
+          "concepts": [
+            "Tabletop exercise (TTX): a discussion-based simulation where the IR team walks through an incident scenario — no actual systems are affected, focus is on process and decision-making",
+            "TTX formats: facilitator-led scenario walkthrough, inject-based (new information introduced during the exercise), functional (some technical execution on isolated systems)",
+            "TTX participants: IR team, IT operations, legal, HR, communications/PR, executive leadership, third-party responders",
+            "CISA Tabletop Exercise Packages (CTEPs): free pre-built scenarios (ransomware, data breach, supply chain) for organizations",
+            "Purple teaming: red team executes attacks while blue team detects and responds — live collaboration to improve both offense and defense"
+          ],
+          "key_facts": [
+            "Tabletop exercises should be conducted at least annually, and after any major organizational or infrastructure change",
+            "CISA provides free tabletop exercise packages at cisa.gov — covering ransomware, data breaches, and supply chain attacks",
+            "Purple team exercises are the most effective way to validate detection coverage — you confirm whether your rules actually fire against real attacks",
+            "TTX objectives should be specific and measurable: 'validate the ransomware communication plan', 'test the external IR retainer activation'",
+            "After-action report (AAR): document what went well, what didn't, and specific improvement actions with owners and deadlines"
+          ],
+          "attack_techniques": [
+            "T1566",
+            "T1486"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "In a purple team exercise, the red team executes the full attack chain (phishing → credential theft → lateral movement → ransomware) and the blue team attempts to detect and respond at each stage. Gaps are identified and remediated.",
+            "attacker_perspective": "From the attacker's perspective, a well-exercised SOC is a hardened target. Each purple team exercise closes detection gaps and tightens response procedures. The attacker doesn't know which techniques will be detected, making each operation riskier. In contrast, a SOC that never exercises will be slow, confused, and error-prone during a real incident.",
+            "bypass_attempts": [
+              "Using novel techniques not covered in previous exercises — the SOC may not have detections for them",
+              "Exploiting gaps between exercises — techniques validated 6 months ago may have degraded if rules haven't been maintained",
+              "Targeting the exercise process itself — timing attacks to coincide with known exercise schedules"
+            ]
+          },
+          "drills": [
+            "Facilitate a ransomware tabletop exercise using a CISA CTEP package — walk through scenario injects, document team decisions, produce an after-action report",
+            "Conduct a mini purple team exercise: red team simulates a phishing-to-ransomware chain using Atomic Red Team, blue team monitors SIEM — identify which ATT&CK techniques were detected and which were missed"
+          ],
+          "common_mistakes": [
+            "Tabletop exercises that are too easy — scenarios should be challenging enough to expose real gaps",
+            "Not involving business stakeholders (legal, PR, leadership) — during a real incident, these groups are critical",
+            "Not following up on after-action report action items — the exercise is wasted if improvement actions aren't completed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "threat-hunting",
+      "title": "Threat Hunting Methodologies",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis",
+        "detection-engineering",
+        "network-security-monitoring"
+      ],
+      "objective": "Design and execute structured threat hunts using hypothesis-driven and TTP-based methodologies, mapping findings to MITRE ATT&CK.",
+      "topics": [
+        {
+          "id": "hypothesis-driven-hunting",
+          "title": "Hypothesis-Driven Threat Hunting",
+          "concepts": [
+            "Threat hunting is the proactive, human-driven search for threats that have evaded existing detection capabilities — unlike alert-driven response, hunting assumes the attacker is already in the environment",
+            "Hypothesis structure: 'If [attacker technique] is present, then we should observe [observable artifact] in [data source]'",
+            "Hypothesis sources: MITRE ATT&CK techniques, threat intelligence reports, emerging vulnerabilities/CVEs, lessons from previous incidents, known gaps in detection coverage",
+            "SQRRL / MITRE TTP-Based Hunting methodology: select ATT&CK technique → identify relevant data sources → formulate hypothesis → collect and analyze data → validate findings → create new detections",
+            "PEAK Framework (Splunk): Prepare, Execute, Analyze, Knowledge — structured hunting lifecycle with hypothesis, analytics, and knowledge output"
+          ],
+          "key_facts": [
+            "The Splunk PEAK framework defines hypothesis types: situational (based on current threat), environmental (based on environment analysis), and hypothetical (based on attack theory)",
+            "Hypotheses should be specific, testable, and falsifiable — 'look for bad stuff' is not a hypothesis",
+            "Every successful hunt should result in a new detection rule — converting manual hunting into automated detection",
+            "MITRE's TTP-Based Hunting paper (2019) is the foundational document for structured, ATT&CK-driven hunting",
+            "Threat hunting maturity model (SQRRL): HM1 (automated alert analysis), HM2 (structured investigation), HM3 (intelligence-driven hunting), HM4 (custom hunting with data science)"
+          ],
+          "attack_techniques": [
+            "T1003"
+          ],
+          "killchain_stage": "credential-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers dump credentials (T1003) using techniques that may not trigger existing alerts — the threat hunter proactively searches for evidence of credential dumping activity regardless of whether alerts fired.",
+            "attacker_perspective": "The threat hunter is the attacker's worst enemy in the SOC — unlike alert-driven analysts who respond to known-bad patterns, hunters proactively look for anomalies that may indicate novel attack techniques. An attacker who evaded all alerts can still be caught by a hunter who notices the behavioral footprint: unusual process relationships, anomalous network connections, or out-of-baseline data access patterns.",
+            "bypass_attempts": [
+              "Minimizing footprint — executing only necessary actions, cleaning up artifacts",
+              "Blending with legitimate admin activity — using the same tools and procedures as real administrators",
+              "Operating slowly over extended periods to make patterns less noticeable in time-bounded hunt queries"
+            ]
+          },
+          "drills": [
+            "Formulate a hunting hypothesis for T1003.001 (LSASS Memory access): 'If an attacker dumped LSASS memory, then we should observe a process accessing lsass.exe with granted access rights including PROCESS_VM_READ in Sysmon Event ID 10 logs' — execute the hunt in your SIEM",
+            "Using the PEAK framework, design a hunt for detecting lateral movement via PsExec: identify data sources, formulate the hypothesis, execute the query, document findings"
+          ],
+          "common_mistakes": [
+            "Hunting without a hypothesis — aimless log searching wastes time and rarely produces actionable results",
+            "Not converting successful hunts into automated detections — the same manual hunt needs to be repeated if not automated",
+            "Only hunting for known techniques — the most valuable hunts target novel or emerging techniques that existing detections don't cover"
+          ]
+        },
+        {
+          "id": "ttp-based-hunting-attack",
+          "title": "TTP-Based Hunting with MITRE ATT&CK",
+          "concepts": [
+            "TTP (Tactics, Techniques, and Procedures) hunting focuses on attacker behaviors rather than specific indicators (IPs, hashes, domains) — TTPs are harder for attackers to change",
+            "ATT&CK-based hunt workflow: identify target technique → identify relevant data sources → understand expected normal behavior → identify anomalies → investigate → create detection",
+            "Pyramid of Pain (David Bianco): hash values (trivial to change) → IP addresses → domain names → host artifacts → network artifacts → TTPs (most painful for attacker to change)",
+            "ATT&CK Navigator: visualize technique coverage and gaps — map detection coverage to the ATT&CK matrix to identify hunting priorities",
+            "Threat group profiles: MITRE ATT&CK documents TTPs used by specific threat groups (APT29, FIN7, etc.) — hunt for group-specific techniques when relevant intelligence is available"
+          ],
+          "key_facts": [
+            "The Pyramid of Pain concept: detecting TTPs causes the most 'pain' to attackers because changing tactics and techniques requires fundamental retooling",
+            "TTPs at the top of the pyramid persist across campaigns, infrastructure changes, and tool updates — making them the highest-value detection targets",
+            "ATT&CK Navigator provides a visual heatmap of detection coverage — red cells = no detection, green cells = covered",
+            "Atomic Red Team (Red Canary) provides small, portable tests for each ATT&CK technique — useful for validating hunts",
+            "Mapping hunts to ATT&CK techniques enables systematic coverage analysis — 'we have hunts for 45% of ATT&CK Enterprise techniques'"
+          ],
+          "attack_techniques": [
+            "T1055",
+            "T1547"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers use TTPs like process injection (T1055) and persistence mechanisms (T1547) that are fundamental to their methodology. TTP-based hunting searches for the behavioral patterns of these techniques regardless of the specific tools or malware used.",
+            "attacker_perspective": "When the defender hunts at the TTP level, the attacker faces the Pyramid of Pain — to evade TTP-based detection, they must change their fundamental techniques, not just rotate infrastructure or recompile malware. A defender hunting for 'process injection behavior' forces the attacker to abandon process injection entirely, not just rename their injector tool.",
+            "bypass_attempts": [
+              "Developing entirely new techniques not covered by existing TTP detections (the most expensive option)",
+              "Using techniques so common in the environment that they're hard to distinguish from normal activity",
+              "Operating at a layer not monitored by the TTP hunt (e.g., kernel-mode operations if the hunt only looks at user-mode activity)"
+            ]
+          },
+          "drills": [
+            "Select 3 ATT&CK techniques with no detection coverage (use ATT&CK Navigator to identify gaps) — design and execute a TTP-based hunt for each, then create Sigma rules for confirmed detections",
+            "Use Atomic Red Team to simulate T1055.001 (Process Injection via DLL injection) and verify your hunting query detects the activity"
+          ],
+          "common_mistakes": [
+            "Hunting for indicators (IPs, hashes) instead of TTPs — indicators are cheap for attackers to change",
+            "Not validating hunt results — a hunt query with 1000 results is useless without investigation to find the true positives",
+            "Ignoring false positive rate when converting hunts to detections — a hunt with 90% FP rate is not deployable as an automated detection"
+          ]
+        },
+        {
+          "id": "hunting-lolbins",
+          "title": "Hunting for Living Off the Land (LOTL) Activity",
+          "concepts": [
+            "Living Off the Land (LOTL): attackers use legitimate, built-in OS tools (LOLBins/LOLScripts) to accomplish objectives without deploying custom malware",
+            "Common LOLBins: certutil.exe (file download, base64 decode), bitsadmin.exe (file download), regsvr32.exe (remote script execution), mshta.exe (HTA execution), wmic.exe (remote process execution), rundll32.exe, PowerShell, cmd.exe",
+            "The LOLBAS Project (lolbas-project.github.io) catalogs all known living-off-the-land binaries and scripts",
+            "Detection strategy: baseline legitimate usage patterns and detect anomalies — unusual execution context, unexpected parent processes, suspicious command-line arguments",
+            "PowerShell detection: Script Block Logging (Event ID 4104) captures the full script content even if obfuscated — AMSI integration provides de-obfuscated content"
+          ],
+          "key_facts": [
+            "PowerShell appears in ~71% of documented LOTL attack cases (Vectra AI telemetry)",
+            "LOTL attacks appear in ~84% of high-severity breaches — they are the dominant attack technique because they bypass signature-based detection",
+            "certutil.exe with -urlcache or -decode flags is a strong indicator of file download or decoding by an attacker",
+            "Event ID 4104 (PowerShell Script Block Logging) captures the de-obfuscated script — even if the attacker uses -enc (base64 encoded), the logged scriptblock contains cleartext",
+            "AMSI (Anti-Malware Scan Interface) integrates with PowerShell to scan script content before execution"
+          ],
+          "attack_techniques": [
+            "T1059.001",
+            "T1218"
+          ],
+          "killchain_stage": "execution",
+          "offense_pairing": {
+            "what_red_does": "Attackers abuse LOLBins (T1218 System Binary Proxy Execution, T1059.001 PowerShell) to execute code using trusted, signed system tools that are whitelisted and blend with normal administrative activity.",
+            "attacker_perspective": "The attacker's advantage with LOTL is that they use tools already present, signed by the OS vendor, and typically whitelisted. The defender cannot simply block certutil.exe or PowerShell without breaking legitimate admin workflows. The attacker's challenge is that behavioral baselining can still detect anomalous usage.",
+            "bypass_attempts": [
+              "Using LOLBins in ways that match the organization's legitimate admin patterns (requires recon)",
+              "Combining multiple LOLBins in chains that individually look benign but collectively accomplish malicious objectives",
+              "Using lesser-known LOLBins not yet on the defender's monitoring list"
+            ]
+          },
+          "drills": [
+            "Hunt for suspicious certutil usage: search for certutil.exe with arguments -urlcache, -decode, -encode, or -split in Sysmon EID 1 or PowerShell logs",
+            "Hunt for LOLBin execution from unexpected directories: Sysmon EID 1 where Image matches *\\Temp\\* or *\\AppData\\*"
+          ],
+          "common_mistakes": [
+            "Blocking LOLBins entirely — this breaks legitimate admin workflows",
+            "Only looking for known-bad command-line patterns — attackers use encoding, aliases, and combinations to evade string matching",
+            "Not establishing baselines — without knowing how PowerShell and other LOLBins are legitimately used, you cannot identify anomalies"
+          ]
+        },
+        {
+          "id": "hunting-persistence-mechanisms",
+          "title": "Hunting for Persistence Mechanisms",
+          "concepts": [
+            "Common Windows persistence locations: Registry Run/RunOnce keys, Scheduled Tasks, Services, WMI Event Subscriptions, COM Object hijacking, AppInit_DLLs, Winlogon Shell, Startup folder, BITS jobs",
+            "Sysmon persistence detection: EID 12 (Registry add/delete), EID 13 (Registry value set), EID 11 (File creation) — configure to monitor persistence-relevant registry keys",
+            "Autoruns (Sysinternals): comprehensive tool for enumerating all auto-start extension points (ASEPs)",
+            "Persistence hunting methodology: enumerate all persistence points → baseline → compare against known-good → investigate new/modified entries",
+            "ATT&CK persistence techniques: T1547 (Boot/Logon Autostart), T1053 (Scheduled Task/Job), T1543 (Create/Modify System Process), T1136 (Create Account), T1098 (Account Manipulation)"
+          ],
+          "key_facts": [
+            "Registry Run Keys (T1547.001) are the most common persistence mechanism — both HKLM (system-wide) and HKCU (user-specific)",
+            "WMI Event Subscriptions (T1546.003) are stealthy persistence — event filters, consumers, and bindings that execute code on system events",
+            "COM Object hijacking (T1546.015) is difficult to detect — attacker modifies HKCU registry for COM objects that legitimate applications use",
+            "Autoruns by Sysinternals is the gold-standard tool for enumerating persistence — autorunsc.exe outputs to CSV for SIEM ingestion",
+            "Scheduled tasks created by non-admin users or running unexpected executables are high-signal persistence indicators"
+          ],
+          "attack_techniques": [
+            "T1547",
+            "T1053",
+            "T1546"
+          ],
+          "killchain_stage": "persistence",
+          "offense_pairing": {
+            "what_red_does": "Attackers establish persistence to survive reboots, credential changes, and initial cleanup — using registry Run keys, scheduled tasks, services, WMI subscriptions, and COM hijacking.",
+            "attacker_perspective": "Persistence is the attacker's anchor in the environment — without it, a reboot or cleanup evicts them. But every persistence mechanism creates detectable artifacts: registry entries, scheduled task definitions, service configurations, file drops. The attacker must choose between well-known persistence locations (likely monitored) and obscure ones (harder to create, harder to maintain).",
+            "bypass_attempts": [
+              "Using stealthy persistence mechanisms (WMI subscriptions, COM hijacking) that don't appear in standard autoruns scans",
+              "Piggybacking on existing legitimate scheduled tasks or services",
+              "Using credential-based persistence instead of system-based — creating new admin accounts"
+            ]
+          },
+          "drills": [
+            "Run Autoruns (autorunsc.exe) on a lab system before and after executing Atomic Red Team persistence technique (e.g., T1547.001) — diff the outputs",
+            "Write a hunting query for WMI Event Subscriptions: query Sysmon EID 19/20/21 or use PowerShell Get-WmiObject -Namespace root\\Subscription -Class __EventFilter"
+          ],
+          "common_mistakes": [
+            "Only checking common persistence locations (Run keys, Startup folder) and missing stealthy ones (WMI, COM hijacking)",
+            "Not baselining — without a known-good baseline, every persistence entry looks suspicious",
+            "Not understanding the legitimate persistence in the environment — many enterprise management tools deploy persistence that looks malicious"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "digital-forensics",
+      "title": "Digital Forensics and DFIR",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "incident-response",
+        "siem-foundations-and-log-analysis"
+      ],
+      "objective": "Conduct digital forensic investigations across disk, memory, and network evidence to reconstruct attacker activity and support incident response.",
+      "topics": [
+        {
+          "id": "memory-forensics-volatility",
+          "title": "Memory Forensics with Volatility",
+          "concepts": [
+            "Memory forensics: analysis of volatile RAM captures to find running malware, injected code, network connections, credentials, and process activity that may not exist on disk",
+            "Volatility 3 (current) / Volatility 2 (legacy): open-source memory forensics framework from the Volatility Foundation",
+            "Key Volatility 3 plugins: windows.pslist (process list via doubly-linked list), windows.psscan (scan for hidden/unlinked processes), windows.malfind (detect injected code via VAD tags + page permissions), windows.netscan (network connections), windows.dlllist (loaded DLLs per process), windows.cmdline (process command lines), windows.modscan (kernel modules)",
+            "Process injection indicators: malfind detects code with PAGE_EXECUTE_READWRITE permissions in processes that shouldn't have executable memory regions",
+            "Memory acquisition tools: WinPMEM, DumpIt, LiME (Linux), Magnet RAM Capture"
+          ],
+          "key_facts": [
+            "pslist uses the active process list (doubly-linked list in EPROCESS); psscan scans memory for EPROCESS structures — psscan can find 'hidden' processes that DKOM removed from the active list",
+            "malfind is the primary tool for detecting code injection — it identifies memory regions with RWX permissions and MZ/PE headers that don't correspond to loaded DLLs",
+            "Volatility can extract credentials from memory — finding cleartext passwords, NTLM hashes, and Kerberos tickets stored in LSASS process memory",
+            "Memory captures should be taken BEFORE shutting down the system — RAM is volatile and lost on power-off",
+            "Volatility 3 is Python 3-based with a plugin framework; Volatility 2 is Python 2 (end-of-life) but still used"
+          ],
+          "attack_techniques": [
+            "T1055",
+            "T1003"
+          ],
+          "killchain_stage": "defense-evasion",
+          "offense_pairing": {
+            "what_red_does": "Attackers inject malicious code into legitimate process memory (T1055 Process Injection) to hide from disk-based forensic analysis. They may also keep tools entirely in memory (fileless malware) without writing to disk.",
+            "attacker_perspective": "The attacker's assumption is often that 'if it's not on disk, it can't be found.' Memory forensics shatters this assumption — injected code, hidden processes, network connections, and even decrypted credentials all live in RAM. An attacker who knows the defender will capture RAM must avoid injecting into processes and storing credentials in LSASS.",
+            "bypass_attempts": [
+              "Using kernel-mode rootkits that manipulate memory structures to hide from Volatility plugins",
+              "Minimizing memory footprint — executing, then cleaning up injected code before a memory capture can be taken",
+              "Detecting memory acquisition tools and taking evasive action before capture completes"
+            ]
+          },
+          "drills": [
+            "Download a practice memory image (from Volatility Foundation samples) and run: vol.py -f memory.img windows.pslist, then windows.malfind, then windows.netscan — identify suspicious processes, injected code, and network connections",
+            "Use Volatility to extract credentials from a memory image containing an LSASS process"
+          ],
+          "common_mistakes": [
+            "Only running pslist and not psscan — missing hidden processes that rootkits unlink from the active process list",
+            "Not correlating memory forensics findings with disk forensics and network logs",
+            "Capturing memory too late — if the attacker has already cleaned up or rebooted, critical evidence is lost"
+          ]
+        },
+        {
+          "id": "disk-forensics-autopsy",
+          "title": "Disk Forensics with Autopsy and Sleuth Kit",
+          "concepts": [
+            "Disk forensics: analysis of disk images (DD/E01) to recover files, examine file system artifacts, reconstruct timelines, and identify malware",
+            "Autopsy: GUI-based forensic platform built on The Sleuth Kit (TSK) — provides file analysis, keyword search, timeline, hash set matching",
+            "The Sleuth Kit (TSK): command-line forensic tools — fls (list files), icat (extract file by inode), mmls (partition table), tsk_recover (recover deleted files)",
+            "Key forensic artifacts: Prefetch files (.pf), Windows Registry hives (SAM, SYSTEM, SOFTWARE, SECURITY, NTUSER.DAT), Event Logs (.evtx), ShimCache/AmCache (program execution history), browser history, LNK files, Jump Lists, $MFT, USN Journal",
+            "Timeline analysis: create a super timeline (using log2timeline/plaso) combining all artifact timestamps chronologically"
+          ],
+          "key_facts": [
+            "Prefetch files (.pf) in C:\\Windows\\Prefetch record every executable run on the system — excellent for proving malware execution",
+            "ShimCache (AppCompatCache) in the SYSTEM registry hive records application execution history — even for deleted executables",
+            "AmCache.hve records detailed metadata about executed programs including SHA-1 hashes, file paths, and execution timestamps",
+            "LNK files and Jump Lists record recently opened files and applications — can reveal files the attacker accessed",
+            "Plaso/log2timeline is the standard tool for creating forensic super-timelines — parses dozens of artifact types"
+          ],
+          "attack_techniques": [
+            "T1070"
+          ],
+          "killchain_stage": "defense-evasion",
+          "offense_pairing": {
+            "what_red_does": "Attackers attempt to cover their tracks (T1070 Indicator Removal) by deleting logs, clearing event logs, removing tools, and deleting prefetch files. Disk forensics recovers evidence from forensic artifacts that the attacker may not know about or cannot easily delete.",
+            "attacker_perspective": "The attacker faces an asymmetric battle on disk forensics: the Windows operating system records hundreds of forensic artifacts that are difficult to comprehensively delete. The attacker may clear Event Logs (generating Event 1102), delete their malware binary, and clean Prefetch — but ShimCache, AmCache, USN Journal, $MFT, and registry traces may still contain evidence. Complete cleanup is nearly impossible.",
+            "bypass_attempts": [
+              "Comprehensive anti-forensics: deleting Prefetch, clearing ShimCache/AmCache, wiping $MFT entries, timestomping files",
+              "Using fileless malware that minimizes disk artifacts — operating entirely in memory",
+              "Disabling forensic artifact collection (e.g., disabling Prefetch via registry)"
+            ]
+          },
+          "drills": [
+            "Analyze a Windows disk image with Autopsy: examine Prefetch files, ShimCache, AmCache, and Event Logs to reconstruct what programs were executed and when",
+            "Use plaso (log2timeline) to create a super-timeline from a disk image and identify the time window of attacker activity"
+          ],
+          "common_mistakes": [
+            "Not examining Windows forensic artifacts beyond Event Logs — ShimCache, AmCache, Prefetch, and LNK files are critical",
+            "Only looking at allocated files and not examining unallocated space, slack space, and deleted file remnants",
+            "Not creating a timeline — individual artifacts are less useful than understanding the sequence of events"
+          ]
+        },
+        {
+          "id": "network-forensics-pcap",
+          "title": "Network Forensics and Evidence Collection",
+          "concepts": [
+            "Network forensics: analysis of captured network traffic (PCAP) and network metadata (Zeek logs, NetFlow, firewall logs) to reconstruct attacker network activity",
+            "Full packet capture (PCAP): preserves the complete content of network traffic — essential for deep-dive analysis but storage-intensive",
+            "Network metadata (Zeek logs, NetFlow): lightweight summary of network activity — enables long-term retention and faster searching",
+            "Key analysis techniques: packet inspection (Wireshark/tshark), flow analysis (Zeek conn.log), DNS analysis (Zeek dns.log, passive DNS), TLS analysis (JA3/JA3S fingerprints, certificate analysis), file extraction",
+            "Network evidence sources: SPAN/mirror ports, network TAPs, IDS/IPS logs, firewall logs, proxy logs, DNS resolver logs"
+          ],
+          "key_facts": [
+            "Zeek logs are the primary network forensic evidence source in well-instrumented environments",
+            "Network forensics is critical for answering 'what data did the attacker exfiltrate?' — only network captures can show the actual data that left the environment",
+            "Passive DNS (pDNS) databases (Farsight DNSDB, VirusTotal) allow historical lookups of DNS associations",
+            "TLS interception (SSL decryption proxy) is required to inspect encrypted traffic content",
+            "Tools for large-scale PCAP analysis: Arkime (formerly Moloch) for indexed PCAP search"
+          ],
+          "attack_techniques": [
+            "T1041",
+            "T1048"
+          ],
+          "killchain_stage": "exfiltration",
+          "offense_pairing": {
+            "what_red_does": "Attackers exfiltrate data over the network (T1041 Exfil Over C2 Channel, T1048 Exfil Over Alternative Protocol) — network forensics captures the actual exfiltration events, including data volume, timing, destination, and sometimes the payload content.",
+            "attacker_perspective": "Network exfiltration is the attacker's most vulnerable moment — moving stolen data out of the environment inevitably creates network traffic that can be captured, analyzed, and attributed. The attacker must choose between: speed (large, obvious transfers), stealth (slow, small transfers), and protocol choice.",
+            "bypass_attempts": [
+              "Exfiltrating via legitimate cloud services (AWS S3, Google Drive, Dropbox) that match normal business traffic patterns",
+              "Using DNS tunneling — encoding data in DNS queries which is often not deeply inspected",
+              "Exfiltrating data in small chunks over extended periods ('low and slow')",
+              "Encrypting exfiltrated data before transmission to prevent content inspection"
+            ]
+          },
+          "drills": [
+            "Analyze Zeek conn.log and dns.log from a known intrusion (from The DFIR Report or Malware-Traffic-Analysis.net): identify the C2 server, exfiltration volume, and timeline",
+            "Use Wireshark to extract a file transferred over HTTP from a PCAP: File → Export Objects → HTTP, then analyze the extracted file"
+          ],
+          "common_mistakes": [
+            "Not correlating network forensics with endpoint and disk forensics — each tells part of the story",
+            "Not retaining PCAP long enough — if PCAP is purged after 24 hours, retrospective investigation of older incidents is impossible",
+            "Ignoring east-west (internal) traffic — lateral movement generates network artifacts that are often missed"
+          ]
+        },
+        {
+          "id": "dfir-collection-kape-velociraptor",
+          "title": "DFIR Collection: KAPE, Velociraptor, and Eric Zimmerman Tools",
+          "concepts": [
+            "KAPE (Kroll Artifact Parser and Extractor): rapid forensic artifact collection tool — collects specific files/registry/artifacts from live or dead systems in minutes",
+            "KAPE modules: Targets (what to collect) and Modules (how to process — runs tools like RECmd, MFTECmd on collected data)",
+            "Velociraptor (Rapid7): open-source endpoint visibility, DFIR, and monitoring platform — uses VQL (Velociraptor Query Language) for forensic artifact collection at scale",
+            "Velociraptor VQL: SQL-like query language for endpoint data collection — can hunt across thousands of endpoints simultaneously",
+            "Eric Zimmerman tools: EZViewer (Registry viewer), RECmd (Registry batch processing), MFTECmd ($MFT parsing), LECmd (LNK file parsing), SBECmd (ShellBags parsing), PECmd (Prefetch parsing)"
+          ],
+          "key_facts": [
+            "KAPE can collect the most critical forensic artifacts (Event Logs, Registry hives, Prefetch, AmCache) from a Windows system in under 5 minutes",
+            "Velociraptor deploys lightweight agents to endpoints and enables centralized hunting — ideal for large-scale DFIR",
+            "Eric Zimmerman's tools are free and widely considered essential for Windows DFIR",
+            "The order of volatility (RFC 3227) guides evidence collection: CPU/registers → RAM → network state → running processes → disk → remote logs",
+            "KAPE and Velociraptor can be used together: Velociraptor deploys KAPE across endpoints for targeted artifact collection"
+          ],
+          "attack_techniques": [
+            "T1547"
+          ],
+          "killchain_stage": "persistence",
+          "offense_pairing": {
+            "what_red_does": "Attackers establish persistence using registry keys, scheduled tasks, and services that leave forensic artifacts on disk. KAPE and Velociraptor enable rapid, targeted collection of these artifacts across hundreds of systems to identify every persistence mechanism deployed.",
+            "attacker_perspective": "The attacker's persistence mechanisms are documented in forensic artifacts that KAPE and Velociraptor can rapidly collect and parse. Even if the attacker deletes the original malware, the forensic breadcrumbs (Prefetch showing execution, Registry showing persistence, AmCache showing file hashes) persist. At scale, the defender can check every endpoint for the same indicators in minutes.",
+            "bypass_attempts": [
+              "Using persistence mechanisms that don't create common forensic artifacts (e.g., WMI subscriptions instead of Registry Run keys)",
+              "Cleaning up forensic artifacts (deleting Prefetch, clearing AmCache) after establishing persistence",
+              "Using fileless persistence that exists only in memory or registry values"
+            ]
+          },
+          "drills": [
+            "Deploy Velociraptor on a lab network and create a VQL hunt that searches all endpoints for suspicious Run keys in the registry",
+            "Use KAPE to triage-collect forensic artifacts from a compromised system: collect Event Logs, Registry hives, Prefetch, and AmCache, then process with Eric Zimmerman tools"
+          ],
+          "common_mistakes": [
+            "Collecting a full disk image when targeted artifact collection (KAPE) would be faster and more actionable",
+            "Not processing collected artifacts — collecting data is only half the job; parsing and analysis is essential",
+            "Not collecting evidence in order of volatility — if you image disk before capturing RAM, you lose volatile evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vulnerability-management-and-hardening",
+      "title": "Vulnerability Management and System Hardening",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis"
+      ],
+      "objective": "Run vulnerability scans, prioritize remediation using CVSS and threat context, and apply CIS Benchmarks and DISA STIGs to harden systems.",
+      "topics": [
+        {
+          "id": "vulnerability-scanning-tools",
+          "title": "Vulnerability Scanning with Nessus, OpenVAS, and Qualys",
+          "concepts": [
+            "Vulnerability scanning: automated identification of known vulnerabilities (CVEs), misconfigurations, and missing patches across network assets",
+            "Nessus (Tenable): industry-standard vulnerability scanner — credentialed and non-credentialed scans, compliance audits",
+            "OpenVAS / Greenbone: open-source vulnerability scanner — alternative to Nessus",
+            "Qualys VMDR: cloud-based vulnerability management platform — includes discovery, assessment, prioritization, and patching",
+            "Scan types: discovery scans, vulnerability scans, compliance scans, authenticated scans",
+            "NVD (National Vulnerability Database): US government repository of vulnerability data, including CVSS scores"
+          ],
+          "key_facts": [
+            "Authenticated (credentialed) scans find significantly more vulnerabilities than unauthenticated scans",
+            "CVSS v3.1 scores range from 0-10: Low (0.1-3.9), Medium (4.0-6.9), High (7.0-8.9), Critical (9.0-10.0)",
+            "EPSS (Exploit Prediction Scoring System) from FIRST provides probability of exploitation within 30 days",
+            "CISA KEV (Known Exploited Vulnerabilities) Catalog: vulnerabilities known to be actively exploited — should be patched immediately",
+            "Nessus plugins are updated daily"
+          ],
+          "attack_techniques": [
+            "T1190"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers exploit known vulnerabilities in public-facing applications (T1190) to gain initial access — the same vulnerabilities that scanners identify. Attackers actively scan for unpatched systems using tools like Nmap, Shodan, and custom exploit scanners.",
+            "attacker_perspective": "The attacker and the vulnerability scanner are racing for the same vulnerabilities — the scanner finds them to patch, the attacker finds them to exploit. Unpatched vulnerabilities (especially those in CISA KEV) are prime targets. The attacker knows that organizations with poor vulnerability management are easy prey. A well-managed vulnerability program that patches CISA KEV vulnerabilities within days closes the attacker's easiest entry points.",
+            "bypass_attempts": [
+              "Exploiting zero-day vulnerabilities not yet in scanner databases",
+              "Targeting systems not included in vulnerability scans (shadow IT, forgotten servers, IoT devices)",
+              "Exploiting vulnerabilities in custom applications that generic vulnerability scanners cannot assess"
+            ]
+          },
+          "drills": [
+            "Run Nessus or OpenVAS against a lab environment (like Metasploitable 2/3) and document all findings — classify by CVSS severity and create a remediation plan",
+            "Cross-reference scan results with the CISA KEV catalog — identify which discovered vulnerabilities are actively exploited"
+          ],
+          "common_mistakes": [
+            "Running only unauthenticated scans — missing the majority of vulnerabilities",
+            "Not prioritizing remediation by exploitability — patching CVSS 9.0 with no exploit before CVSS 7.0 in CISA KEV",
+            "Scanning infrequently — vulnerabilities discovered between scans represent unmonitored risk windows"
+          ]
+        },
+        {
+          "id": "cis-benchmarks-and-stigs",
+          "title": "CIS Benchmarks and DISA STIGs",
+          "concepts": [
+            "CIS Benchmarks: consensus-based secure configuration guidelines for OS, cloud platforms, applications, and network devices — published by the Center for Internet Security",
+            "CIS Benchmarks include two levels: Level 1 (basic security, minimal impact) and Level 2 (high security, may impact functionality)",
+            "DISA STIGs (Security Technical Implementation Guides): US DoD security configuration standards — more stringent than CIS Benchmarks, mandatory for DoD systems",
+            "CIS-CAT (CIS Configuration Assessment Tool): automated tool for scanning against CIS Benchmarks",
+            "STIG Viewer: tool for viewing and managing STIG compliance requirements",
+            "SCAP (Security Content Automation Protocol): NIST standard for automating vulnerability checking and compliance measurement"
+          ],
+          "key_facts": [
+            "CIS Benchmarks cover 100+ technologies including Windows, Linux, macOS, AWS, Azure, Kubernetes, and web browsers",
+            "DISA STIGs are more prescriptive than CIS Benchmarks — they define exact settings with exact values",
+            "CIS Level 1 Benchmark for Windows Server includes ~200+ individual configuration checks",
+            "Hardening reduces attack surface significantly — disabling unnecessary services, removing default accounts, enforcing strong passwords",
+            "SCAP-compliant tools (OpenSCAP, OvalDI) can automate compliance checking against CIS Benchmarks and STIGs"
+          ],
+          "attack_techniques": [
+            "T1110",
+            "T1547"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers exploit weak configurations: default passwords (brute force, T1110), unnecessary services running (exploitable attack surface), excessive user privileges (privilege escalation), and missing audit logging. CIS Benchmarks and STIGs close these gaps.",
+            "attacker_perspective": "An unhardened system is an easy target — default configurations are designed for usability, not security. Default services, weak password policies, unnecessary open ports, and excessive privileges all provide attacker footholds. A hardened system (CIS/STIG compliant) removes these low-hanging fruit, forcing the attacker to work harder for initial access.",
+            "bypass_attempts": [
+              "Targeting systems or services not covered by the hardening baseline",
+              "Exploiting hardening gaps in the framework itself (new CVEs in hardened configurations)",
+              "Using stolen valid credentials — hardening makes brute-force harder but doesn't prevent credential theft"
+            ]
+          },
+          "drills": [
+            "Apply CIS Benchmark Level 1 for Windows Server to a lab system — document changes and scan with CIS-CAT before and after",
+            "Compare a specific control between CIS Benchmark and DISA STIG (e.g., password policy) — document the differences"
+          ],
+          "common_mistakes": [
+            "Applying hardening blindly without testing — some CIS/STIG settings can break applications",
+            "Not re-scanning periodically — configuration drift causes systems to fall out of compliance",
+            "Only hardening servers and neglecting endpoints (workstations, laptops)"
+          ]
+        },
+        {
+          "id": "patch-management-and-remediation",
+          "title": "Patch Management and Remediation Prioritization",
+          "concepts": [
+            "Patch management lifecycle: discover assets → assess vulnerabilities → prioritize patches → test → deploy → verify → monitor for new vulnerabilities",
+            "Prioritization factors: CVSS score, EPSS (exploit probability), CISA KEV status, asset criticality, exposure (internet-facing vs. internal), threat intelligence",
+            "Risk-based vulnerability management (RBVM): prioritize based on actual risk rather than just CVSS score",
+            "Patch deployment tools: Microsoft SCCM/MECM, WSUS, Ansible, Chef, Puppet, Jamf (macOS), AWS Systems Manager, Azure Update Manager",
+            "Virtual patching: deploying WAF rules, IPS signatures, or network ACLs to block exploitation before the patch is deployed"
+          ],
+          "key_facts": [
+            "A CVSS 7.0 vulnerability on an internet-facing web server in CISA KEV should be patched before a CVSS 9.5 on an isolated internal test server",
+            "Average time to patch: organizations typically take 30-60 days for critical vulnerabilities; attackers exploit within days of disclosure",
+            "Virtual patching (WAF rules, IPS signatures) buys time between vulnerability disclosure and patch deployment",
+            "Patch compliance metrics: percentage of systems patched within SLA (Critical: 7 days, High: 30 days, Medium: 90 days)"
+          ],
+          "attack_techniques": [
+            "T1190"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers exploit newly disclosed vulnerabilities (T1190) faster than organizations can patch — the time between CVE disclosure and patch deployment is the attacker's window of opportunity.",
+            "attacker_perspective": "When a new CVE is disclosed (especially with a public PoC exploit), the attacker races to exploit it before organizations patch. The defender's patch management speed directly determines how long this window stays open. A mature patch management program that deploys critical patches within days closes the window quickly. The attacker monitors security disclosures and weaponizes exploits within hours.",
+            "bypass_attempts": [
+              "Developing exploits for zero-day vulnerabilities before any patch exists",
+              "Targeting systems that cannot be patched quickly (legacy systems, OT/ICS, medical devices)",
+              "Exploiting vulnerabilities in the patching infrastructure itself (compromising WSUS or SCCM)"
+            ]
+          },
+          "drills": [
+            "Create a vulnerability remediation priority matrix: take 20 vulnerabilities from a Nessus scan and rank them by actual risk using CVSS + EPSS + CISA KEV + asset criticality",
+            "Design a virtual patching workflow: when a critical CVE is disclosed, immediately deploy a WAF rule or IPS signature as interim protection"
+          ],
+          "common_mistakes": [
+            "Patching by CVSS score alone without considering exploitability (EPSS) and active exploitation (CISA KEV)",
+            "Not testing patches before deployment — a bad patch can cause more outage than the vulnerability",
+            "Ignoring unpatchable systems (legacy OS, embedded devices) — these require compensating controls"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cloud-security-monitoring",
+      "title": "Cloud Security Monitoring and CSPM",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis",
+        "vulnerability-management-and-hardening"
+      ],
+      "objective": "Monitor cloud environments (AWS, Azure, GCP) for threats, implement CSPM for continuous compliance, and detect cloud-specific attack patterns.",
+      "topics": [
+        {
+          "id": "aws-security-monitoring",
+          "title": "AWS Security Monitoring: CloudTrail, GuardDuty, and Config",
+          "concepts": [
+            "AWS CloudTrail: logs all API calls made in the AWS account — the primary audit log for AWS",
+            "Amazon GuardDuty: managed threat detection service analyzing CloudTrail logs, VPC Flow Logs, and DNS logs using ML and threat intelligence",
+            "AWS Config: tracks configuration changes to AWS resources — enables compliance monitoring and drift detection",
+            "AWS Security Hub: centralized security findings aggregator — collects from GuardDuty, Config, IAM Access Analyzer, and third-party tools",
+            "Key AWS log sources: CloudTrail (management events, data events), VPC Flow Logs, S3 access logs, Route 53 DNS logs"
+          ],
+          "key_facts": [
+            "CloudTrail logs every API call including source IP, identity (IAM user/role), request parameters, and response",
+            "GuardDuty finding types: UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration, DefenseEvasion:IAMUser/CloudTrailLoggingDisabled, Persistence:IAMUser/BackdoorUser",
+            "CloudTrail should be enabled for all regions and log file integrity validation should be enabled",
+            "AWS Config rules can automatically detect non-compliant resources (public S3 buckets, overly permissive security groups)",
+            "IAM users with administrative privileges who have never been used are prime targets for attackers"
+          ],
+          "attack_techniques": [
+            "T1078.004",
+            "T1530"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers compromise cloud accounts (T1078.004 Cloud Accounts) by stealing IAM credentials via phishing, GitHub leaks, or SSRF. Once in, they enumerate resources, create backdoor users, disable logging (CloudTrail), and exfiltrate data from S3 buckets (T1530).",
+            "attacker_perspective": "In the cloud, every action is an API call — and every API call is logged by CloudTrail. The attacker cannot operate 'silently' in AWS unless they disable CloudTrail (which itself is a GuardDuty finding: DefenseEvasion:IAMUser/CloudTrailLoggingDisabled). The attacker must either accept full visibility or disable logging (creating an immediate alert).",
+            "bypass_attempts": [
+              "Disabling CloudTrail logging to operate without audit trail (triggers GuardDuty DefenseEvasion finding)",
+              "Using the AWS CLI from within a compromised EC2 instance to blend with legitimate instance activity",
+              "Creating new IAM users with admin privileges rather than modifying existing ones",
+              "Exfiltrating data via legitimate AWS services (sharing S3 buckets with attacker-controlled account)"
+            ]
+          },
+          "drills": [
+            "Enable CloudTrail, GuardDuty, and Config on an AWS account. Simulate an attack (create backdoor IAM user, make S3 bucket public, download large file) and review the resulting CloudTrail events and GuardDuty findings",
+            "Write a CloudTrail analysis query (in Athena or Sentinel) to detect IAM users making API calls from new geographic regions"
+          ],
+          "common_mistakes": [
+            "Not enabling CloudTrail in all regions — attackers operate in regions you're not monitoring",
+            "Only logging CloudTrail management events and not data events (GetObject, PutObject) — missing S3 data access",
+            "Not setting up alerts for CloudTrail being disabled — attackers disable logging as a first step"
+          ]
+        },
+        {
+          "id": "azure-and-gcp-monitoring",
+          "title": "Azure and GCP Security Monitoring",
+          "concepts": [
+            "Microsoft Defender for Cloud (formerly Azure Security Center): unified cloud security posture management and threat protection for Azure",
+            "Azure Activity Log: logs all control-plane activities (create/update/delete resources) — Azure equivalent of AWS CloudTrail",
+            "Azure Monitor / Log Analytics: centralized logging and monitoring — Sentinel ingests from Log Analytics workspace",
+            "Google Cloud Security Command Center (SCC): GCP's security posture and threat detection platform",
+            "GCP Cloud Audit Logs: Admin Activity logs and Data Access logs — GCP equivalent of CloudTrail",
+            "Microsoft Sentinel: cloud-native SIEM built on Azure — native integration with Microsoft 365, Azure, and hybrid environments"
+          ],
+          "key_facts": [
+            "Azure Activity Log captures all write operations (control plane) by default; Data Access logs require explicit enablement",
+            "Defender for Cloud includes both CSPM (posture management) and workload protection (CWP) for Azure VMs, containers, and databases",
+            "Sentinel provides pre-built analytics rules for common Azure attack patterns (impossible travel, brute force, suspicious resource creation)",
+            "GCP SCC findings include misconfigurations (public storage), vulnerabilities, and threat detections",
+            "All three clouds (AWS, Azure, GCP) use identity-based access (IAM) — monitoring for IAM abuse is universal"
+          ],
+          "attack_techniques": [
+            "T1078.004"
+          ],
+          "killchain_stage": "privilege-escalation",
+          "offense_pairing": {
+            "what_red_does": "Attackers escalate privileges in cloud environments by abusing IAM misconfigurations — over-privileged roles, unused access keys, and publicly exposed service account keys (T1078.004 Cloud Accounts).",
+            "attacker_perspective": "Cloud privilege escalation is fundamentally different from on-prem — there are no 'local admin' accounts to exploit. Instead, the attacker abuses IAM policy chains: assuming a role that has more permissions, using a leaked service account key, or exploiting a misconfigured trust policy. The defender monitors for unusual IAM activity.",
+            "bypass_attempts": [
+              "Creating new access keys for existing service accounts rather than using compromised credentials — looks like legitimate key rotation",
+              "Abusing existing over-privileged roles rather than escalating — if a role already has admin access, no escalation is needed",
+              "Using cloud-native services (Lambda, Cloud Functions) to proxy actions through legitimate compute resources"
+            ]
+          },
+          "drills": [
+            "In Azure, enable Defender for Cloud and review security recommendations. Create a Sentinel analytics rule to detect when a user is added to the Global Administrator role outside business hours",
+            "In GCP, enable Security Command Center and review findings. Write a query to detect service account key creation events in Cloud Audit Logs"
+          ],
+          "common_mistakes": [
+            "Not correlating cloud logs with on-premises logs — hybrid environments have blind spots at the boundary",
+            "Not monitoring for unused IAM credentials — stale access keys and service accounts are prime targets",
+            "Over-relying on cloud provider security tools without supplementing with independent monitoring (SIEM, third-party CSPM)"
+          ]
+        },
+        {
+          "id": "cloud-security-posture-management",
+          "title": "CSPM, CWPP, and CNAPP",
+          "concepts": [
+            "CSPM (Cloud Security Posture Management): continuous assessment of cloud infrastructure for misconfigurations, compliance violations, and security risks — examples: Prisma Cloud, Wiz, Check Point CloudGuard, Lacework",
+            "CWPP (Cloud Workload Protection Platform): runtime protection for cloud workloads (VMs, containers, serverless) — vulnerability scanning, runtime threat detection",
+            "CIEM (Cloud Infrastructure Entitlement Management): analysis and management of cloud identity and access permissions — identifies over-privileged users, roles, and service accounts",
+            "CNAPP (Cloud-Native Application Protection Platform): unified platform combining CSPM + CWPP + CIEM",
+            "Common cloud misconfigurations: public S3 buckets, overly permissive security groups (0.0.0.0/0), exposed databases, disabled encryption, hardcoded credentials in code/IaC"
+          ],
+          "key_facts": [
+            "Misconfigurations are the #1 cause of cloud breaches — not vulnerabilities or zero-days, but simple configuration errors",
+            "Wiz is currently the leading CNAPP platform — providing agentless scanning for vulnerabilities, misconfigurations, exposed secrets, and excessive permissions",
+            "CSPM should scan Infrastructure-as-Code (Terraform, CloudFormation) BEFORE deployment — 'shift-left' security",
+            "CIEM is critical because cloud environments accumulate permission debt over time — roles are granted permissions but rarely revoked",
+            "Container security is a key CNAPP capability — scanning container images, runtime drift detection, Kubernetes configuration validation"
+          ],
+          "attack_techniques": [
+            "T1530",
+            "T1552"
+          ],
+          "killchain_stage": "reconnaissance",
+          "offense_pairing": {
+            "what_red_does": "Attackers scan for cloud misconfigurations (public S3 buckets, exposed databases, leaked credentials in public repos) using tools like Shodan, GrayhatWarfare, and truffleHog — CSPM continuously monitors for and remediates these exposures.",
+            "attacker_perspective": "The cloud attacker's reconnaissance is often external and automated — scanning the entire internet for misconfigured cloud resources. A public S3 bucket, an exposed Elasticsearch cluster, or credentials in a public GitHub repo are all easily found by automated scanners. CSPM tools continuously monitor for these exposures and alert/remediate before attackers find them.",
+            "bypass_attempts": [
+              "Exploiting misconfigurations that CSPM doesn't check for (custom or novel misconfigurations)",
+              "Timing attacks between CSPM scan intervals — exploiting a misconfiguration before the next scan detects it",
+              "Compromising legitimate credentials to access resources that appear properly secured from the outside"
+            ]
+          },
+          "drills": [
+            "Deploy a CSPM tool (Wiz trial, Prisma Cloud trial, or Prowler open-source for AWS) and scan a cloud environment — document all findings and create a remediation plan",
+            "Run Prowler (open-source AWS security assessment tool) against an AWS account and review the compliance checks against CIS AWS Foundations Benchmark"
+          ],
+          "common_mistakes": [
+            "Deploying CSPM in alert-only mode without automated remediation — misconfigurations persist until manually fixed",
+            "Not scanning Infrastructure-as-Code before deployment — catching misconfigurations after they're in production is too late",
+            "Ignoring CIEM findings — over-privileged identities are as dangerous as misconfigured resources"
+          ]
+        },
+        {
+          "id": "container-and-kubernetes-security",
+          "title": "Container and Kubernetes Security Monitoring",
+          "concepts": [
+            "Container image scanning: scanning Docker/OCI images for OS package vulnerabilities, application library vulnerabilities, hardcoded secrets, and misconfigurations before deployment",
+            "Kubernetes audit logging: kube-apiserver audit log records all API requests to the Kubernetes control plane — the primary security log for K8s",
+            "Runtime container security: monitoring running containers for anomalous behavior (unexpected process execution, network connections, file system changes)",
+            "Key Kubernetes security controls: RBAC, Network Policies (microsegmentation), Pod Security Standards, Secrets management",
+            "Tools: Falco (CNCF runtime security), Aqua Security, Sysdig Secure, kube-bench (CIS Kubernetes Benchmark), Trivy (image scanning)"
+          ],
+          "key_facts": [
+            "Falco is the CNCF graduated project for container runtime security — uses rules to detect anomalous container behavior in real-time",
+            "kube-bench checks Kubernetes cluster configuration against CIS Kubernetes Benchmark",
+            "Trivy is a popular open-source vulnerability scanner for container images, file systems, and Kubernetes",
+            "Kubernetes RBAC is the primary access control mechanism — over-privileged service accounts are a common attack vector",
+            "Container escape (breaking out of the container to the host) is a high-severity finding"
+          ],
+          "attack_techniques": [
+            "T1611",
+            "T1525"
+          ],
+          "killchain_stage": "privilege-escalation",
+          "offense_pairing": {
+            "what_red_does": "Attackers exploit container escape vulnerabilities (T1611 Escape to Host) to break from a container to the underlying host, gaining access to all containers on the node. They may also implant malicious container images (T1525 Implant Internal Image) in registries.",
+            "attacker_perspective": "Container environments present a unique attack surface — a single container escape can compromise the entire host node and all containers running on it. The attacker's goals are: escape the container to the host, access other containers, pivot to the Kubernetes API server, access secrets. Runtime security tools (Falco) and image scanning (Trivy) are the defender's primary countermeasures.",
+            "bypass_attempts": [
+              "Exploiting zero-day container escape vulnerabilities that runtime security tools don't yet detect",
+              "Operating within the container's normal behavior profile to avoid triggering Falco rules",
+              "Compromising the container image supply chain — injecting malicious code into base images or CI/CD pipelines"
+            ]
+          },
+          "drills": [
+            "Scan a Docker image with Trivy: trivy image nginx:latest — document all vulnerabilities and identify which are fixable",
+            "Install Falco on a Kubernetes cluster and review the default rules — simulate a container opening a shell (kubectl exec) and verify Falco detects it"
+          ],
+          "common_mistakes": [
+            "Scanning images at build time but not enforcing that only scanned images can be deployed (admission control)",
+            "Not monitoring Kubernetes audit logs — the API server is the control plane for the entire cluster",
+            "Granting excessive RBAC permissions to service accounts — following least privilege is critical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cyber-threat-intelligence",
+      "title": "Cyber Threat Intelligence",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis"
+      ],
+      "objective": "Integrate threat intelligence into defensive operations using STIX/TAXII, MISP, and intelligence-driven hunting to proactively detect emerging threats.",
+      "topics": [
+        {
+          "id": "cti-lifecycle-and-types",
+          "title": "CTI Lifecycle and Intelligence Types",
+          "concepts": [
+            "CTI lifecycle: (1) Requirements/Planning → (2) Collection → (3) Processing & Exploitation → (4) Analysis & Production → (5) Dissemination → (6) Feedback",
+            "Intelligence types: Strategic (high-level trends, threat actor motivations, executive briefings), Operational (specific threats, campaign analysis, TTPs), Tactical (IOCs, hashes, IPs, domains)",
+            "Intelligence sources: internal (past incidents, SIEM data, honeypots), external (ISACs/ISAOs, commercial feeds, open-source intelligence, government advisories)",
+            "ISACs (Information Sharing and Analysis Centers): sector-specific intelligence sharing organizations — FS-ISAC, MS-ISAC, Aviation-ISAC, etc.",
+            "Threat actor attribution: tracking threat groups (APTs, cybercriminal groups) by TTPs, infrastructure, and objectives — MITRE ATT&CK groups"
+          ],
+          "key_facts": [
+            "The CTI lifecycle is circular — feedback from intelligence consumers (SOC, IR) drives new collection requirements",
+            "Tactical intelligence (IOCs) has the shortest lifespan — IPs, domains, and hashes change frequently. TTPs have the longest lifespan.",
+            "ISACs are a critical source of sector-specific threat intelligence — many provide free STIX/TAXII feeds to member organizations",
+            "Intelligence requirements should be specific and aligned with business risk: 'What TTPs are threat groups targeting financial services using?'"
+          ],
+          "attack_techniques": [
+            "T1592"
+          ],
+          "killchain_stage": "reconnaissance",
+          "offense_pairing": {
+            "what_red_does": "Attackers themselves conduct reconnaissance (T1592 Gather Victim Host Information) before attacking — CTI flips this by gathering intelligence on the attackers: their TTPs, infrastructure, tools, and objectives.",
+            "attacker_perspective": "The attacker operates under the assumption that the defender doesn't know who they are or how they operate. CTI disrupts this assumption — by tracking threat groups, their TTPs, and infrastructure, the defender can anticipate attacks before they happen. When a defender has good CTI, they can proactively hunt for specific threat groups' techniques and block known infrastructure.",
+            "bypass_attempts": [
+              "Rapidly rotating infrastructure, tools, and TTPs to avoid being tracked and attributed",
+              "Operating as a new, unattributed threat group with no historical intelligence footprint",
+              "Deliberately planting false flags to mislead intelligence analysis"
+            ]
+          },
+          "drills": [
+            "Write intelligence requirements for a fictional organization (e.g., a hospital): identify the top 3 threat groups likely to target them and what TTPs to watch for",
+            "Subscribe to a free threat intelligence feed (CISA advisories, MS-ISAC) and integrate 10 IOCs into your SIEM as watchlists"
+          ],
+          "common_mistakes": [
+            "Collecting intelligence without defined requirements — gathering IOCs and reports that are never used",
+            "Treating all IOCs equally — a domain from 3 years ago is not actionable, but a hash from yesterday is",
+            "Not sharing intelligence back to the community — intelligence sharing is reciprocal"
+          ]
+        },
+        {
+          "id": "stix-taxii-misp",
+          "title": "STIX, TAXII, MISP, and OpenCTI",
+          "concepts": [
+            "STIX (Structured Threat Information eXpression): standardized JSON-based language for representing cyber threat intelligence — describes indicators, observables, TTPs, threat actors, campaigns, and relationships",
+            "TAXII (Trusted Automated Exchange of Intelligence Information): HTTPS-based transport protocol for sharing STIX content between organizations and tools",
+            "MISP (Malware Information Sharing Platform): open-source threat intelligence platform for collecting, storing, distributing, and sharing threat intelligence — supports STIX import/export",
+            "OpenCTI: open-source threat intelligence platform with a graph-based data model — integrates with STIX 2.x natively",
+            "Intelligence platforms vs. feeds: platforms (MISP, OpenCTI, ThreatConnect, Anomali) manage, enrich, and correlate intelligence; feeds provide raw indicators"
+          ],
+          "key_facts": [
+            "STIX 2.x uses JSON-LD format and defines objects: Indicator, Observed Data, Attack Pattern, Threat Actor, Intrusion Set, Malware, Tool, Campaign, Identity, Relationship, Report",
+            "MISP is the most widely deployed open-source threat intelligence platform — used by ISACs, CSIRTs, and commercial organizations worldwide",
+            "TAXII defines collections and channels for intelligence sharing — a TAXII server hosts collections that clients can poll or subscribe to",
+            "MISP 'galaxies' provide structured taxonomies for classification: MITRE ATT&CK, threat actors, ransomware, sectors",
+            "OpenCTI's graph model visualizes relationships between threat actors, campaigns, TTPs, and indicators"
+          ],
+          "attack_techniques": [
+            "T1592"
+          ],
+          "killchain_stage": "command-and-control",
+          "offense_pairing": {
+            "what_red_does": "Attackers use shared infrastructure, tools, and TTPs across multiple campaigns — CTI platforms (MISP, OpenCTI) correlate these across organizations, identifying shared infrastructure that links disparate attacks to the same threat group.",
+            "attacker_perspective": "The attacker's infrastructure (C2 domains, IPs, certificates) is their fingerprint across campaigns. When multiple organizations share observations via STIX/TAXII/MISP, the defender community can link attacks that the attacker intended to appear separate. The attacker must invest in entirely new infrastructure for each campaign to avoid this correlation.",
+            "bypass_attempts": [
+              "Using completely separate infrastructure for each campaign — no shared C2 domains, IPs, or certificates",
+              "Compromising legitimate infrastructure (websites, cloud services) for C2 to avoid attribution",
+              "Rapidly cycling through disposable infrastructure (burner domains, short-lived cloud instances)"
+            ]
+          },
+          "drills": [
+            "Install MISP (Docker) and import a threat intelligence feed (e.g., CISA, abuse.ch) — explore the imported indicators and use MISP galaxies to classify them by ATT&CK technique",
+            "Set up a TAXII client to pull indicators from a public feed and ingest them into your SIEM as watchlists"
+          ],
+          "common_mistakes": [
+            "Not enriching raw IOCs with context before use — an IP address without context (what threat group, what campaign, what TTP) is barely actionable",
+            "Not aging out stale indicators — 3-year-old IPs in a blocklist generate false positives and reduce trust in the intelligence",
+            "Not correlating intelligence with internal telemetry — external IOCs should be matched against SIEM data, not just added to blocklists"
+          ]
+        },
+        {
+          "id": "diamond-model-and-pyramid-of-pain",
+          "title": "Diamond Model and Pyramid of Pain",
+          "concepts": [
+            "Diamond Model of Intrusion Analysis (Sergio Caltagirone, Andrew Pendergast, Chris Betz, 2013): every intrusion event has 4 core features — Adversary, Capability, Infrastructure, Victim — connected by relationships",
+            "Diamond Model axioms: every intrusion contains these 4 features; the defender can pivot from any feature to discover the others",
+            "Pyramid of Pain (David Bianco): the hierarchy of indicators from easy to detect but trivial for attacker to change (hashes) up to TTPs (hard to detect but most painful for attacker to change)",
+            "Pyramid levels (bottom to top): Hash Values → IP Addresses → Domain Names → Host Artifacts → Network Artifacts → Tools → TTPs",
+            "Intelligence-driven defense: use the Diamond Model and Pyramid of Pain to focus defensive efforts on high-value indicators (TTPs) that cause the most pain to attackers"
+          ],
+          "key_facts": [
+            "Diamond Model pivot: if you find one feature (e.g., a C2 IP address = Infrastructure), you can search for related features (what malware = Capability, what victim = Victim, what adversary = Adversary)",
+            "Blocking a hash value causes the attacker almost no pain (trivial to change); detecting their TTPs forces them to retrain and retool (maximum pain)",
+            "The Diamond Model was developed at the US DoD and published in 2013 as a foundational CTI analysis framework",
+            "Pyramid of Pain drives prioritization: invest detection and hunting effort in the upper layers (network/host artifacts, tools, TTPs) for maximum impact",
+            "Both frameworks are complementary — Diamond Model for analysis/understanding, Pyramid of Pain for prioritization"
+          ],
+          "attack_techniques": [
+            "T1592"
+          ],
+          "killchain_stage": "reconnaissance",
+          "offense_pairing": {
+            "what_red_does": "Attackers use reusable infrastructure, tools, and TTPs across campaigns — the Diamond Model and Pyramid of Pain help defenders identify and exploit these reuses, pivoting from one observable to map the attacker's full infrastructure and capabilities.",
+            "attacker_perspective": "The attacker's efficiency is their vulnerability: reusing infrastructure, tools, and TTPs saves them time and money but creates correlations that CTI analysis can exploit. When the defender operates at the TTP level (top of the Pyramid of Pain), the attacker must fundamentally change their approach — developing new techniques, training operators, and building new infrastructure. This is the most expensive outcome for the attacker.",
+            "bypass_attempts": [
+              "Complete operational separation between campaigns — new infrastructure, new tools, new techniques for each operation (maximum cost)",
+              "Deploying false flags and misleading indicators to corrupt the defender's Diamond Model analysis",
+              "Rapidly evolving TTPs to stay ahead of defender intelligence faster than it can be shared"
+            ]
+          },
+          "drills": [
+            "Take a real-world intrusion (from The DFIR Report or a CISA advisory) and map it using the Diamond Model: identify Adversary, Capability, Infrastructure, Victim, and the relationships between them",
+            "Take 5 IOCs from a threat report and place them on the Pyramid of Pain — rank them by how much pain each causes the attacker if detected and blocked"
+          ],
+          "common_mistakes": [
+            "Focusing intelligence efforts on the bottom of the Pyramid of Pain (hashes, IPs) — high volume, low impact",
+            "Not using the Diamond Model to pivot from known indicators to discover unknown infrastructure and capabilities",
+            "Treating CTI as a feed-consumption exercise rather than an analytical discipline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zero-trust-architecture",
+      "title": "Zero Trust Architecture",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis",
+        "vulnerability-management-and-hardening"
+      ],
+      "objective": "Design and implement Zero Trust principles per NIST SP 800-207, including identity-centric access, microsegmentation, and continuous verification.",
+      "topics": [
+        {
+          "id": "nist-800-207-zero-trust",
+          "title": "NIST SP 800-207 Zero Trust Principles",
+          "concepts": [
+            "Zero Trust core assumption: 'Never trust, always verify' — no implicit trust based on network location; all access requests must be authenticated, authorized, and continuously validated",
+            "NIST SP 800-207 defines 7 basic tenets of Zero Trust",
+            "Tenet 1: All data sources and computing services are considered resources",
+            "Tenet 2: All communication is secured regardless of network location",
+            "Tenet 3: Access to individual enterprise resources is granted on a per-session basis",
+            "Tenet 4: Access is determined by dynamic policy including identity, application/service, and security posture",
+            "Tenet 5: The enterprise monitors and measures the integrity and security posture of all owned and associated assets",
+            "Tenet 6: All resource authentication and authorization are dynamic and strictly enforced before access is allowed",
+            "Tenet 7: The enterprise collects as much information as possible about the current state of assets, network infrastructure, and communications to improve its security posture"
+          ],
+          "key_facts": [
+            "Zero Trust shifts security from network-perimeter-based to identity-and-context-based",
+            "NIST SP 800-207 was published in August 2020 and is the authoritative Zero Trust reference",
+            "The traditional 'castle-and-moat' model assumes trusted internal network — Zero Trust assumes breach",
+            "CISA Zero Trust Maturity Model defines 5 pillars: Identity, Devices, Networks, Applications & Workloads, Data",
+            "Zero Trust is a journey, not a product — it requires process, culture, and technology changes"
+          ],
+          "attack_techniques": [
+            "T1021",
+            "T1078"
+          ],
+          "killchain_stage": "lateral-movement",
+          "offense_pairing": {
+            "what_red_does": "Attackers rely on lateral movement (T1021 Remote Services) and stolen valid credentials (T1078 Valid Accounts) once inside the network — in a traditional network, reaching the internal network means trusted access to everything. Zero Trust eliminates this trust, requiring authentication and authorization for every resource access.",
+            "attacker_perspective": "In a Zero Trust environment, the attacker who compromises one system cannot pivot freely to others — every lateral movement attempt requires fresh authentication, is evaluated against dynamic policy, and is logged with full context. The attacker's traditional advantage (once inside, everything is reachable) is removed. Every resource access becomes a potential detection point.",
+            "bypass_attempts": [
+              "Compromising the Zero Trust policy engine or identity provider (IdP) to modify access policies",
+              "Stealing valid tokens/credentials that pass the continuous verification checks",
+              "Exploiting trust relationships between the identity provider and service providers (federation attacks)"
+            ]
+          },
+          "drills": [
+            "Map your organization's current security architecture against the 7 NIST SP 800-207 tenets — identify which tenets are fully implemented, partially implemented, or not implemented",
+            "Assess your organization's Zero Trust maturity using the CISA Zero Trust Maturity Model (5 pillars x 4 maturity levels: Traditional, Initial, Advanced, Optimal)"
+          ],
+          "common_mistakes": [
+            "Treating Zero Trust as a single product purchase (e.g., 'we bought a ZTNA solution so we have Zero Trust') — it requires holistic architecture changes",
+            "Only implementing Zero Trust for remote access (ZTNA) while leaving internal network flat and unsegmented",
+            "Not continuously validating trust — session-based access that persists indefinitely defeats the purpose"
+          ]
+        },
+        {
+          "id": "microsegmentation",
+          "title": "Microsegmentation and Network Controls",
+          "concepts": [
+            "Microsegmentation: dividing the network into granular security zones, each with its own access controls — limits lateral movement by restricting east-west traffic flows",
+            "Traditional segmentation: VLANs and subnet-level firewalls (coarse); Microsegmentation: per-workload, per-process, per-identity rules (fine-grained)",
+            "Implementation approaches: network-based (ACLs, firewalls, VXLAN), host-based (host firewalls, EDR-enforced), identity-based (ZTNA, software-defined perimeter)",
+            "Software-Defined Networking (SDN) enables dynamic microsegmentation — policies follow the workload regardless of network location",
+            "Zero Trust Network Access (ZTNA): replaces VPN with identity-and-context-aware access to specific applications, not the entire network"
+          ],
+          "key_facts": [
+            "CISA published 'Zero Trust Maturity Model' and microsegmentation guidance in 2025 emphasizing it as a core Zero Trust control",
+            "Microsegmentation limits the blast radius of a compromise — even if an attacker reaches one segment, they cannot pivot to others",
+            "Effective microsegmentation requires asset discovery, dependency mapping, and policy modeling before enforcement — understand the application flows first",
+            "ZTNA (Zero Trust Network Access) products: Zscaler Private Access, Cloudflare Access, Palo Alto Prisma Access, Microsoft Entra Private Access",
+            "Microsegmentation is the network-layer implementation of least privilege — default deny, allow only explicitly needed flows"
+          ],
+          "attack_techniques": [
+            "T1021",
+            "T1570"
+          ],
+          "killchain_stage": "lateral-movement",
+          "offense_pairing": {
+            "what_red_does": "Attackers move laterally using remote services (T1021) and lateral tool transfer (T1570) — microsegmentation blocks these movements by enforcing default-deny between segments, requiring explicit policy for any cross-segment communication.",
+            "attacker_perspective": "In a microsegmented environment, the attacker who compromises a web server cannot directly access the database server — there is no network path between them unless explicitly allowed. Every lateral movement attempt either fails (blocked) or generates a policy violation alert (if the segment allows logging of denied flows). The attacker must find application-level paths that the segmentation policy permits, or find a way to modify the segmentation policy itself.",
+            "bypass_attempts": [
+              "Finding permitted paths between segments (e.g., through an application API that spans segments)",
+              "Compromising the microsegmentation controller or policy engine to create allowed paths",
+              "Using out-of-band communication channels (e.g., cloud metadata service, management interfaces) that bypass segmentation rules"
+            ]
+          },
+          "drills": [
+            "Map your organization's east-west traffic flows and identify which flows are necessary (application dependencies) vs. unnecessary (potential lateral movement paths)",
+            "Design a microsegmentation policy for a 3-tier web application: web tier → app tier → database tier, with default-deny between tiers except explicitly required ports/protocols"
+          ],
+          "common_mistakes": [
+            "Implementing microsegmentation without understanding application dependencies — blocking legitimate traffic and causing outages",
+            "Starting with enforcement instead of monitoring — always run in monitor-only mode first to validate policies",
+            "Making segmentation rules too broad — 'allow all from web subnet to app subnet' defeats the purpose of microsegmentation"
+          ]
+        },
+        {
+          "id": "identity-centric-security",
+          "title": "Identity-Centric Security and Continuous Authentication",
+          "concepts": [
+            "Identity as the new perimeter: in Zero Trust, identity (not network location) determines access — every request is authenticated and authorized based on user identity, device posture, and context",
+            "Multi-Factor Authentication (MFA): requires multiple authentication factors (something you know, have, are) — foundational Zero Trust control",
+            "Conditional Access: dynamic access policies based on real-time context (user location, device compliance, risk score, time of day, resource sensitivity)",
+            "Continuous authentication: re-validating user identity throughout the session, not just at login — detects session hijacking and insider threats",
+            "Identity Provider (IdP) and Single Sign-On (SSO): centralized identity management — Okta, Microsoft Entra ID (Azure AD), PingIdentity, Google Workspace Identity"
+          ],
+          "key_facts": [
+            "MFA blocks >99.9% of automated account compromise attacks (Microsoft security research)",
+            "Conditional Access evaluates signals: user risk, sign-in risk, device compliance, location, and application sensitivity before granting access",
+            "Passwordless authentication (FIDO2/WebAuthn, Windows Hello, smart cards) eliminates the password attack surface entirely",
+            "Privileged Access Management (PAM): just-in-time, just-enough access for admin accounts — CyberArk, BeyondTrust, Microsoft Entra PIM",
+            "Identity Governance and Administration (IGA): managing the identity lifecycle (joiner-mover-leaver), access reviews, and segregation of duties"
+          ],
+          "attack_techniques": [
+            "T1078",
+            "T1110"
+          ],
+          "killchain_stage": "initial-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers use stolen valid credentials (T1078) or brute force (T1110) to gain access — identity-centric security (MFA, conditional access, PAM) blocks these attacks by requiring additional verification factors and evaluating access context in real-time.",
+            "attacker_perspective": "In an identity-centric environment, the attacker who steals a password cannot access resources — MFA requires a second factor, conditional access evaluates the request context (new device? unusual location? suspicious time?), and PAM limits admin access to just-in-time windows. The attacker's stolen credential is insufficient. They must steal the MFA token, compromise the device (for device-based conditional access), or bypass the identity provider entirely.",
+            "bypass_attempts": [
+              "Stealing MFA tokens via adversarial-in-the-middle (AiTM) phishing (e.g., Evilginx2)",
+              "Registering a new MFA device after compromising the account (MFA fatigue/push bombing)",
+              "Exploiting the identity provider directly (Golden SAML, AD CS attacks)",
+              "Using pass-the-cookie or token theft to bypass MFA for already-authenticated sessions"
+            ]
+          },
+          "drills": [
+            "Implement Conditional Access policies in Azure AD / Entra ID: require MFA for all users, block access from non-compliant devices, require password change for high-risk sign-ins",
+            "Design a PAM workflow: admin requests just-in-time access to a privileged role → approval workflow → time-limited access (4 hours) → automatic revocation → full audit trail"
+          ],
+          "common_mistakes": [
+            "Implementing MFA without protecting against AiTM phishing (use phishing-resistant MFA like FIDO2)",
+            "Not applying conditional access to all applications (legacy apps may bypass the policy)",
+            "Standing admin privileges (always-on admin accounts) instead of just-in-time access — violates least privilege"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deception-technology-and-honeypots",
+      "title": "Deception Technology and Honeypots",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "siem-foundations-and-log-analysis",
+        "network-security-monitoring"
+      ],
+      "objective": "Deploy deception technologies (honeypots, canary tokens, honeyfiles) to detect attackers early in the kill chain with high-fidelity alerts.",
+      "topics": [
+        {
+          "id": "honeypot-deployment",
+          "title": "Honeypot Concepts and Deployment",
+          "concepts": [
+            "Honeypot: a decoy system designed to attract attackers, study their behavior, and generate high-fidelity alerts — no legitimate user should ever interact with a honeypot",
+            "Honeypot types: low-interaction (simulated services, e.g., Honeyd, Cowrie), high-interaction (real OS/services, e.g., real VMs deployed as decoys), research honeypots (for threat intelligence gathering), production honeypots (for early warning detection)",
+            "Honeynet: a network of honeypots designed to present a realistic target environment",
+            "Honeywall/honeynet gateway: controls and monitors traffic in/out of the honeypot environment",
+            "Deployment considerations: realism (must blend with production environment), placement (within production network segments), alerting (immediate notification on any interaction)"
+          ],
+          "key_facts": [
+            "Honeypot alerts have extremely high fidelity — any interaction with a honeypot is suspicious by definition because no legitimate user should access it",
+            "Cowrie is a popular open-source SSH/Telnet honeypot — medium-interaction that logs commands, captures malware payloads, and records attacker sessions",
+            "T-Pot is an all-in-one honeypot platform from Telekom Security — bundles multiple honeypots (Cowrie, Dionaea, Honeypy, ConPot, etc.) with ELK for analysis",
+            "High-interaction honeypots provide the richest intelligence but carry risk — the attacker could use them as a pivot point",
+            "Honeypots are especially effective for detecting internal lateral movement — if an attacker reaches an internal honeypot, they are already inside the network"
+          ],
+          "attack_techniques": [
+            "T1046",
+            "T1021"
+          ],
+          "killchain_stage": "discovery",
+          "offense_pairing": {
+            "what_red_does": "Attackers perform network scanning and discovery (T1046 Network Service Discovery) and lateral movement (T1021 Remote Services) — if they scan or access a honeypot, the interaction is immediately detected because no legitimate user should ever touch it.",
+            "attacker_perspective": "The attacker cannot distinguish a honeypot from a real system — if it looks like a vulnerable SSH server, they will attempt to exploit it. The moment they connect, the defender knows an attacker is in the network. Unlike traditional alerts that may be false positives, honeypot alerts are almost always true positives. The attacker's scanning and exploitation behaviors betray their presence.",
+            "bypass_attempts": [
+              "Fingerprinting honeypots by probing for simulation artifacts (low-interaction honeypots have telltale signs)",
+              "Avoiding honeypots by using intelligence about common honeypot deployments and configurations",
+              "Using the honeypot itself as a pivot while being careful not to trigger alerts (exploiting but not modifying)"
+            ]
+          },
+          "drills": [
+            "Deploy Cowrie SSH honeypot (or T-Pot) in an isolated lab network — observe attacker connections, brute-force attempts, and command execution. Document the TTPs used by attackers",
+            "Deploy an internal honeypot (fake SMB share, fake web server) within a production network segment — any connection to it is an immediate high-fidelity alert"
+          ],
+          "common_mistakes": [
+            "Deploying honeypots that are too obvious — attackers fingerprint and avoid them, wasting the deployment",
+            "Not isolating high-interaction honeypots — attackers can use them as pivots to attack real systems",
+            "Not monitoring honeypot alerts — a honeypot that nobody watches is worse than useless because it wastes resources"
+          ]
+        },
+        {
+          "id": "canary-tokens-and-honeyfiles",
+          "title": "Canary Tokens and Honeyfiles",
+          "concepts": [
+            "Canary token: a lightweight tripwire embedded in files, folders, URLs, database records, or API keys that generates an alert when accessed — Thinkst Canary (canarytokens.org) is the most popular free tool",
+            "Canary token types: fake AWS API keys, fake SQL database credentials, Word/Excel documents with embedded beacons, fake credit card numbers, DNS canary tokens",
+            "Honeyfile: a decoy file placed in a location that an attacker is likely to access (e.g., 'passwords.docx' in a file share) — opening the file triggers an alert",
+            "Honey credentials: fake credentials planted in code, configuration files, or password managers — if used for authentication, they trigger an alert",
+            "Honey data: decoy database records, API endpoints, or administrative interfaces that alert on access"
+          ],
+          "key_facts": [
+            "Canary tokens from Thinkst Canary (canarytokens.org) are free and deploy in seconds — they generate DNS or HTTP callbacks when triggered",
+            "Canary tokens have near-zero false positive rate — only an attacker (or someone exploring where they shouldn't) would access them",
+            "Fake AWS API keys as canary tokens: if planted in a code repository and someone uses them, AWS API calls trigger an alert — detects credential theft from public or private repos",
+            "Honeyfiles should have enticing names ('financial_data.xlsx', 'admin_passwords.txt', 'database_backup.sql') to attract attacker attention",
+            "Canary tokens work because they exploit attacker behavior — attackers enumerate, explore, and steal everything they find; canary tokens are designed to be found and accessed"
+          ],
+          "attack_techniques": [
+            "T1552",
+            "T1005"
+          ],
+          "killchain_stage": "credential-access",
+          "offense_pairing": {
+            "what_red_does": "Attackers search for unsecured credentials (T1552 Unsecured Credentials) and collect data from target systems (T1005 Data from Local System) — honey credentials and honeyfiles are designed to be found and accessed by attackers, triggering immediate alerts.",
+            "attacker_perspective": "The attacker's instinct to collect everything they find is their vulnerability — they cannot resist opening a file named 'passwords.txt' or using credentials found in a config file. Canary tokens exploit this greed. When the attacker accesses the honeyfile or uses the honey credentials, the defender receives an immediate high-fidelity alert. The attacker doesn't know which credentials are real vs. honey until they try them — by then, it's too late.",
+            "bypass_attempts": [
+              "Fingerprinting honeyfiles and canary tokens before accessing them (checking for tracking beacons)",
+              "Avoiding files and credentials that look 'too good to be true'",
+              "Using obtained credentials only from infrastructure that doesn't callback to known canary token endpoints"
+            ]
+          },
+          "drills": [
+            "Generate canary tokens at canarytokens.org (fake AWS keys, fake SQL creds, Word doc tokens) and deploy them in strategic locations: code repositories, file shares, password managers, configuration files",
+            "Create honeyfiles with enticing names ('passwords.xlsx', 'salary_data.xlsx') in file shares — configure file access auditing to alert immediately when opened"
+          ],
+          "common_mistakes": [
+            "Not deploying enough canary tokens — a few tokens may be missed by an attacker; widespread deployment increases detection probability",
+            "Making canary tokens too obvious — if the honeyfile or honey credential looks unrealistic, the attacker may skip it",
+            "Not monitoring canary token alerts — a triggered canary token that goes unnoticed is a wasted opportunity"
+          ]
+        },
+        {
+          "id": "deception-in-the-attack-lifecycle",
+          "title": "Deception Across the Attack Lifecycle",
+          "concepts": [
+            "Deception at each kill chain stage: Reconnaissance (honeypot services that attract scanning), Initial Access (fake login portals that capture attacker credentials), Execution (canary commands/scripts that alert when run), Persistence (fake persistence locations that alert when modified), Lateral Movement (fake hosts/services/credentials that detect probing), Data Exfiltration (honey data that alerts when exfiltrated)",
+            "Deception architecture: distributed decoys + centralized management + SIEM integration — commercial platforms (Attivo/SentinelOne, Acalvio, TrapX, Hexis) provide enterprise-scale deception",
+            "Early warning value: deception provides the earliest possible detection because it doesn't wait for the attacker to trigger a signature or threshold — any interaction with a decoy is immediately suspicious",
+            "Deception as a force multiplier: a few well-placed decoys can protect an entire network — the attacker doesn't know which systems are real and which are decoys",
+            "Intelligence gathering: high-interaction honeypots capture attacker tools, techniques, and infrastructure — valuable threat intelligence"
+          ],
+          "key_facts": [
+            "Deception provides the highest signal-to-noise ratio of any detection technology — near-zero false positives because legitimate users don't interact with decoys",
+            "Commercial deception platforms can auto-deploy decoys that match the production environment (same OS, same services, same naming conventions) for realism",
+            "Deception is particularly effective against insider threats — an employee accessing honeyfiles or honey credentials is immediately suspicious",
+            "Deception complements (not replaces) traditional detection — use alongside SIEM, EDR, and IDS for defense-in-depth",
+            "The uncertainty principle: once the attacker knows deception is deployed, they must second-guess every system, credential, and file — slowing them down and increasing operational cost"
+          ],
+          "attack_techniques": [
+            "T1046",
+            "T1552",
+            "T1005"
+          ],
+          "killchain_stage": "discovery",
+          "offense_pairing": {
+            "what_red_does": "Attackers operate across the full kill chain: scanning for services, searching for credentials, collecting data, moving laterally. Deception technology places traps at each stage — decoy services for scanners, honey credentials for credential thieves, honeyfiles for data collectors, fake hosts for lateral movers.",
+            "attacker_perspective": "The attacker's biggest enemy in a deception-rich environment is uncertainty: they cannot trust any system, credential, or file. Every action could trigger an alert. This paranoia slows them down and increases operational cost. If they scan a network full of honeypots, they trigger alerts at every step. If they use stolen credentials, they may be using honey credentials that callback. The defender gains asymmetric advantage: cheap decoys that are expensive for the attacker to validate.",
+            "bypass_attempts": [
+              "Fingerprinting and cataloging deception products to identify and avoid decoys",
+              "Moving slowly and selectively to minimize interaction with potential decoys",
+              "Validating every credential and system before use (testing in an isolated environment first)",
+              "Using behavioral analysis to distinguish real from decoy systems"
+            ]
+          },
+          "drills": [
+            "Design a deception strategy for a fictional enterprise: deploy SSH honeypots in each network segment, canary tokens in all file shares and code repos, honey credentials in password managers, fake database records in production databases — map each deception element to the kill chain stage it detects",
+            "Simulate an attacker finding and triggering a canary token — document the alert workflow from canary trigger to SOC notification to incident response"
+          ],
+          "common_mistakes": [
+            "Deploying deception in isolation — not integrating alerts into the SIEM or SOAR means deception alerts may be missed",
+            "Not maintaining deception realism — decoys that don't match the production environment are easily identified and avoided",
+            "Over-investing in commercial deception platforms without first trying free tools (canarytokens.org, Cowrie, T-Pot) to validate the concept"
+          ]
+        }
+      ]
+    }
+  ]
+}

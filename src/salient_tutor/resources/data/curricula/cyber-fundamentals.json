@@ -1,0 +1,1977 @@
+{
+  "track": "cyber-fundamentals",
+  "title": "Cyber Fundamentals",
+  "description": "Foundational cybersecurity knowledge covering networking, cryptography, operating systems, and core security principles required before specializing.",
+  "modules": [
+    {
+      "id": "networking-foundations",
+      "title": "Networking Foundations",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Explain how data moves across networks using the OSI and TCP/IP models and identify common protocols by port and function.",
+      "topics": [
+        {
+          "id": "osi-model-seven-layers",
+          "title": "The OSI Model — Seven Layers",
+          "concepts": [
+            "Layer 1 Physical: raw bit transmission over media (copper, fiber, radio)",
+            "Layer 2 Data Link: node-to-node frame delivery, MAC addressing, error detection (Ethernet, ARP, switches)",
+            "Layer 3 Network: logical addressing, routing between networks (IP, ICMP, routers)",
+            "Layer 4 Transport: reliable or unreliable end-to-end delivery (TCP, UDP, port numbers)",
+            "Layer 5 Session: managing communication sessions and dialog control",
+            "Layer 6 Presentation: data translation, encryption, compression, character encoding",
+            "Layer 7 Application: network services to user applications (HTTP, DNS, SMTP)"
+          ],
+          "key_facts": [
+            "OSI has exactly 7 layers, numbered 1 (bottom/physical) to 7 (top/application)",
+            "Mnemonic bottom-up: 'Please Do Not Throw Sausage Pizza Away'",
+            "Mnemonic top-down: 'All People Seem To Need Data Processing'",
+            "Layers 1-3 are 'media layers'; layers 4-7 are 'host layers'",
+            "Each layer adds a header (encapsulation); receiving side strips headers (decapsulation)",
+            "PDU names: L1=Bits, L2=Frames, L3=Packets, L4=Segments (TCP)/Datagrams (UDP), L7=Data"
+          ],
+          "attack_techniques": ["T1040"],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Attackers target specific layers: L2 for ARP spoofing/VLAN hopping, L3 for IP spoofing/routing attacks, L7 for application exploits. Understanding the model helps identify which layer an attack operates at.",
+          "defense_application": "Defenders map alerts to OSI layers for triage; firewalls operate at L3-L4 (ACLs), WAFs at L7, switches with port security at L2. Layered defense = defense in depth maps directly to OSI layers.",
+          "drills": [
+            "Given a packet capture, identify which OSI layer each header belongs to",
+            "Map 10 common protocols to their correct OSI layer numbers",
+            "Draw the encapsulation/decapsulation process for an HTTP request through all 7 layers"
+          ],
+          "common_mistakes": [
+            "Placing ARP at Layer 3 — ARP operates at Layer 2 (Data Link)",
+            "Confusing the 5-layer TCP/IP model with the 7-layer OSI model",
+            "Thinking encryption only happens at Layer 6 — TLS operates at L6/L7 boundary and encrypts application data"
+          ]
+        },
+        {
+          "id": "tcp-ip-model",
+          "title": "The TCP/IP Model",
+          "concepts": [
+            "4-layer model: Link (Network Interface), Internet, Transport, Application",
+            "Maps to OSI: Link=L1+L2, Internet=L3, Transport=L4, Application=L5+L6+L7",
+            "Practical model that the actual Internet runs on (RFC 1122)",
+            "TCP (Transmission Control Protocol): connection-oriented, reliable, ordered, three-way handshake",
+            "UDP (User Datagram Protocol): connectionless, unreliable, fast, no handshake"
+          ],
+          "key_facts": [
+            "TCP/IP has 4 layers vs OSI's 7 layers",
+            "TCP uses a 3-way handshake: SYN, SYN-ACK, ACK",
+            "TCP teardown: FIN, FIN-ACK (or RST for abrupt close)",
+            "TCP states: LISTEN, SYN_SENT, SYN_RECEIVED, ESTABLISHED, FIN_WAIT, CLOSE_WAIT, TIME_WAIT",
+            "UDP is faster than TCP because it has no handshake, no guaranteed delivery, no ordering",
+            "Common TCP protocols: HTTP, HTTPS, SSH, FTP, SMTP; Common UDP protocols: DNS, DHCP, SNMP, NTP, TFTP"
+          ],
+          "attack_techniques": ["T1565", "T1499"],
+          "killchain_stage": "command-and-control",
+          "offense_application": "Attackers exploit TCP state machines for SYN flood DoS, hijack TCP sessions, or prefer UDP for covert channels. C2 frameworks often use TCP but can tunnel over DNS (UDP 53) to evade firewalls.",
+          "defense_application": "Defenders inspect TCP flags for port scans (SYN scans, XMAS scans, FIN scans), set firewall rules by protocol/port, and use IDS rules to detect anomalous connection patterns like SYN floods.",
+          "drills": [
+            "In Wireshark, trace a full TCP three-way handshake and identify SYN/SYN-ACK/ACK packets",
+            "Compare a TCP capture vs UDP capture — identify which has handshake overhead",
+            "List which of your system's connections are TCP vs UDP using netstat or ss"
+          ],
+          "common_mistakes": [
+            "Believing TCP is always better than UDP — UDP is correct for DNS, VoIP, video streaming where speed matters more than retransmission",
+            "Confusing the TCP/IP model layers with OSI layer numbers — TCP/IP 'Application' spans OSI layers 5-7",
+            "Forgetting that DNS uses both TCP (zone transfers, large responses) and UDP (standard queries)"
+          ]
+        },
+        {
+          "id": "protocols-and-ports",
+          "title": "Common Protocols and Port Numbers",
+          "concepts": [
+            "Well-known ports: 0-1023 (require root/admin to bind on Unix)",
+            "Registered ports: 1024-49151",
+            "Dynamic/ephemeral ports: 49152-65535",
+            "IANA assigns and maintains official port numbers",
+            "TCP vs UDP port assignments for each protocol"
+          ],
+          "key_facts": [
+            "FTP: 20 (data), 21 (control) — TCP",
+            "SSH: 22 — TCP",
+            "Telnet: 23 — TCP (unencrypted!)",
+            "SMTP: 25 — TCP (mail transfer between servers)",
+            "DNS: 53 — TCP and UDP",
+            "DHCP: 67 (server), 68 (client) — UDP",
+            "TFTP: 69 — UDP",
+            "HTTP: 80 — TCP",
+            "Kerberos: 88 — TCP/UDP",
+            "POP3: 110 — TCP",
+            "NTP: 123 — UDP",
+            "RPC Endpoint Mapper: 135 — TCP/UDP",
+            "NetBIOS: 137 (Name), 138 (Datagram), 139 (Session) — TCP/UDP",
+            "IMAP: 143 — TCP",
+            "SNMP: 161 (agent), 162 (trap) — UDP",
+            "BGP: 179 — TCP",
+            "LDAP: 389 — TCP",
+            "HTTPS: 443 — TCP",
+            "SMB: 445 — TCP",
+            "Syslog: 514 — UDP",
+            "SMTP Submission: 587 — TCP",
+            "LDAPS: 636 — TCP (LDAP over TLS)",
+            "IMAPS: 993 — TCP",
+            "POP3S: 995 — TCP",
+            "MS SQL Server: 1433 — TCP",
+            "MySQL: 3306 — TCP",
+            "RDP: 3389 — TCP/UDP",
+            "PostgreSQL: 5432 — TCP",
+            "WinRM: 5985 (HTTP), 5986 (HTTPS) — TCP",
+            "ISAKMP/IKE (IPsec VPN): 500 — UDP",
+            "HTTP Alternate: 8080 — TCP"
+          ],
+          "attack_techniques": ["T1046", "T1043"],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Port scanning (Nmap) reveals running services; attackers match open ports to known vulnerabilities (e.g., EternalBlue on SMB 445, BlueKeep on RDP 3389). Insecure protocols like Telnet (23) and FTP (21) transmit credentials in cleartext.",
+          "defense_application": "Defenders harden by closing unnecessary ports, enforcing least-privilege firewall rules, replacing cleartext protocols (Telnet→SSH, HTTP→HTTPS), and monitoring for unauthorized port usage with tools like netstat, ss, lsof.",
+          "drills": [
+            "Nmap scan a lab machine and identify every open port and its service",
+            "Memorize the top 20 ports — quiz yourself on protocol, port number, and TCP/UDP",
+            "Identify which ports should never be exposed to the internet (RDP, SMB, NetBIOS, Telnet)"
+          ],
+          "common_mistakes": [
+            "Thinking port numbers are per-protocol (TCP/UDP) — they are independent; a service can be TCP-only",
+            "Assuming a service on port 8080 is always HTTP — many apps use non-standard ports to hide",
+            "Forgetting that well-known ports (0-1023) require elevated privileges on Unix-like systems"
+          ]
+        },
+        {
+          "id": "subnetting-cidr",
+          "title": "IP Addressing, Subnetting, and CIDR",
+          "concepts": [
+            "IPv4: 32-bit address, 4 octets (0-255 each), ~4.3 billion addresses",
+            "IPv6: 128-bit address, 8 groups of hex digits, effectively unlimited addresses",
+            "Subnet mask: separates network portion from host portion (e.g., 255.255.255.0 = /24)",
+            "CIDR notation: /N means N network bits (e.g., 192.168.1.0/24 = 256 addresses, 254 usable)",
+            "Private IP ranges (RFC 1918): 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16",
+            "NAT (Network Address Translation): translates private IPs to public IPs",
+            "Special addresses: 127.0.0.0/8 (loopback), 169.254.0.0/16 (APIPA/link-local), 0.0.0.0 (default route)"
+          ],
+          "key_facts": [
+            "IPv4 = 32 bits, written as four decimal octets (e.g., 192.168.1.1)",
+            "IPv6 = 128 bits, written as eight colon-separated hex groups (e.g., 2001:db8::1)",
+            "/24 = 256 total addresses (254 usable hosts), /16 = 65,536 addresses, /8 = 16,777,216 addresses",
+            "/30 = 4 addresses (2 usable) — typical for point-to-point links",
+            "/31 = 2 addresses — used for point-to-point per RFC 3021",
+            "/32 = single host (host route)",
+            "Private ranges: 10.0.0.0/8 (16M hosts), 172.16.0.0/12 (1M hosts), 192.168.0.0/16 (65K hosts)",
+            "Loopback: 127.0.0.1 (IPv4), ::1 (IPv6)",
+            "APIPA: 169.254.0.0/16 — assigned when DHCP fails",
+            "Number of usable hosts in /N = 2^(32-N) - 2 (subtract network and broadcast addresses)"
+          ],
+          "attack_techniques": ["T1018", "T1046"],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Attackers use subnet knowledge to enumerate internal networks (ping sweeps across /24 ranges), identify network architecture, and pivot through subnets after initial compromise. CIDR ranges guide scanner scope.",
+          "defense_application": "Defenders segment networks with VLANs and subnets to contain breaches, write precise firewall ACLs using CIDR notation, and design DMZ architectures. Network segmentation limits lateral movement.",
+          "drills": [
+            "Calculate the network address, broadcast address, and host range for 10.20.30.40/22",
+            "Given a requirement for 50 hosts per subnet, determine the optimal subnet mask from a /24",
+            "Identify whether 172.20.5.10 is a private or public IP and explain why"
+          ],
+          "common_mistakes": [
+            "Forgetting to subtract 2 from total addresses for network and broadcast addresses",
+            "Thinking /24 always means 255.255.255.0 is the only valid mask — it is, but /23, /22 etc. are also common",
+            "Confusing NAT with subnetting — NAT translates addresses, subnetting divides address space"
+          ]
+        },
+        {
+          "id": "routing-basics",
+          "title": "Routing Fundamentals",
+          "concepts": [
+            "Routers operate at OSI Layer 3 (Network), forward packets between networks",
+            "Routing table: destination network, next hop, metric, interface",
+            "Default gateway: where packets go when no specific route matches",
+            "Static routing: manually configured routes",
+            "Dynamic routing protocols: OSPF (Interior), BGP (Exterior/Internet), RIP, EIGRP",
+            "BGP: Border Gateway Protocol — routes between autonomous systems (AS), the backbone of the Internet",
+            "OSPF: Open Shortest Path First — link-state IGP, uses Dijkstra's algorithm"
+          ],
+          "key_facts": [
+            "Routers operate at Layer 3; switches at Layer 2",
+            "BGP uses TCP port 179",
+            "OSPF uses IP protocol number 89 (not TCP or UDP)",
+            "RIP uses UDP port 520, max 15 hops (16 = unreachable)",
+            "BGP autonomous system numbers (ASN) identify networks on the Internet",
+            "Default route is 0.0.0.0/0"
+          ],
+          "attack_techniques": ["T1557", "T1490"],
+          "killchain_stage": "defense-evasion",
+          "offense_application": "Attackers manipulate routing tables (ARP spoofing at L2, BGP hijacking at L3) to intercept traffic (MITM), inject malicious routes to redirect traffic, or isolate segments. Route table modification enables traffic interception.",
+          "defense_application": "Defenders use routing segmentation for isolation, implement route authentication (BGP MD5, OSPF authentication), monitor routing table changes for anomalies, and use ACLs on routing protocol traffic.",
+          "drills": [
+            "Run 'route -n' or 'ip route' and explain every entry in the routing table",
+            "Trace the path of a packet from your machine to 8.8.8.8 using traceroute/tracert",
+            "Diagram how a packet travels through routers, switches, and the default gateway to reach the internet"
+          ],
+          "common_mistakes": [
+            "Confusing switches (L2) with routers (L3) — switches forward frames by MAC, routers forward packets by IP",
+            "Thinking the default gateway is only for internet traffic — it handles any traffic without a specific route",
+            "Forgetting that BGP is what actually runs the Internet's inter-domain routing"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dns-and-web-protocols",
+      "title": "DNS, HTTP, and Web Protocols in Depth",
+      "difficulty": "beginner",
+      "prerequisites": ["networking-foundations"],
+      "objective": "Explain DNS resolution and HTTP request/response cycles, and identify security weaknesses in both.",
+      "topics": [
+        {
+          "id": "dns-in-depth",
+          "title": "DNS — Domain Name System in Depth",
+          "concepts": [
+            "DNS translates domain names to IP addresses (forward lookup) and vice versa (reverse lookup)",
+            "Hierarchical structure: root (.), TLD (.com, .org), second-level (example.com), subdomains",
+            "Resolution process: client → recursive resolver → root server → TLD server → authoritative server",
+            "DNS caching at multiple levels (browser, OS, resolver) with TTL (Time To Live)",
+            "DNS record types: A (IPv4), AAAA (IPv6), CNAME (alias), MX (mail exchange), TXT (text/SPF/DKIM), NS (name server), SOA (start of authority), PTR (reverse lookup), SRV (service)"
+          ],
+          "key_facts": [
+            "DNS primarily uses UDP port 53, but TCP port 53 for zone transfers and responses > 512 bytes",
+            "A record = IPv4 address; AAAA record (quad-A) = IPv6 address",
+            "MX records have priority values (lower = higher priority)",
+            "TXT records are used for SPF, DKIM, DMARC email authentication",
+            "DNSSEC adds cryptographic signatures to DNS records (using RRSIG, DNSKEY, DS records)",
+            "13 logical root server clusters named A through M (a.root-servers.net through m.root-servers.net)",
+            "Common tools: dig, nslookup, host"
+          ],
+          "attack_techniques": ["T1071", "T1568", "T1059"],
+          "killchain_stage": "command-and-control",
+          "offense_application": "DNS is used for C2 via DNS tunneling (encoding data in subdomain queries), DNS rebinding to bypass same-origin policy, and domain fronting. Attackers compromise DNS to redirect users to phishing sites. DNS exfiltration hides data in DNS queries.",
+          "defense_application": "Defenders monitor DNS for data exfiltration (long subdomain labels, high entropy queries), implement DNS filtering/blocking (Pi-hole, Cisco Umbrella), enforce DNSSEC to prevent cache poisoning, and use DNS logging as a detection source.",
+          "drills": [
+            "Use 'dig' to manually trace DNS resolution: dig +trace example.com",
+            "Query specific record types: dig MX, dig TXT, dig AAAA for a domain",
+            "Analyze DNS traffic in Wireshark and identify query/response pairs, record types, and TTL values"
+          ],
+          "common_mistakes": [
+            "Forgetting DNS can use TCP (not just UDP) for large responses and zone transfers",
+            "Thinking DNS is always insecure — DNSSEC exists but adoption is incomplete",
+            "Confusing authoritative servers with recursive resolvers — authoritative servers answer for their zones, recursive resolvers chase the chain"
+          ]
+        },
+        {
+          "id": "http-https",
+          "title": "HTTP and HTTPS",
+          "concepts": [
+            "HTTP: stateless request-response protocol at OSI Layer 7",
+            "Request structure: method, URL/path, headers, optional body",
+            "Response structure: status line (version, status code, reason), headers, body",
+            "HTTPS = HTTP over TLS/SSL — encrypts the entire HTTP message",
+            "HTTP/2: multiplexed streams, header compression (HPACK), binary framing",
+            "HTTP/3: runs over QUIC (UDP-based), eliminates head-of-line blocking"
+          ],
+          "key_facts": [
+            "HTTP uses TCP port 80; HTTPS uses TCP port 443",
+            "HTTP/1.1 introduced persistent connections (keep-alive)",
+            "HTTP/2 and HTTP/3 are binary protocols (not human-readable like HTTP/1.1)",
+            "HTTP/3 uses UDP (via QUIC) instead of TCP",
+            "HTTPS encrypts headers AND body — only the SNI (Server Name Indication) in TLS is visible pre-encryption",
+            "Common request headers: Host, User-Agent, Cookie, Authorization, Content-Type, Accept"
+          ],
+          "attack_techniques": ["T1071", "T1059"],
+          "killchain_stage": "command-and-control",
+          "offense_application": "Attackers use HTTP(S) for C2 because it blends with normal web traffic. HTTPS hides payloads from IDS. Web exploits (SQLi, XSS, SSRF) target HTTP requests. Downgrade attacks force HTTPS→HTTP to intercept cleartext.",
+          "defense_application": "Defenders use TLS inspection (SSL bumping) at proxies, WAFs to inspect Layer 7 HTTP traffic, enforce HSTS to prevent downgrade attacks, and monitor HTTP headers for anomalies. Certificate pinning prevents MITM.",
+          "drills": [
+            "Use curl -v to examine full HTTP request and response headers for a website",
+            "Compare HTTP vs HTTPS traffic in Wireshark — show that HTTPS body is encrypted",
+            "Identify all HTTP headers in a request and explain what each one does"
+          ],
+          "common_mistakes": [
+            "Thinking HTTPS encrypts the destination domain — SNI leaks it (only encrypted with ECH/ESNI)",
+            "Believing HTTP/2 is human-readable like HTTP/1.1 — HTTP/2 is binary",
+            "Forgetting HTTP is stateless — sessions/cookies are workarounds, not built into the protocol"
+          ]
+        },
+        {
+          "id": "packet-analysis",
+          "title": "Packet Analysis and Network Tools",
+          "concepts": [
+            "Wireshark: GUI packet capture and analysis tool — the industry standard",
+            "tcpdump: command-line packet capture tool for servers and embedded systems",
+            "pcap/pcapng: packet capture file formats",
+            "Display filters vs capture filters (BPF syntax): 'tcp port 443', 'host 192.168.1.1'",
+            "Common tools: nmap (port scanning), netcat (network utility), curl (HTTP), dig (DNS), traceroute",
+            "Reading packet captures: identifying protocols, TCP handshakes, DNS queries, HTTP requests",
+            "TLS decryption: using private keys (RSA) or SSLKEYLOGFILE for session key logging"
+          ],
+          "key_facts": [
+            "Wireshark display filter syntax: ip.addr==10.0.0.1, tcp.port==443, http.request.method==POST",
+            "BPF capture filter syntax (different from display filter): 'tcp port 443', 'host 10.0.0.1'",
+            "nmap scan types: -sS (SYN/stealth), -sT (TCP connect), -sU (UDP), -sV (version), -O (OS detection)",
+            "netcat (nc): the 'Swiss Army knife' — port scanning, banner grabbing, file transfer, reverse shells",
+            "traceroute uses incrementing TTL values (ICMP Time Exceeded messages) to map path",
+            "pcap files can be analyzed after capture (offline) or in real-time (live)",
+            "Wireshark follows TCP streams to reconstruct full conversations"
+          ],
+          "attack_techniques": ["T1040", "T1046"],
+          "killchain_stage": "discovery",
+          "offense_application": "Attackers use packet captures to steal credentials transmitted in cleartext, nmap for reconnaissance and vulnerability identification, and netcat for establishing backdoor connections and data exfiltration.",
+          "defense_application": "Defenders analyze pcaps to detect intrusions, identify C2 traffic, investigate data exfiltration, verify firewall/IDS rules, and perform network forensics during incident response.",
+          "drills": [
+            "Capture traffic with tcpdump, open the pcap in Wireshark, and identify each protocol layer",
+            "Run an nmap scan against a lab machine with -sV and interpret the version detection results",
+            "Use Wireshark to follow a TCP stream and reconstruct an HTTP session"
+          ],
+          "common_mistakes": [
+            "Confusing capture filters (BPF) with display filters (Wireshark) — different syntax entirely",
+            "Forgetting that TLS-encrypted traffic cannot be read without the key or SSLKEYLOGFILE",
+            "Running full-range nmap scans (-p-) in production — noisy and may trigger alerts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cryptography-fundamentals",
+      "title": "Cryptography Fundamentals",
+      "difficulty": "beginner",
+      "prerequisites": ["networking-foundations"],
+      "objective": "Explain symmetric vs asymmetric encryption, hashing, digital signatures, and common cryptographic attacks.",
+      "topics": [
+        {
+          "id": "symmetric-asymmetric",
+          "title": "Symmetric vs Asymmetric Encryption",
+          "concepts": [
+            "Symmetric encryption: same key for encryption and decryption (shared secret), fast, used for bulk data",
+            "Asymmetric encryption: key pair (public + private), slower, used for key exchange and small data",
+            "Hybrid encryption: use asymmetric to exchange a symmetric key, then symmetric for bulk data (how TLS works)",
+            "Symmetric algorithms: AES, ChaCha20, 3DES (deprecated), DES (obsolete)",
+            "Asymmetric algorithms: RSA, ECC (Elliptic Curve Cryptography), Diffie-Hellman key exchange"
+          ],
+          "key_facts": [
+            "AES (Advanced Encryption Standard): 128, 192, or 256-bit keys, 128-bit block size — the standard for symmetric encryption",
+            "AES-256 is approved for Top Secret data by NSA",
+            "RSA: minimum 2048-bit keys recommended; 4096-bit for high security",
+            "ECC (P-256 curve): 256-bit ECC key ≈ 3072-bit RSA key in security strength",
+            "DES: 56-bit key — broken, obsolete. 3DES: 168-bit effective — deprecated by NIST",
+            "ChaCha20: 256-bit key, stream cipher, used in TLS 1.3 as alternative to AES",
+            "Symmetric is ~1000x faster than asymmetric for bulk data",
+            "AES operates in modes: ECB (insecure!), CBC, GCM (recommended, authenticated), CTR"
+          ],
+          "attack_techniques": ["T1552", "T1573"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers steal encryption keys (hardcoded in source, in config files, memory dumps), exploit weak algorithms (DES, MD5), and crack symmetric keys with brute force if too short. ECB mode leaks patterns.",
+          "defense_application": "Defenders enforce strong algorithms (AES-256, RSA-2048+), manage keys in HSMs/KMS, rotate keys regularly, and flag deprecated algorithms (DES, 3DES, RC4) in security scans. Crypto agility allows algorithm migration.",
+          "drills": [
+            "Use OpenSSL to encrypt a file with AES-256-GCM and decrypt it",
+            "Generate an RSA 2048-bit key pair and explain the public/private key relationship",
+            "Compare the speed of encrypting 100MB with AES vs RSA using OpenSSL benchmarks"
+          ],
+          "common_mistakes": [
+            "Using ECB mode — identical plaintext blocks produce identical ciphertext blocks, leaking patterns (the famous ECB penguin image)",
+            "Using DES or 3DES — both deprecated; 3DES has birthday-attack vulnerability at ~2^32 blocks",
+            "Thinking longer keys always help — key management and algorithm choice matter more than brute key length"
+          ]
+        },
+        {
+          "id": "hashing-and-macs",
+          "title": "Hashing and Message Authentication",
+          "concepts": [
+            "Cryptographic hash: one-way function producing fixed-size output (digest) from any input",
+            "Properties: deterministic, pre-image resistant, second pre-image resistant, collision resistant",
+            "Hash algorithms: SHA-256, SHA-384, SHA-512, SHA-3, BLAKE2/3",
+            "Broken hashes: MD5 (collision-broken), SHA-1 (collision-broken — SHAttered 2017)",
+            "HMAC: Hash-based Message Authentication Code — hash + secret key for integrity AND authenticity",
+            "Password hashing: bcrypt, scrypt, Argon2 (with salt and work factor — deliberately slow)",
+            "Digital fingerprinting: hashes used for file integrity (checksums) and malware signatures"
+          ],
+          "key_facts": [
+            "SHA-256 produces a 256-bit (32-byte, 64 hex char) digest",
+            "MD5 produces 128-bit — BROKEN for security (collision attacks since 2004)",
+            "SHA-1 produces 160-bit — BROKEN (SHAttered collision demonstrated in 2017, Google)",
+            "SHA-3 is based on Keccak sponge construction — fundamentally different from SHA-2",
+            "Argon2 is the winner of the 2015 Password Hashing Competition — recommended for password storage",
+            "bcrypt has an adaptive work factor (cost parameter) — can be increased as hardware improves",
+            "Salt: random value added to password before hashing — prevents rainbow table attacks",
+            "Pepper: secret key added alongside salt — stored separately, unknown to the database"
+          ],
+          "attack_techniques": ["T1110", "T1555"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers use rainbow tables and GPU hash cracking (hashcat, John the Ripper) against unsalted/weakly hashed passwords. MD5 collisions enable certificate forgery. Hash collisions allow creating two different files with the same hash.",
+          "defense_application": "Defenders use bcrypt/Argon2 for password storage with unique salts, verify file integrity with SHA-256 checksums (tripwire, AIDE), detect malware via hash signatures, and migrate away from MD5/SHA-1 everywhere.",
+          "drills": [
+            "Hash a file with SHA-256 using sha256sum, modify one byte, and hash again — observe avalanche effect",
+            "Crack a list of unsalted MD5 hashes vs bcrypt hashes using hashcat — compare difficulty",
+            "Generate an HMAC for a message and verify it using OpenSSL"
+          ],
+          "common_mistakes": [
+            "Using MD5 or SHA-1 for security-critical purposes (certificates, password storage, integrity)",
+            "Storing passwords as plain SHA-256 without salt or work factor — GPU-crackable in seconds",
+            "Confusing encoding (Base64) with encryption or hashing — Base64 is reversible, hashing is not"
+          ]
+        },
+        {
+          "id": "digital-signatures",
+          "title": "Digital Signatures",
+          "concepts": [
+            "Digital signature: hash of data encrypted with sender's private key",
+            "Verification: decrypt signature with sender's public key, compare to hash of received data",
+            "Provides: authentication (who sent it), integrity (not modified), non-repudiation (cannot deny sending)",
+            "Signature algorithms: RSA-PSS, ECDSA, EdDSA (Ed25519)",
+            "Distinct from HMAC: signatures use asymmetric keys, HMAC uses a shared symmetric key",
+            "Code signing: software developers sign executables so users can verify authenticity"
+          ],
+          "key_facts": [
+            "ECDSA with P-256 is the NIST-recommended curve for digital signatures",
+            "Ed25519 is preferred in modern systems — faster, resistant to side-channel attacks, deterministic",
+            "RSA signatures: minimum 2048-bit, 3072-bit recommended for long-term",
+            "Digital signatures do NOT provide confidentiality — encrypt separately if needed",
+            "Sign-then-encrypt vs encrypt-then-sign — encrypt-then-sign is generally preferred",
+            "TLS 1.3 dropped RSA key exchange and uses ephemeral Diffie-Hellman (forward secrecy)"
+          ],
+          "attack_techniques": ["T1552", "T1649"],
+          "killchain_stage": "defense-evasion",
+          "offense_application": "Attackers steal code-signing certificates to sign malware (appears legitimate to AV/OS). Stolen private keys allow impersonation. ECDSA nonce reuse leaks private keys (Sony PlayStation 3 hack).",
+          "defense_application": "Defenders verify digital signatures on software (GPG, Authenticode), implement certificate-based authentication (smart cards, mutual TLS), and use signed firmware updates. Code signing prevents supply-chain attacks.",
+          "drills": [
+            "Sign a file with GPG and verify the signature — explain the math (hash + private key)",
+            "Examine a code-signed Windows executable's signature using sigcheck or Get-AuthenticodeSignature",
+            "Explain why you must sign-then-encrypt for both confidentiality and non-repudiation"
+          ],
+          "common_mistakes": [
+            "Confusing digital signatures with encryption — signatures prove authenticity/integrity, not confidentiality",
+            "Thinking signatures provide non-repudiation with symmetric keys — true non-repudiation requires asymmetric keys",
+            "Reusing the ECDSA nonce (k) — catastrophic: leaks the private key completely"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pki-and-tls",
+      "title": "PKI, Certificates, and TLS",
+      "difficulty": "intermediate",
+      "prerequisites": ["cryptography-fundamentals"],
+      "objective": "Explain how PKI and the TLS handshake establish secure encrypted channels, and identify common cryptographic attacks.",
+      "topics": [
+        {
+          "id": "pki-certificates",
+          "title": "Public Key Infrastructure (PKI) and X.509 Certificates",
+          "concepts": [
+            "PKI: framework of roles, policies, and procedures for managing digital certificates",
+            "Certificate Authority (CA): trusted entity that issues and signs certificates",
+            "Registration Authority (RA): verifies identity before certificate issuance",
+            "Certificate Revocation List (CRL) and OCSP (Online Certificate Status Protocol): revocation checking",
+            "X.509 certificate format: subject, issuer, public key, validity dates, extensions, CA signature",
+            "Chain of trust: root CA → intermediate CA → end-entity certificate",
+            "Certificate Transparency (CT): public logs of all issued certificates for accountability"
+          ],
+          "key_facts": [
+            "X.509 is the standard certificate format (v3 is current)",
+            "Root CA certificates are self-signed and pre-installed in OS/browser trust stores",
+            "OCSP uses HTTP (port 80 typically) to check revocation status in real-time",
+            "CRL is a signed list of revoked certificate serial numbers",
+            "Common certificate extensions: SAN (Subject Alternative Name), Key Usage, Extended Key Usage",
+            "Certificate pinning: hardcoding expected public key to prevent CA compromise MITM",
+            "Let's Encrypt provides free automated DV (Domain Validation) certificates",
+            "EV (Extended Validation) certificates show organization name (green bar, deprecated in browsers)"
+          ],
+          "attack_techniques": ["T1552", "T1557"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers compromise CAs to issue fraudulent certificates (DigiNotar breach 2011), steal private keys from servers, and exploit OCSP stapling issues. Rogue CA certificates in trust stores enable undetectable MITM.",
+          "defense_application": "Defenders enforce certificate pinning for critical apps, monitor Certificate Transparency logs for unauthorized certificates, rotate certificates regularly, use HSTS to prevent certificate bypass, and maintain private PKI for internal infrastructure.",
+          "drills": [
+            "Examine a website's certificate chain in a browser — identify root CA, intermediate CA, and leaf certificate",
+            "Use OpenSSL to generate a CSR (Certificate Signing Request), sign it with a local CA, and install it",
+            "Check a certificate's OCSP status and CRL for revocation"
+          ],
+          "common_mistakes": [
+            "Trusting a certificate without verifying the full chain up to a root CA",
+            "Ignoring certificate expiration — expired certificates cause outages and security warnings",
+            "Assuming HTTPS = secure — a valid certificate only proves identity, not that the server is safe"
+          ]
+        },
+        {
+          "id": "tls-handshake",
+          "title": "The TLS Handshake",
+          "concepts": [
+            "TLS (Transport Layer Security) encrypts application-layer data (replaced SSL)",
+            "TLS handshake: negotiate cipher suite, authenticate server via certificate, derive shared keys",
+            "Forward secrecy (PFS): session keys are ephemeral — compromise of long-term key doesn't decrypt past sessions",
+            "TLS 1.2: ClientHello, ServerHello, Certificate, Key Exchange, ChangeCipherSpec, Finished (2 RTT)",
+            "TLS 1.3: streamlined handshake (1 RTT or 0-RTT with resumption), removed RSA key exchange, mandated PFS",
+            "Cipher suite components: key exchange, authentication, encryption, MAC/hash"
+          ],
+          "key_facts": [
+            "TLS 1.3 (RFC 8446, 2018) is the current standard — deprecated TLS 1.0 and 1.1 in 2020",
+            "TLS 1.2 requires 2 round trips (2-RTT); TLS 1.3 requires only 1-RTT (or 0-RTT with PSK)",
+            "TLS 1.3 removed: RSA key exchange, static DH, CBC mode, SHA-1, RC4, MD5",
+            "TLS 1.3 requires: ephemeral DH (DHE/ECDHE) for forward secrecy, AEAD ciphers (AES-GCM, ChaCha20-Poly1305)",
+            "TLS 1.3 cipher suites are simpler: only 5 approved suites (e.g., TLS_AES_256_GCM_SHA384)",
+            "SNI (Server Name Indication): client tells server which hostname it wants — visible before encryption (privacy leak)",
+            "ECH (Encrypted Client Hello) encrypts SNI to fix the privacy leak",
+            "SSL 3.0 (POODLE attack), TLS 1.0 (BEAST attack) — both deprecated"
+          ],
+          "attack_techniques": ["T1557", "T1573"],
+          "killchain_stage": "command-and-control",
+          "offense_application": "Attackers perform downgrade attacks (forcing TLS 1.0/SSLv3 to enable BEAST/POODLE), exploit certificate validation flaws, and intercept without forward secrecy if they capture traffic and later obtain the private key.",
+          "defense_application": "Defenders disable TLS 1.0/1.1, enforce TLS 1.2+, prefer TLS 1.3, use HSTS to prevent downgrade, enable OCSP stapling, and scan for weak cipher suites with tools like testssl.sh and SSL Labs.",
+          "drills": [
+            "Capture a TLS 1.2 handshake in Wireshark and label each message (ClientHello, ServerHello, Certificate, etc.)",
+            "Use SSL Labs (ssllabs.com) to test a website's TLS configuration and identify weaknesses",
+            "Compare a TLS 1.2 vs TLS 1.3 handshake — count the round trips"
+          ],
+          "common_mistakes": [
+            "Enabling TLS 1.0/1.1 'for compatibility' — these are deprecated and vulnerable",
+            "Allowing CBC mode ciphers in TLS 1.2 — prefer GCM or ChaCha20-Poly1305 (AEAD)",
+            "Thinking HTTPS means forward secrecy — only TLS 1.3 mandates it; TLS 1.2 needs ECDHE cipher suites"
+          ]
+        },
+        {
+          "id": "crypto-attacks",
+          "title": "Common Cryptographic Attacks",
+          "concepts": [
+            "Man-in-the-Middle (MITM): attacker intercepts and possibly modifies communication between two parties",
+            "Downgrade attack: forcing use of weaker protocol/cipher (e.g., POODLE, Logjam)",
+            "Padding oracle attack: exploiting error messages about padding to decrypt ciphertext (POODLE, Lucky 13)",
+            "Birthday attack: exploiting collision probability (birthday paradox) — affects hashes at 2^(n/2) complexity",
+            "Brute force: trying all possible keys — mitigated by sufficient key length",
+            "Side-channel attacks: timing, power analysis, cache timing to extract keys",
+            "Replay attack: capturing and resending valid messages"
+          ],
+          "key_facts": [
+            "POODLE (2014): exploits SSL 3.0 CBC padding — downgrade to SSLv3 to decrypt cookies",
+            "BEAST (2011): exploits TLS 1.0 CBC mode — fixed in TLS 1.1+",
+            "Logjam (2015): exploits weak DH key exchange — downgrade to export-grade 512-bit DH",
+            "Heartbleed (2014): OpenSSL bug (CVE-2014-0160) leaks memory including private keys",
+            "Lucky 13: timing attack on TLS CBC mode padding verification",
+            "Spectre/Meltdown (2018): CPU side-channel attacks that can leak cryptographic keys from memory",
+            "Birthday paradox: for n-bit hash, collision found in ~2^(n/2) operations (SHA-256 → 2^128)",
+            "Replay attacks prevented by nonces, timestamps, and sequence numbers"
+          ],
+          "attack_techniques": ["T1557", "T1040"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers downgrade connections to exploit older protocols, use padding oracles to decrypt cookies byte-by-byte, capture HTTPS traffic now and crack it later if no forward secrecy, and exploit implementation bugs like Heartbleed to steal keys.",
+          "defense_application": "Defenders disable legacy protocols (SSLv3, TLS 1.0), use AEAD ciphers (no padding oracle), enforce forward secrecy, patch crypto libraries promptly (Heartbleed patching), and use HSTS to prevent downgrades.",
+          "drills": [
+            "Research the Heartbleed vulnerability — explain how the heartbeat extension bug leaks memory",
+            "Demonstrate a MITM using ettercap or bettercap in a lab environment on HTTP traffic",
+            "Check a server's TLS configuration for downgrade vulnerability using testssl.sh"
+          ],
+          "common_mistakes": [
+            "Assuming strong algorithms are enough — implementation bugs (Heartbleed) and configuration errors (weak ciphers enabled) are more common than algorithm breaks",
+            "Ignoring side-channel attacks in high-security environments — timing attacks can extract keys remotely",
+            "Believing longer keys protect against protocol-level attacks like downgrades"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "linux-fundamentals",
+      "title": "Linux Fundamentals for Security",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Navigate the Linux file system, manage permissions and processes, and understand systemd from both attack and defense perspectives.",
+      "topics": [
+        {
+          "id": "linux-file-system",
+          "title": "Linux File System Structure",
+          "concepts": [
+            "Everything is a file (devices, processes, network connections via /proc)",
+            "Root directory: / — hierarchical tree structure",
+            "Key directories: /bin, /sbin, /etc, /home, /var, /tmp, /opt, /usr, /proc, /sys, /dev",
+            "/etc: system configuration files (passwd, shadow, hosts, ssh/sshd_config)",
+            "/var/log: system and application logs (auth.log, syslog, messages)",
+            "/proc: virtual filesystem exposing kernel and process info (PID, /proc/self)",
+            "/dev: device files (null, zero, random, urandom, sda, tty)",
+            "File paths: absolute (/etc/passwd) vs relative (../config)"
+          ],
+          "key_facts": [
+            "/etc/passwd: user account info (readable by all), /etc/shadow: password hashes (root-only)",
+            "/etc/shadow format: username:$hash:fields — $6$ = SHA-512, $2b$ = bcrypt",
+            "/var/log/auth.log (Debian/Ubuntu) or /var/log/secure (RHEL/CentOS): authentication logs",
+            "/proc/1/cmdline: command line of PID 1 (usually systemd)",
+            "/dev/null discards data, /dev/zero produces null bytes, /dev/urandom produces random bytes",
+            "Hidden files start with . (dotfiles like .bashrc, .ssh)",
+            "Symlinks (ln -s) vs hard links (ln)"
+          ],
+          "attack_techniques": ["T1083", "T1005", "T1552"],
+          "killchain_stage": "discovery",
+          "offense_application": "Attackers read /etc/passwd and /etc/shadow for credentials, enumerate /home for SSH keys and bash history, search config files for hardcoded passwords, and read /proc to find process details and network connections.",
+          "defense_application": "Defenders restrict file permissions on sensitive files, use file integrity monitoring (AIDE, tripwire) on /etc and binaries, audit access to sensitive paths, and monitor /var/log for unauthorized access attempts.",
+          "drills": [
+            "Navigate the entire Linux directory tree and explain the purpose of each top-level directory",
+            "Read /etc/passwd and /etc/shadow — identify the format and why shadow is root-only",
+            "Use /proc to find all network connections of a process without netstat"
+          ],
+          "common_mistakes": [
+            "Thinking /etc/passwd contains password hashes — they moved to /etc/shadow in modern Linux",
+            "Confusing /tmp (world-writable, ephemeral) with /var/tmp (persists across reboots)",
+            "Ignoring /proc and /sys — these virtual filesystems are goldmines for process and kernel information"
+          ]
+        },
+        {
+          "id": "linux-permissions",
+          "title": "Linux Users, Groups, and Permissions",
+          "concepts": [
+            "Three permission types: read (r=4), write (w=2), execute (x=1)",
+            "Three permission scopes: owner (user), group, others (world)",
+            "Octal notation: rwxr-xr-x = 755, rw-r--r-- = 644, rwxrwxrwx = 777",
+            "chmod: change permissions (symbolic: chmod u+x, or octal: chmod 755)",
+            "chown: change owner, chgrp: change group",
+            "SUID (Set User ID): run executable as file owner (e.g., sudo, passwd command)",
+            "SGID (Set Group ID): run as group owner; on directories, new files inherit group",
+            "Sticky bit: only file owner can delete files in directory (e.g., /tmp)"
+          ],
+          "key_facts": [
+            "Permission octal values: r=4, w=2, x=1 — sum them per scope (0-7 each)",
+            "SUID = 4000 octal, SGID = 2000 octal, Sticky bit = 1000 octal",
+            "/tmp typically has sticky bit (drwxrwxrwt = 1777) — users can only delete their own files",
+            "SUID binaries are privilege escalation vectors — find with: find / -perm -4000",
+            "Common SUID binaries: sudo, su, passwd, mount, ping, nmap (sometimes)",
+            "root (UID 0) bypasses all permission checks",
+            "umask determines default permissions for new files (e.g., 022 → files: 644, dirs: 755)"
+          ],
+          "attack_techniques": ["T1548", "T1068", "T1078"],
+          "killchain_stage": "privilege-escalation",
+          "offense_application": "Attackers exploit SUID/SGID binaries for privilege escalation (GTFOBins), search for world-readable sensitive files, abuse misconfigured sudo permissions (sudo -l), and modify file permissions after gaining access.",
+          "defense_application": "Defenders audit SUID binaries regularly, enforce strict permissions on sensitive files, use AppArmor/SELinux for mandatory access control, monitor for unauthorized permission changes, and harden sudo configurations.",
+          "drills": [
+            "Find all SUID binaries on a system with 'find / -perm -4000 -type f 2>/dev/null' and evaluate each",
+            "Set permissions on a script to 750, then explain what each digit means",
+            "Run 'sudo -l' and identify any overly permissive sudo rules that could enable privilege escalation"
+          ],
+          "common_mistakes": [
+            "Using chmod 777 on files/directories — grants world write access, a major security risk",
+            "Forgetting about SUID/SGID binaries when auditing security — these are common privesc vectors",
+            "Thinking file permissions protect against root — root bypasses standard Unix permissions entirely"
+          ]
+        },
+        {
+          "id": "linux-processes-systemd",
+          "title": "Processes and Systemd",
+          "concepts": [
+            "Process: running instance of a program, identified by PID (Process ID)",
+            "Process hierarchy: init/systemd (PID 1) → child processes → grandchildren",
+            "Foreground vs background processes, signals (SIGTERM=15, SIGKILL=9, SIGHUP=1)",
+            "systemd: modern init system and service manager (replaced SysV init)",
+            "systemd units: .service, .timer, .socket, .mount, .target",
+            "journalctl: query systemd journal for centralized logging",
+            "Daemons: background services (named with 'd' suffix — sshd, httpd, crond)",
+            "Cron: scheduled task execution (crontab, /etc/cron.*)"
+          ],
+          "key_facts": [
+            "systemd is PID 1 on most modern Linux distributions (since ~2015)",
+            "Common systemd commands: systemctl start/stop/enable/disable/status <service>",
+            "journalctl -u <service>: view logs for a specific service",
+            "journalctl -f: follow logs in real-time (like tail -f)",
+            "Process states: Running (R), Sleeping (S), Disk Sleep (D), Stopped (T), Zombie (Z)",
+            "Zombie process: child finished but parent hasn't read exit status",
+            "Signals: SIGTERM (15, graceful), SIGKILL (9, force kill, cannot be caught), SIGHUP (1, reload config)",
+            "Cron format: minute hour day-of-month month day-of-week (e.g., */5 * * * * = every 5 minutes)"
+          ],
+          "attack_techniques": ["T1053", "T1543", "T1547"],
+          "killchain_stage": "persistence",
+          "offense_application": "Attackers create malicious systemd services or cron jobs for persistence, hide processes by renaming them, inject into legitimate processes, and use systemd timers as stealthy scheduled tasks.",
+          "defense_application": "Defenders enumerate running processes (ps aux, top), inspect systemd services for unauthorized entries, audit cron jobs, use process monitoring (auditd, sysmon-for-linux), and detect anomalous parent-child process relationships.",
+          "drills": [
+            "Create a simple systemd service file, enable it, start it, and check its status with systemctl and journalctl",
+            "List all running processes and identify their parent PIDs — trace the tree back to PID 1",
+            "Audit all cron jobs on a system (crontab -l for each user + /etc/cron.*) for suspicious entries"
+          ],
+          "common_mistakes": [
+            "Killing processes with SIGKILL (-9) by default — use SIGTERM (-15) first for graceful shutdown",
+            "Ignoring systemd timers — attackers increasingly use .timer units instead of cron for persistence",
+            "Confusing enable (start on boot) with start (run now) in systemctl"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "windows-internals",
+      "title": "Windows Internals for Security",
+      "difficulty": "intermediate",
+      "prerequisites": ["linux-fundamentals"],
+      "objective": "Navigate Windows internals including the registry, services, Active Directory, and event logs for both attack and defense.",
+      "topics": [
+        {
+          "id": "windows-registry",
+          "title": "Windows Registry",
+          "concepts": [
+            "Registry: hierarchical database storing Windows configuration settings",
+            "Five root keys: HKEY_CLASSES_ROOT (HKCR), HKEY_CURRENT_USER (HKCU), HKEY_LOCAL_MACHINE (HKLM), HKEY_USERS (HKU), HKEY_CURRENT_CONFIG (HKCC)",
+            "Registry structure: keys → subkeys → values (name, type, data)",
+            "Common value types: REG_SZ (string), REG_DWORD (32-bit int), REG_BINARY, REG_EXPAND_SZ, REG_MULTI_SZ",
+            "Persistence locations: Run keys, Winlogon, Services, Scheduled Tasks, WMI",
+            "Tools: regedit (GUI), reg (command line), PowerShell (Get-ItemProperty, Set-ItemProperty)"
+          ],
+          "key_facts": [
+            "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run — classic autorun persistence location",
+            "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run — per-user persistence",
+            "HKLM\\SYSTEM\\CurrentControlSet — services and drivers",
+            "HKLM\\SAM — Security Account Manager (password hashes, restricted access)",
+            "HKLM\\SECURITY — full security database (domain cache, LSA secrets)",
+            "Registry hives stored as files: NTUSER.DAT (HKCU), SYSTEM, SOFTWARE, SAM, SECURITY (in C:\\Windows\\System32\\config\\)",
+            "RegRipper and RECmd are forensic tools for registry analysis"
+          ],
+          "attack_techniques": ["T1547", "T1546", "T1112"],
+          "killchain_stage": "persistence",
+          "offense_application": "Attackers add entries to Run keys for persistence, modify registry to disable security features (Windows Defender, UAC), install registry-based COM hijacking, and read SAM hive for password hashes (needs SYSTEM access).",
+          "defense_application": "Defenders monitor registry changes (Sysmon Event ID 12/13/14), check known persistence locations during incident response, use registry ACLs, and baseline known-good registry state for comparison.",
+          "drills": [
+            "Navigate to the Run keys in regedit and explain what programs start at login",
+            "Use 'reg query' from command line to read a registry value",
+            "Use Sysmon to monitor registry modifications and identify Run key changes"
+          ],
+          "common_mistakes": [
+            "Editing HKLM without admin privileges — requires elevated rights",
+            "Forgetting that HKCU is per-user — malware in HKCU only runs for that user, not system-wide",
+            "Ignoring registry as a persistence mechanism during incident response"
+          ]
+        },
+        {
+          "id": "windows-services-and-processes",
+          "title": "Windows Services, Processes, and WMI",
+          "concepts": [
+            "Windows services: background processes managed by Service Control Manager (SCM)",
+            "Service types: own process, shared process, kernel driver",
+            "Service accounts: LocalSystem (SYSTEM), LocalService, NetworkService",
+            "WMI (Windows Management Instrumentation): management infrastructure for querying and controlling Windows",
+            "Task Manager and Process Explorer for process analysis",
+            "Critical system processes: System, smss.exe, csrss.exe, wininit.exe, services.exe, svchost.exe, lsass.exe, winlogon.exe",
+            "svchost.exe hosts multiple Windows services — legitimate but also impersonated by malware"
+          ],
+          "key_facts": [
+            "SCM (Service Control Manager) runs as services.exe",
+            "svchost.exe should always run from C:\\Windows\\System32\\ and be signed by Microsoft",
+            "lsass.exe (Local Security Authority Subsystem Service): handles authentication, stores credentials — prime target for credential dumping (Mimikatz)",
+            "WMI permanent event subscriptions are a stealthy persistence mechanism",
+            "Service commands: sc query, sc config, Get-Service, Start-Service (PowerShell)",
+            "WMIC (deprecated) and PowerShell CIM cmdlets (Get-CimInstance) for WMI queries",
+            "Event IDs 7045 (new service), 7036 (service state change) in System log"
+          ],
+          "attack_techniques": ["T1543", "T1047", "T1003"],
+          "killchain_stage": "persistence",
+          "offense_application": "Attackers create malicious services for persistence and privilege escalation (if service runs as SYSTEM), use WMI for lateral movement and stealthy execution, and target lsass.exe for credential dumping with Mimikatz.",
+          "defense_application": "Defenders monitor service creation (Event ID 7045), verify svchost.exe paths and parent processes, protect lsass.exe with Credential Guard and RunAsPPL, and detect WMI event subscriptions.",
+          "drills": [
+            "Use Process Explorer to identify the parent-child relationships of all running svchost.exe instances",
+            "List all running services with 'Get-Service' and identify which run as LocalSystem",
+            "Query WMI for running processes using PowerShell: Get-CimInstance Win32_Process"
+          ],
+          "common_mistakes": [
+            "Assuming all svchost.exe processes are legitimate — malware commonly impersonates it",
+            "Ignoring the security implications of services running as LocalSystem (full admin)",
+            "Forgetting to protect lsass.exe — it's the #1 target for credential theft"
+          ]
+        },
+        {
+          "id": "active-directory-basics",
+          "title": "Active Directory Fundamentals",
+          "concepts": [
+            "Active Directory (AD): Microsoft's directory service for Windows domain networks",
+            "Domain Controller (DC): server running AD, authenticates users and stores directory data",
+            "AD structure: Forest > Domain > Organizational Units (OUs) > Objects (users, computers, groups)",
+            "Objects: users, computers, groups, service accounts, GPOs (Group Policy Objects)",
+            "Authentication: primarily Kerberos (port 88) for domain logon, NTLM as fallback",
+            "LDAP (port 389/636): protocol for querying and modifying AD directory data",
+            "Trust relationships: between domains and forests",
+            "Group Policy (GPO): centralized configuration management pushed to domain machines"
+          ],
+          "key_facts": [
+            "AD uses DNS for service location (SRV records, _ldap._tcp.domain.com)",
+            "Kerberos is the default authentication protocol (port 88 TCP/UDP)",
+            "LDAP operates on port 389 (TCP), LDAPS on port 636 (TCP)",
+            "SMB (port 445) used for SYSVOL replication and file sharing",
+            "Global Catalog: searchable index of all objects in the forest (port 3268/3269)",
+            "Common AD attack tools: BloodHound (attack path mapping), PowerView (enumeration), Mimikatz",
+            "Key AD attacks: Kerberoasting, AS-REP Roasting, Pass-the-Hash, Golden Ticket, Silver Ticket",
+            "Domain Admin is the most privileged group — compromise = full domain control"
+          ],
+          "attack_techniques": ["T1212", "T1558", "T1078", "T1068"],
+          "killchain_stage": "privilege-escalation",
+          "offense_application": "Attackers enumerate AD for attack paths (BloodHound), extract service account tickets (Kerberoasting), forge Kerberos tickets (Golden/Silver Ticket), pass hashes between machines, and abuse GPOs for lateral movement.",
+          "defense_application": "Defenders use BloodHound defensively to identify and close attack paths, enforce tiered admin model, protect KRBTGT account, monitor for anomalous Kerberos ticket requests, implement LAPS for local admin password management, and use managed service accounts (gMSA).",
+          "drills": [
+            "In a lab AD environment, use BloodHound to map attack paths from a standard user to Domain Admin",
+            "Enumerate all service accounts in AD using PowerShell (Get-ADUser -Filter {ServicePrincipalName -ne '$null'})",
+            "Explain the difference between Golden Ticket (forged TGT using KRBTGT hash) and Silver Ticket (forged service ticket using service account hash)"
+          ],
+          "common_mistakes": [
+            "Giving too many users Domain Admin privileges — should be extremely limited (tier 0)",
+            "Using regular user accounts as service accounts — use gMSAs instead to avoid Kerberoasting",
+            "Forgetting that compromising a Domain Controller means total domain compromise"
+          ]
+        },
+        {
+          "id": "windows-event-log",
+          "title": "Windows Event Logs and Auditing",
+          "concepts": [
+            "Windows Event Log: centralized logging of system, security, and application events",
+            "Event Viewer: GUI tool for browsing logs; channels: Application, Security, System, Setup, Forwarded Events",
+            "Event ID: numeric identifier for specific event types",
+            "Sysmon (System Monitor): advanced host monitoring tool from Sysinternals — goes beyond default logging",
+            "PowerShell Event Log: Module, ScriptBlock, and Provider logs",
+            "Windows Audit Policy: defines what security events are logged",
+            "WEF (Windows Event Forwarding): centralized log collection to a collector"
+          ],
+          "key_facts": [
+            "Event ID 4624: successful logon; 4625: failed logon",
+            "Event ID 4648: explicit credential logon (RunAs); 4672: special privileges assigned",
+            "Event ID 4688: process creation (requires audit process creation enabled)",
+            "Event ID 7045: new service installed (System log)",
+            "Logon types: 2 (Interactive), 3 (Network), 7 (Unlock), 10 (RemoteInteractive/RDP), 5 (Service)",
+            "Sysmon Event ID 1: process creation, 3: network connection, 7: image loaded (DLL), 10: process access, 11: file creation, 13: registry value set, 22: DNS query",
+            "PowerShell ScriptBlock logging: Event ID 4104 (reveals script content even when obfuscated)",
+            "Get-WinEvent and Get-EventLog: PowerShell cmdlets for querying logs"
+          ],
+          "attack_techniques": ["T1562", "T1070", "T1559"],
+          "killchain_stage": "defense-evasion",
+          "offense_application": "Attackers clear or tamper with event logs (Event ID 1102 — audit log cleared), disable Sysmon or audit policies, use living-off-the-land binaries to minimize logged events, and clear PowerShell history.",
+          "defense_application": "Defenders forward logs to a SIEM (Splunk, ELK) for centralized analysis, deploy Sysmon with a robust config (SwiftOnSecurity), monitor for log clearing (Event ID 1102), set up alerts on key event IDs, and enable PowerShell ScriptBlock logging.",
+          "drills": [
+            "Install Sysmon with SwiftOnSecurity config and generate/test Event IDs 1, 3, and 11",
+            "Query Security log for Event ID 4624 and identify the logon type for each entry",
+            "Set up a PowerShell ScriptBlock logging alert that triggers on suspicious commands"
+          ],
+          "common_mistakes": [
+            "Not enabling Sysmon — default Windows logging misses many important events",
+            "Forgetting PowerShell logging — ScriptBlock logging catches obfuscated and encoded PowerShell",
+            "Only looking at Security log — Application and System logs also contain critical security events"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "identity-and-access-management",
+      "title": "Identity and Access Management",
+      "difficulty": "intermediate",
+      "prerequisites": ["networking-foundations", "cryptography-fundamentals"],
+      "objective": "Distinguish authentication from authorization and explain modern identity protocols including OAuth, OIDC, SAML, and Kerberos.",
+      "topics": [
+        {
+          "id": "authn-vs-authz",
+          "title": "Authentication vs Authorization",
+          "concepts": [
+            "Authentication (AuthN): verifying WHO you are (proving identity)",
+            "Authorization (AuthZ): determining WHAT you can do (permissions/access rights)",
+            "Accounting/Auditing: tracking what you did (logs, audit trails)",
+            "AAA: Authentication, Authorization, Accounting — the three pillars",
+            "Identification: claiming an identity (username) — must be authenticated before trusted",
+            "AuthN factors: something you know (password), something you have (token), something you are (biometric)",
+            "AuthZ models: DAC (Discretionary), MAC (Mandatory), RBAC (Role-Based), ABAC (Attribute-Based)"
+          ],
+          "key_facts": [
+            "Authentication = identity verification; Authorization = permission check",
+            "Multi-factor authentication (MFA) requires 2+ different factor types (not 2 passwords)",
+            "NIST SP 800-63B: passwords should be long, not necessarily complex; no mandatory periodic rotation for good passwords",
+            "Something you know: password, PIN, security question",
+            "Something you have: smart card, hardware token (YubiKey), phone (TOTP app)",
+            "Something you are: fingerprint, face, iris, voice (biometrics)",
+            "RBAC: permissions assigned to roles, users assigned to roles",
+            "ABAC: permissions based on attributes (user, resource, environment) — more granular than RBAC"
+          ],
+          "attack_techniques": ["T1110", "T1078", "T1621"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers steal credentials (phishing, brute force, credential dumping) to authenticate, exploit broken authorization (IDOR, privilege escalation), bypass MFA (SIM swapping, MFA fatigue/prompt bombing), and use stolen session tokens to skip authentication entirely.",
+          "defense_application": "Defenders enforce MFA everywhere, implement least-privilege RBAC/ABAC, monitor for impossible travel and anomalous logins, use conditional access policies, implement session timeouts, and audit permission creep.",
+          "drills": [
+            "Design an RBAC model for a small company: list roles, users, and permissions",
+            "Identify which factors each of your accounts uses and whether they are truly multi-factor",
+            "Explain how an IDOR (Insecure Direct Object Reference) is an authorization failure, not an authentication failure"
+          ],
+          "common_mistakes": [
+            "Using two passwords as 'two-factor' — same factor type (something you know) is single-factor",
+            "Confusing authentication with authorization — a properly authenticated user can still be unauthorized",
+            "Implementing authorization checks only at login — checks needed at every resource access"
+          ]
+        },
+        {
+          "id": "oauth-oidc-saml",
+          "title": "OAuth 2.0, OpenID Connect, and SAML",
+          "concepts": [
+            "OAuth 2.0: authorization framework — delegates access without sharing credentials (access tokens)",
+            "OpenID Connect (OIDC): authentication layer on top of OAuth 2.0 (ID tokens, JWT)",
+            "SAML 2.0: XML-based SSO protocol for enterprise federation (used by ADFS, Okta)",
+            "OAuth roles: Resource Owner, Client, Authorization Server, Resource Server",
+            "OAuth grant types: authorization code, client credentials, device code, PKCE (mobile/SPA)",
+            "Tokens: access token (API authorization), refresh token (get new access token), ID token (OIDC identity claims)",
+            "JWT (JSON Web Token): compact, self-contained token format (header.payload.signature)"
+          ],
+          "key_facts": [
+            "OAuth 2.0 is for AUTHORIZATION, not authentication — OIDC adds authentication",
+            "OIDC returns an ID token (JWT) with user identity claims (sub, email, name)",
+            "SAML uses XML, OAuth/OIDC uses JSON — SAML is older, more enterprise-focused",
+            "Authorization Code flow with PKCE is recommended for all client types (RFC 9700)",
+            "Implicit flow is DEPRECATED — use Authorization Code + PKCE instead",
+            "JWT structure: header.payload.signature, base64url-encoded, signed (typically RS256 or ES256)",
+            "JWT is NOT encrypted by default — don't put secrets in JWT claims",
+            "Common OAuth attacks: stolen authorization codes, open redirects, weak redirect URI validation, token replay"
+          ],
+          "attack_techniques": ["T1550", "T1525", "T1098"],
+          "killchain_stage": "defense-evasion",
+          "offense_application": "Attackers steal OAuth access/refresh tokens (phishing via OAuth consent prompts — 'illicit consent grant'), forge JWTs (algorithm confusion: none/HS256/RS256), exploit open redirect vulnerabilities in OAuth flows, and abuse overly permissive API scopes.",
+          "defense_application": "Defenders validate JWT signatures server-side, enforce strict redirect URI allowlists, use PKCE, implement token expiration and rotation, audit OAuth consent grants, and monitor for suspicious token usage patterns.",
+          "drills": [
+            "Decode a JWT at jwt.io — inspect header, payload, and signature — identify the signing algorithm",
+            "Trace an OAuth 2.0 Authorization Code + PKCE flow step by step and explain each request/response",
+            "Explain why the implicit flow was deprecated and how PKCE solves the problem it was meant for"
+          ],
+          "common_mistakes": [
+            "Using OAuth 2.0 for authentication without OIDC — OAuth alone doesn't verify identity",
+            "Accepting JWT with 'alg: none' — always verify signatures and reject unsigned tokens",
+            "Storing sensitive data in JWT claims — JWT payload is base64-encoded, NOT encrypted"
+          ]
+        },
+        {
+          "id": "kerberos",
+          "title": "Kerberos Authentication Protocol",
+          "concepts": [
+            "Kerberos: network authentication protocol using symmetric key cryptography and tickets",
+            "Key Distribution Center (KDC): consists of Authentication Server (AS) and Ticket Granting Server (TGS)",
+            "AS-REQ/AS-REP: initial authentication — user gets Ticket Granting Ticket (TGT)",
+            "TGS-REQ/TGS-REP: user presents TGT to get service ticket for specific service",
+            "Service ticket: presented to target service for authentication",
+            "SPN (Service Principal Name): uniquely identifies a service instance in AD",
+            "In Active Directory, the KDC runs on Domain Controllers; KRBTGT account's hash encrypts TGTs"
+          ],
+          "key_facts": [
+            "Kerberos uses port 88 (TCP/UDP) and port 464 for password change",
+            "TGT (Ticket Granting Ticket) is encrypted with the KRBTGT account's hash — user can't read contents",
+            "Service tickets are encrypted with the service account's hash",
+            "Tickets have lifetimes: TGT typically 10 hours (renewable up to 7 days in AD)",
+            "Kerberoasting: request service tickets for SPN-bearing accounts, crack offline (tickets contain encrypted material using service account's hash)",
+            "AS-REP Roasting: targets accounts with 'Do not require Kerberos preauthentication' — offline crackable AS-REP",
+            "Golden Ticket: forged TGT using stolen KRBTGT hash — full domain access until TGT lifetime expires",
+            "Silver Ticket: forged service ticket using service account hash — access to specific service"
+          ],
+          "attack_techniques": ["T1558", "T1212"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers perform Kerberoasting (request and crack service tickets), AS-REP Roasting (crack AS-REP for accounts without preauth), Pass-the-Ticket (reuse stolen tickets), Golden Ticket (forge TGT with KRBTGT hash), and Silver Ticket (forge service ticket).",
+          "defense_application": "Defenders use strong passwords/gMSAs for service accounts (resistant to Kerberoasting), disable 'Do not require Kerberos preauthentication', protect KRBTGT account (rotate password twice after compromise), monitor for anomalous TGS requests, and use AES encryption for Kerberos.",
+          "drills": [
+            "Trace the Kerberos authentication flow: user → AS → TGT → TGS → service ticket → service",
+            "Explain why Kerberoasting works offline — the service ticket is encrypted with the service account hash, crackable without contacting the DC",
+            "Describe how a Golden Ticket differs from a Silver Ticket and what hash each requires"
+          ],
+          "common_mistakes": [
+            "Confusing TGT (issued by AS, encrypted with KRBTGT hash) with service ticket (issued by TGS, encrypted with service account hash)",
+            "Forgetting that Kerberos requires time synchronization — tickets have timestamps and clocks must be within 5 minutes",
+            "Using weak passwords for service accounts — makes Kerberoasted tickets trivially crackable"
+          ]
+        },
+        {
+          "id": "mfa-and-directory-services",
+          "title": "MFA, SSO, and Directory Services",
+          "concepts": [
+            "MFA: requiring multiple authentication factors from different categories",
+            "TOTP (Time-based One-Time Password): Google Authenticator, Authy — RFC 6238, 30-second window",
+            "HOTP (HMAC-based OTP): counter-based OTP — RFC 4226",
+            "FIDO2/WebAuthn: hardware-based authentication resistant to phishing (public key challenge-response)",
+            "SSO (Single Sign-On): one login grants access to multiple applications (SAML, OIDC)",
+            "Directory services: LDAP, Active Directory, Entra ID (Azure AD), Okta, FreeIPA",
+            "Conditional access: policy-based access control considering user, device, location, risk"
+          ],
+          "key_facts": [
+            "TOTP codes change every 30 seconds and are derived from a shared secret + current time",
+            "FIDO2/WebAuthn is phishing-resistant — private key never leaves the device, origin-bound",
+            "SMS-based MFA is the weakest — vulnerable to SIM swapping",
+            "Common SSO protocols: SAML 2.0 (enterprise), OIDC (modern apps), WS-Federation (legacy Microsoft)",
+            "Entra ID (formerly Azure AD) is Microsoft's cloud-based directory service",
+            "LDAP distinguished names (DN): CN=user,OU=IT,DC=example,DC=com",
+            "MFA fatigue attack: sending repeated push notifications hoping user approves one"
+          ],
+          "attack_techniques":["T1621", "T1110", "T1556"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers bypass MFA via SIM swapping (SMS), MFA fatigue (push bombing), adversary-in-the-middle (reverse proxy phishing kits like Evilginx), steal session cookies post-MFA, and downgrade to weaker authentication methods.",
+          "defense_application": "Defenders prefer FIDO2/hardware keys over SMS/TOTP, implement number matching for push MFA (prevents fatigue attacks), monitor for new device registrations, use conditional access with device compliance checks, and implement risk-based authentication.",
+          "drills": [
+            "Compare security of SMS MFA vs TOTP vs FIDO2 against phishing, SIM swap, and MITM attacks",
+            "Set up a TOTP MFA app and explain the shared secret and time window",
+            "Explain how an adversary-in-the-middle (AiTM) phishing kit defeats traditional MFA but not FIDO2"
+          ],
+          "common_mistakes": [
+            "Relying on SMS for MFA in high-security environments — SIM swapping is common",
+            "Implementing push MFA without number matching — vulnerable to fatigue attacks",
+            "Thinking MFA makes phishing impossible — AiTM phishing kits intercept both credentials and MFA"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security-principles",
+      "title": "Core Security Principles and Architecture",
+      "difficulty": "beginner",
+      "prerequisites": [],
+      "objective": "Apply fundamental security principles including the CIA triad, least privilege, defense in depth, and zero trust to real-world scenarios.",
+      "topics": [
+        {
+          "id": "cia-triad",
+          "title": "The CIA Triad",
+          "concepts": [
+            "Confidentiality: information is accessible only to authorized parties (encryption, access control)",
+            "Integrity: information is accurate and unaltered (hashing, digital signatures, version control)",
+            "Availability: information and systems are accessible when needed (redundancy, backups, DDoS protection)",
+            "Every security control maps to at least one CIA component",
+            "Tensions exist: maximum confidentiality may reduce availability, etc."
+          ],
+          "key_facts": [
+            "CIA = Confidentiality, Integrity, Availability — the foundational triad",
+            "Confidentiality controls: encryption, access control, data classification, DLP",
+            "Integrity controls: hashing, digital signatures, checksums, change management",
+            "Availability controls: redundancy, load balancing, backups, UPS, DDoS mitigation",
+            "Sometimes extended to CIANA (adding Non-repudiation and Authenticity) or Parkerian Hexad",
+            "Parkerian Hexad: Confidentiality, Integrity, Availability, Possession, Authenticity, Utility"
+          ],
+          "attack_techniques": ["T1565", "T1485", "T1499"],
+          "killchain_stage": "impact",
+          "offense_application": "Attackers compromise confidentiality (data exfiltration, credential theft), compromise integrity (data tampering, ransomware encryption, DNS poisoning), and compromise availability (DDoS, ransomware, wiping). Each attack type maps to breaking one or more CIA pillars.",
+          "defense_application": "Defenders classify data by CIA requirements, select controls for each pillar (encryption for C, hashing for I, redundancy for A), and balance all three based on risk. Security frameworks require CIA-based control selection.",
+          "drills": [
+            "For 5 common attacks (phishing, DDoS, ransomware, SQL injection, insider data theft), identify which CIA pillar(s) are compromised",
+            "For your organization's top 3 assets, rank CIA priority and justify the ranking",
+            "Map each of your existing security controls to which CIA pillar(s) it protects"
+          ],
+          "common_mistakes": [
+            "Over-focusing on confidentiality and ignoring availability (e.g., over-restrictive encryption that breaks systems)",
+            "Confusing data integrity with data accuracy — integrity is about unauthorized modification, not data correctness",
+            "Forgetting that backups protect both availability AND integrity (restore unaltered data)"
+          ]
+        },
+        {
+          "id": "least-privilege-defense-in-depth",
+          "title": "Least Privilege, Defense in Depth, and Separation of Duties",
+          "concepts": [
+            "Least Privilege: grant only the minimum access needed to perform a task",
+            "Defense in Depth: multiple overlapping security controls (if one fails, others remain)",
+            "Separation of Duties (SoD): no single person can complete a sensitive task alone (requires collusion)",
+            "Fail Secure: when a system fails, it defaults to a secure state (not open)",
+            "Economy of Mechanism: keep security simple to reduce attack surface",
+            "Complete Mediation: every access must be checked against the access control system"
+          ],
+          "key_facts": [
+            "Least privilege is Saltzer and Schroeder's #1 principle (1975)",
+            "Defense in depth = layered defense (firewall + IDS + EDR + hardening + monitoring)",
+            "Separation of Duties example: one person requests a payment, another approves it",
+            "Fail secure example: a firewall failure should block all traffic, not allow all traffic",
+            "These principles come from Saltzer & Schroeder 'The Protection of Information in Computer Systems' (1975)",
+            "Complete mediation: don't cache access decisions — re-check every time (performance vs security tradeoff)"
+          ],
+          "attack_techniques": ["T1078", "T1548"],
+          "killchain_stage": "privilege-escalation",
+          "offense_application": "Attackers exploit violations of least privilege (over-privileged service accounts), target single layers when defense in depth is missing, and exploit missing separation of duties (single admin can both create and approve changes).",
+          "defense_application": "Defenders implement JIT/JEA (Just-In-Time/Just-Enough-Access), design multi-layer security architectures, enforce SoD in business processes (change management, financial controls), and configure systems to fail closed.",
+          "drills": [
+            "Audit a set of user accounts and identify which have more permissions than needed",
+            "Design a defense-in-depth architecture for a web application (list all layers and controls)",
+            "Identify where SoD violations exist in a sample change management process"
+          ],
+          "common_mistakes": [
+            "Granting permanent admin access instead of just-in-time elevation — privilege creep",
+            "Thinking one layer (e.g., a firewall) is sufficient — defense in depth requires multiple independent layers",
+            "Configuring systems to fail open for convenience — should always fail secure/closed"
+          ]
+        },
+        {
+          "id": "zero-trust",
+          "title": "Zero Trust Architecture",
+          "concepts": [
+            "Zero Trust: 'Never trust, always verify' — no implicit trust based on network location",
+            "Core principle: treat all networks as untrusted, verify every request explicitly",
+            "NIST SP 800-207: Zero Trust Architecture standard",
+            "Key pillars: identity, device, network, application, data",
+            "Microsegmentation: granular network isolation between applications and workloads",
+            "Continuous verification: assess trust dynamically, not just at login",
+            "Policy Decision Point (PDP) + Policy Enforcement Point (PEP) architecture"
+          ],
+          "key_facts": [
+            "Zero Trust replaces 'trust but verify' with 'never trust, always verify'",
+            "NIST SP 800-207 (2020) is the authoritative Zero Trust reference",
+            "Zero Trust assumes breach — designed to limit blast radius",
+            "MFA, conditional access, and microsegmentation are core Zero Trust controls",
+            "Traditional perimeter security ('castle and moat') fails once attacker is inside",
+            "Zero Trust Maturity Model stages: Traditional → Initial → Advanced → Optimal",
+            "Identity-first Zero Trust: starts with strong identity as the primary control plane"
+          ],
+          "attack_techniques": ["T1021", "T1078"],
+          "killchain_stage": "lateral-movement",
+          "offense_application": "Attackers exploit traditional perimeter trust models — once they breach the perimeter (phishing, VPN compromise), the flat network gives them free lateral movement. Zero Trust forces them to authenticate at every step.",
+          "defense_application": "Defenders implement microsegmentation to contain breaches, enforce device compliance and identity verification for every resource access, implement continuous monitoring, and reduce attack surface by removing implicit trust between internal systems.",
+          "drills": [
+            "Compare a traditional 'castle and moat' network to a Zero Trust design — identify where implicit trust exists in the former",
+            "Map the 5 Zero Trust pillars (identity, device, network, application, data) to specific controls in your environment",
+            "Explain how microsegmentation would have limited the damage of a known breach (e.g., Colonial Pipeline)"
+          ],
+          "common_mistakes": [
+            "Thinking Zero Trust is a product you buy — it's an architecture and mindset requiring organizational change",
+            "Believing Zero Trust eliminates all network controls — network controls still matter, they're just not the only control",
+            "Implementing Zero Trust only for remote access — it applies to internal traffic too"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "risk-and-threat-modeling",
+      "title": "Risk Management and Threat Modeling",
+      "difficulty": "intermediate",
+      "prerequisites": ["security-principles"],
+      "objective": "Assess security risk using structured frameworks and apply threat modeling methodologies (STRIDE, PASTA, DREAD) to systems.",
+      "topics": [
+        {
+          "id": "risk-assessment",
+          "title": "Risk Assessment Fundamentals",
+          "concepts": [
+            "Risk = Threat × Vulnerability × Impact (or Likelihood × Impact)",
+            "Asset: anything of value (data, systems, reputation)",
+            "Threat: potential cause of unwanted incident (adversary, natural disaster)",
+            "Vulnerability: weakness that a threat can exploit",
+            "Impact: consequence if the risk materializes",
+            "Risk treatment options: Accept, Mitigate (reduce), Transfer (insurance), Avoid",
+            "Residual risk: remaining risk after controls are applied",
+            "Qualitative vs quantitative risk analysis"
+          ],
+          "key_facts": [
+            "Risk formula: Risk = Likelihood × Impact (commonly used)",
+            "ALE (Annualized Loss Expectancy) = SLE (Single Loss Expectancy) × ARO (Annual Rate of Occurrence)",
+            "SLE = Asset Value × Exposure Factor",
+            "Risk matrix typically uses 5x5 or 3x3 Likelihood × Impact grid",
+            "Risk appetite: amount of risk an organization is willing to accept",
+            "Risk tolerance: acceptable variation around risk appetite"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Attackers perform their own risk assessment — targeting high-value assets with exploitable vulnerabilities and high impact. They prioritize attacks with highest ROI (effort vs reward).",
+          "defense_application": "Defenders use risk assessment to prioritize security investments, justify budgets, focus remediation on highest-risk vulnerabilities (not just CVSS scores), and communicate risk to leadership in business terms.",
+          "drills": [
+            "Build a 5x5 risk matrix and place 10 threats on it (likelihood × impact)",
+            "Calculate ALE for a scenario: asset worth $500K, exposure factor 40%, occurs 3x/year",
+            "For your top 5 risks, assign a treatment (accept, mitigate, transfer, avoid) and justify"
+          ],
+          "common_mistakes": [
+            "Equating risk with vulnerability — risk also depends on threat and impact",
+            "Focusing only on technical risk while ignoring business and reputational risk",
+            "Treating risk assessment as a one-time activity — it must be continuous and updated"
+          ]
+        },
+        {
+          "id": "stride-threat-modeling",
+          "title": "Threat Modeling — STRIDE",
+          "concepts": [
+            "STRIDE: Microsoft's threat categorization mnemonic",
+            "S = Spoofing (impersonating identity)",
+            "T = Tampering (modifying data)",
+            "R = Repudiation (denying an action)",
+            "I = Information Disclosure (data exposure)",
+            "D = Denial of Service (availability disruption)",
+            "E = Elevation of Privilege (gaining unauthorized access levels)",
+            "STRIDE maps to CIA+ (each letter corresponds to a security property)"
+          ],
+          "key_facts": [
+            "STRIDE was developed by Microsoft (Loren Kohnfelder and Praerit Garg, 1999)",
+            "Spoofing → breaks Authentication",
+            "Tampering → breaks Integrity",
+            "Repudiation → breaks Non-repudiation",
+            "Information Disclosure → breaks Confidentiality",
+            "Denial of Service → breaks Availability",
+            "Elevation of Privilege → breaks Authorization",
+            "STRIDE-per-element: apply STRIDE to each element in a data flow diagram (DFD)"
+          ],
+          "attack_techniques": ["T1078", "T1485", "T1499"],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Attackers intuitively map their attacks to STRIDE categories — phishing is Spoofing, data breach is Information Disclosure, ransomware is Tampering + DoS, privilege escalation is Elevation of Privilege.",
+          "defense_application": "Defenders use STRIDE during design phase to systematically identify threats, create a data flow diagram (DFD), apply STRIDE to each element/flow/data store, and design controls for each identified threat. This is proactive security.",
+          "drills": [
+            "Create a DFD for a simple web application and apply STRIDE to each element",
+            "Map 10 common attacks to STRIDE categories",
+            "Design a control for each STRIDE category applied to an authentication system"
+          ],
+          "common_mistakes": [
+            "Starting STRIDE without a data flow diagram — the DFD is essential context",
+            "Only applying STRIDE to external-facing components — internal components have threats too",
+            "Using STRIDE only once — it should be applied during design AND when architecture changes"
+          ]
+        },
+        {
+          "id": "pasta-dread-frameworks",
+          "title": "PASTA, DREAD, and Security Frameworks (NIST CSF, ISO 27001)",
+          "concepts": [
+            "PASTA (Process for Attack Simulation and Threat Analysis): 7-stage risk-centric threat modeling",
+            "DREAD: risk rating model — Damage, Reproducibility, Exploitability, Affected Users, Discoverability",
+            "NIST Cybersecurity Framework (CSF): Identify, Protect, Detect, Respond, Recover (+ Govern in 2.0)",
+            "ISO 27001: international standard for Information Security Management Systems (ISMS)",
+            "ISO 27002: controls and best practices complementing ISO 27001",
+            "CIS Controls: prioritized set of best practices (18 control areas)",
+            "MITRE ATT&CK: knowledge base of adversary tactics and techniques"
+          ],
+          "key_facts": [
+            "PASTA stages: 1) Define objectives, 2) Define technical scope, 3) Application decomposition, 4) Threat analysis, 5) Vulnerability analysis, 6) Attack modeling, 7) Risk analysis",
+            "DREAD score: average of D+R+E+A+D (each 1-10), higher = higher risk",
+            "NIST CSF 2.0 (2024) added 'Govern' as a sixth function: Identify, Protect, Detect, Respond, Recover, Govern",
+            "NIST CSF profiles: Core, Tiers (1-4), Profiles",
+            "ISO 27001 requires: risk assessment, risk treatment plan, Statement of Applicability (SoA), ISMS",
+            "ISO 27001 certification requires audit by accredited body",
+            "CIS Controls v8 has 18 control areas with 153 safeguards (IG1/IG2/IG3 tiers)",
+            "MITRE ATT&CK organizes by Tactics (the 'why') and Techniques (the 'how')"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Attackers are mapped to MITRE ATT&CK techniques by defenders; threat models like PASTA simulate realistic attack chains. Understanding frameworks helps predict where attackers focus.",
+          "defense_application": "Defenders use NIST CSF as a security program roadmap, ISO 27001 for certification and compliance, CIS Controls for prioritized hardening, MITRE ATT&CK for detection engineering, and PASTA for deep threat modeling.",
+          "drills": [
+            "Rate 3 vulnerabilities using DREAD and compare scores to CVSS",
+            "Map your current security program to the 6 NIST CSF 2.0 functions — identify gaps",
+            "Walk through PASTA's 7 stages for a specific application in your environment"
+          ],
+          "common_mistakes": [
+            "Confusing ISO 27001 (the standard/certification) with ISO 27002 (the controls guidance)",
+            "Treating frameworks as checklists rather than continuous improvement programs",
+            "Using DREAD alone without context — it's a quick rating, not a comprehensive risk analysis"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compliance-and-governance",
+      "title": "Compliance and Governance",
+      "difficulty": "intermediate",
+      "prerequisites": ["security-principles", "risk-and-threat-modeling"],
+      "objective": "Explain major regulatory frameworks (GDPR, HIPAA, PCI-DSS, SOC 2, FedRAMP) and how they drive security requirements.",
+      "topics": [
+        {
+          "id": "gdpr-data-privacy",
+          "title": "GDPR and Data Privacy Regulations",
+          "concepts": [
+            "GDPR (General Data Protection Regulation): EU data protection law (enforced May 2018)",
+            "Applies to any organization processing EU residents' personal data, regardless of location",
+            "Key principles: lawfulness, transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity/confidentiality",
+            "Data subject rights: access, rectification, erasure ('right to be forgotten'), portability, objection",
+            "Data Protection Officer (DPO): required for certain organizations",
+            "Data breach notification: 72 hours to supervisory authority",
+            "Lawful basis for processing: consent, contract, legal obligation, legitimate interest, etc."
+          ],
+          "key_facts": [
+            "GDPR went into effect May 25, 2018",
+            "Maximum fine: €20 million or 4% of global annual revenue, whichever is higher",
+            "Data breach notification deadline: 72 hours from awareness",
+            "Personal data: any information relating to an identified or identifiable person",
+            "Special category data: health, biometric, genetic, racial/ethnic, religious, political, sexual orientation — stricter rules",
+            "CCPA/CPRA: California's equivalent data privacy law",
+            "Other privacy laws: LGPD (Brazil), PIPEDA (Canada), UK DPA"
+          ],
+          "attack_techniques": ["T1567", "T1005"],
+          "killchain_stage": "exfiltration",
+          "offense_application": "Data breaches trigger GDPR notification requirements (72-hour deadline). Attackers target personal data for identity theft, ransom, or sale. The regulatory consequences make data breaches costly beyond technical remediation.",
+          "defense_application": "Defenders implement data classification and DLP to identify and protect personal data, maintain data inventory, enforce encryption at rest/in transit, implement data retention policies, and have incident response procedures aligned with 72-hour notification requirements.",
+          "drills": [
+            "Map an organization's data flows and identify where personal data is stored, processed, and transmitted",
+            "Draft a GDPR-compliant data breach notification template including required elements",
+            "Identify which data in a sample database constitutes 'special category data' under GDPR"
+          ],
+          "common_mistakes": [
+            "Thinking GDPR only applies to EU companies — it applies to ANY organization processing EU residents' data",
+            "Ignoring data subject rights requests — must respond within 1 month",
+            "Storing unnecessary personal data — GDPR requires data minimization"
+          ]
+        },
+        {
+          "id": "hipaa-pci-dss",
+          "title": "HIPAA and PCI-DSS",
+          "concepts": [
+            "HIPAA (Health Insurance Portability and Accountability Act): US healthcare data protection (1996)",
+            "HIPAA Rules: Privacy Rule, Security Rule, Breach Notification Rule",
+            "Protected Health Information (PHI): individually identifiable health information",
+            "PCI-DSS (Payment Card Industry Data Security Standard): credit card data protection",
+            "PCI-DSS requirements: 12 requirements across 6 control objectives",
+            "PCI scope: cardholder data environment (CDE) — everything that touches card data",
+            "PCI-DSS 4.0 (current version, mandatory March 2024+)"
+          ],
+          "key_facts": [
+            "HIPAA applies to covered entities (healthcare providers, plans, clearinghouses) and business associates",
+            "PHI examples: medical records, insurance information, SSN + health data",
+            "HIPAA Security Rule has administrative, physical, and technical safeguards",
+            "PCI-DSS v4.0 has 12 requirements including: firewalls, no default passwords, protect stored cardholder data, encrypt transmission, maintain AV, develop secure systems, restrict access, track/monitor access, test security, maintain an information security policy",
+            "PCI levels based on transaction volume: Level 1 (>6M transactions/year) requires formal audit",
+            "PCI scope reduction: tokenization and network segmentation reduce audit scope",
+            "Cardholder data: PAN (Primary Account Number), cardholder name, expiration date, service code",
+            "PCI prohibits storing CVV/CVC after authorization"
+          ],
+          "attack_techniques": ["T1567", "T1078", "T1555"],
+          "killchain_stage": "exfiltration",
+          "offense_application": "Attackers target healthcare (ransomware on hospitals — high impact, HIPAA violations), payment card data (credit card skimming, Magecart attacks, POS malware). Stolen PHI sells for more than credit cards on dark web.",
+          "defense_application": "Defenders reduce PCI scope via tokenization and segmentation, encrypt all PHI and cardholder data, implement access controls and audit logging, conduct regular penetration tests, and maintain compliance documentation.",
+          "drills": [
+            "Design a network architecture that isolates the cardholder data environment (CDE) from the rest of the network",
+            "Identify which PCI-DSS requirements address encryption, access control, and monitoring",
+            "Given a hospital data breach scenario, identify which HIPAA rules were violated"
+          ],
+          "common_mistakes": [
+            "Storing CVV/CVC codes — PCI-DSS explicitly prohibits post-authorization storage",
+            "Underestimating PCI scope — any system that can impact CDE security is in scope",
+            "Thinking HIPAA is only about IT — it covers administrative and physical safeguards too"
+          ]
+        },
+        {
+          "id": "soc2-fedramp",
+          "title": "SOC 2 and FedRAMP",
+          "concepts": [
+            "SOC 2 (System and Organization Controls 2): AICPA framework for service organization security",
+            "SOC 2 Trust Service Criteria (TSC): Security, Availability, Processing Integrity, Confidentiality, Privacy",
+            "SOC 2 Type I: point-in-time design assessment; Type II: effectiveness over a period (6-12 months)",
+            "FedRAMP (Federal Risk and Authorization Management Program): US government cloud security authorization",
+            "FedRAMP levels: Low, Moderate, High impact",
+            "FedRAMP authorization: requires 3PAO (Third-Party Assessment Organization) assessment",
+            "FISMA: Federal Information Security Modernization Act — broader federal security requirement"
+          ],
+          "key_facts": [
+            "SOC 2 Type I = design suitability at a point in time; Type II = operating effectiveness over 6-12 months",
+            "SOC 2 Security criterion is required; others (Availability, Processing Integrity, Confidentiality, Privacy) are optional add-ons",
+            "SOC 1 (SSAE 18) = financial controls; SOC 2 = security controls; SOC 3 = public summary of SOC 2",
+            "FedRAMP Moderate is the most common authorization level — protects non-public CUI",
+            "FedRAMP High = high-impact data (life-threatening, major financial loss if breached)",
+            "FedRAMP requires continuous monitoring (ConMon) after authorization",
+            "ATO (Authority to Operate): final authorization from the agency",
+            "StateRAMP: state/local government equivalent of FedRAMP"
+          ],
+          "attack_techniques": [],
+          "killchain_stage": "reconnaissance",
+          "offense_application": "Attackers target SOC 2/FedRAMP-certified organizations knowing they hold sensitive data. Compliance certifications don't guarantee security — gaps between audited controls and actual practice create exploitable weaknesses.",
+          "defense_application": "Defenders use SOC 2/FedRAMP requirements as comprehensive security program baselines, implement continuous monitoring, maintain evidence for audits, and use compliance requirements to justify security investments.",
+          "drills": [
+            "Compare SOC 2 Type I vs Type II reports and explain why Type II is more valuable",
+            "Map the 5 SOC 2 Trust Service Criteria to specific security controls",
+            "Explain the FedRAMP authorization process from preparation to ATO"
+          ],
+          "common_mistakes": [
+            "Treating SOC 2 as a one-time certification — it requires annual Type II audits",
+            "Confusing SOC 1 (financial controls) with SOC 2 (security controls)",
+            "Thinking compliance = security — compliance is a minimum baseline, not comprehensive protection"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web-security-fundamentals",
+      "title": "Web Security Fundamentals",
+      "difficulty": "beginner",
+      "prerequisites": ["networking-foundations", "dns-and-web-protocols"],
+      "objective": "Explain HTTP mechanics, web session management, REST APIs, and browser security policies including CORS and same-origin policy.",
+      "topics": [
+        {
+          "id": "http-methods-status-codes",
+          "title": "HTTP Methods and Status Codes",
+          "concepts": [
+            "HTTP methods: GET (read), POST (create), PUT (replace), PATCH (partial update), DELETE (remove)",
+            "Safe methods: GET, HEAD, OPTIONS — should not modify server state",
+            "Idempotent methods: GET, PUT, DELETE — same result no matter how many times called",
+            "Status codes: 1xx (informational), 2xx (success), 3xx (redirect), 4xx (client error), 5xx (server error)",
+            "Common status codes: 200 (OK), 301/302 (redirect), 304 (Not Modified), 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), 500 (Internal Server Error), 503 (Service Unavailable)"
+          ],
+          "key_facts": [
+            "GET requests can be cached/bookmarked; POST requests cannot",
+            "401 Unauthorized = not authenticated (no/invalid credentials)",
+            "403 Forbidden = authenticated but not authorized (insufficient permissions)",
+            "500 = server-side error (may leak stack traces/info)",
+            "PUT is idempotent (calling twice = same result); POST is not (calling twice creates two resources)",
+            "OPTIONS method used for CORS preflight requests",
+            "TRACE method = XSS risk (XST - Cross-Site Tracing), should be disabled",
+            "Idempotent: GET, HEAD, PUT, DELETE, OPTIONS; NOT idempotent: POST, PATCH (debated)"
+          ],
+          "attack_techniques": ["T1190", "T1059"],
+          "killchain_stage": "initial-access",
+          "offense_application": "Attackers manipulate HTTP methods for exploitation: parameter tampering in GET/POST, method override to access restricted functionality, verbose error responses (500) for information gathering, and forced browsing.",
+          "defense_application": "Defenders restrict allowed HTTP methods on web servers, return generic error pages (no stack traces), implement proper status code usage (401 vs 403 distinction), and monitor for unusual method usage.",
+          "drills": [
+            "Use curl to make requests with different HTTP methods (GET, POST, PUT, DELETE) against a test API",
+            "Examine server error responses and identify information leakage in 500 errors",
+            "Explain the security implications of each common status code"
+          ],
+          "common_mistakes": [
+            "Using GET for actions that modify state (violates HTTP spec, vulnerable to CSRF via image tags/links)",
+            "Confusing 401 (unauthenticated) with 403 (unauthorized) — return 401 when login is needed, 403 when permissions are insufficient",
+            "Returning detailed error messages (stack traces, SQL queries) in 500 responses — information disclosure"
+          ]
+        },
+        {
+          "id": "cookies-sessions",
+          "title": "Cookies and Session Management",
+          "concepts": [
+            "Cookie: key-value pair sent by server, stored by browser, sent with subsequent requests",
+            "Session management: server maintains state across stateless HTTP using session IDs (in cookies)",
+            "Cookie attributes: HttpOnly (no JS access), Secure (HTTPS only), SameSite (cross-site policy), Domain, Path, Max-Age/Expires",
+            "SameSite values: Strict (no cross-site), Lax (top-level GET navigation only), None (requires Secure)",
+            "JWT as stateless session tokens vs server-side sessions",
+            "Session fixation: attacker sets a known session ID, victim authenticates with it"
+          ],
+          "key_facts": [
+            "HttpOnly prevents JavaScript from reading cookies (mitigates session theft via XSS)",
+            "Secure ensures cookies only sent over HTTPS",
+            "SameSite=Strict: cookie not sent on cross-site requests at all",
+            "SameSite=Lax (browser default since 2020): sent on top-level navigation (GET) only",
+            "SameSite=None: sent cross-site but REQUIRES Secure attribute",
+            "Session ID should be: long, random, unpredictable, regenerated after login",
+            "Common cookie-based attacks: session hijacking (steal cookie), CSRF (force authenticated request), session fixation"
+          ],
+          "attack_techniques":["T1539", "T1550", "T1506"],
+          "killchain_stage": "credential-access",
+          "offense_application": "Attackers steal cookies via XSS (if no HttpOnly), intercept them via MITM (if no Secure), perform CSRF (if no SameSite), and use session fixation to hijack sessions. Cookie theft bypasses MFA since the session is already authenticated.",
+          "defense_application": "Defenders set HttpOnly + Secure + SameSite on all session cookies, regenerate session IDs after login, set short session timeouts, implement CSRF tokens, and use HSTS to prevent cookie interception.",
+          "drills": [
+            "Inspect cookies in browser DevTools and evaluate each attribute (HttpOnly, Secure, SameSite)",
+            "Explain how HttpOnly prevents session theft via document.cookie in XSS",
+            "Demonstrate CSRF and explain how SameSite=Lax and CSRF tokens mitigate it"
+          ],
+          "common_mistakes": [
+            "Forgetting to set HttpOnly — allows XSS to steal session cookies",
+            "Setting SameSite=None without Secure — browser rejects it",
+            "Not regenerating session ID after login — enables session fixation"
+          ]
+        },
+        {
+          "id": "same-origin-cors",
+          "title": "Same-Origin Policy and CORS",
+          "concepts": [
+            "Same-Origin Policy (SOP): browser security model — scripts can only access resources from the same origin",
+            "Origin = scheme (protocol) + host (domain) + port — all three must match",
+            "CORS (Cross-Origin Resource Sharing): mechanism to relax SOP for specific cross-origin requests",
+            "CORS preflight: browser sends OPTIONS request before certain cross-origin requests",
+            "CORS headers: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Allow-Credentials",
+            "Access-Control-Allow-Origin: * is dangerous when combined with Allow-Credentials: true (browsers block this)"
+          ],
+          "key_facts": [
+            "Same-origin = same protocol + same host + same port (e.g., https://a.com:443 ≠ http://a.com:80)",
+            "SOP prevents malicious.com from reading data from bank.com via JavaScript",
+            "CORS is a server-side mechanism — the server decides which origins can access its resources",
+            "Preflight (OPTIONS) required for: non-simple methods (PUT, DELETE), custom headers, non-simple content types",
+            "Access-Control-Allow-Origin: * allows any origin but CANNOT be used with credentials",
+            "Reflecting Origin header in Access-Control-Allow-Origin with Allow-Credentials: true is a critical CORS vulnerability",
+            "CORS does NOT protect against CSRF — CSRF doesn't need to read the response"
+          ],
+          "attack_techniques": ["T1185", "T1059"],
+          "killchain_stage": "execution",
+          "offense_application": "Attackers exploit misconfigured CORS: wildcard origins with credentials, Origin header reflection, null origin handling, to read cross-origin responses from authenticated sessions. SOP bypasses enable data theft.",
+          "defense_application": "Defenders configure CORS with explicit allowlists (not wildcards), never reflect Origin headers, validate origin against a server-side allowlist, and understand that CORS is not a substitute for authentication/authorization.",
+          "drills": [
+            "Identify the origin of three URLs and determine if they are same-origin with each other",
+            "Examine a CORS response in browser DevTools — identify misconfigured headers",
+            "Explain why Access-Control-Allow-Origin: * with Allow-Credentials: true is blocked by browsers"
+          ],
+          "common_mistakes": [
+            "Thinking CORS is a security feature that protects you — it RELAXES security, configure carefully",
+            "Using Access-Control-Allow-Origin: * for authenticated APIs — allows any site to read responses (but not with credentials)",
+            "Confusing SOP with CORS — SOP is the browser's restriction; CORS is the exception mechanism"
+          ]
+        },
+        {
+          "id": "rest-apis",
+          "title": "REST APIs and API Security",
+          "concepts": [
+            "REST (Representational State Transfer): architectural style for web APIs",
+            "REST principles: statelessness, client-server, cacheable, uniform interface, layered",
+            "Resources identified by URLs: /api/users/123, /api/orders/456",
+            "Standard methods map to CRUD: GET (Read), POST (Create), PUT (Update), DELETE (Delete)",
+            "API authentication: API keys, OAuth 2.0 bearer tokens, JWT, mutual TLS",
+            "API security concerns: broken object level authorization (BOLA/IDOR), excessive data exposure, rate limiting"
+          ],
+          "key_facts": [
+            "REST is stateless — each request contains all needed information, no server-side session",
+            "Common API security risks from OWASP API Top 10: BOLA, broken authentication, excessive data exposure, lack of rate limiting, broken function level authorization",
+            "BOLA (Broken Object Level Authorization) / IDOR: accessing other users' data by changing object IDs in URLs",
+            "API versioning: /api/v1/users vs /api/v2/users",
+            "Rate limiting prevents brute force and DoS — typically measured in requests per minute",
+            "GraphQL APIs have different security concerns: introspection, query depth/complexity attacks",
+            "HTTP status codes in REST APIs: 200 (success), 201 (created), 204 (no content), 400 (bad request), 401 (unauthenticated), 403 (forbidden), 404 (not found), 429 (rate limited)"
+          ],
+          "attack_techniques": ["T1190", "T1110"],
+          "killchain_stage": "initial-access",
+          "offense_application": "Attackers exploit API vulnerabilities: BOLA to access other users' data, enumerate IDs, abuse lack of rate limiting for brute force, extract excessive data from responses, and abuse broken authentication.",
+          "defense_application": "Defenders implement object-level authorization checks on every request, enforce rate limiting, minimize data in responses (no sensitive fields by default), validate input, and use API gateways with security controls.",
+          "drills": [
+            "Identify BOLA/IDOR vulnerabilities by manipulating object IDs in API requests",
+            "Design a REST API with proper CRUD operations and identify where authorization checks are needed",
+            "Implement and test rate limiting on an API endpoint"
+          ],
+          "common_mistakes": [
+            "Relying on client-side authorization (hidden buttons/menus) — server must enforce authorization on every request",
+            "Not implementing rate limiting on API endpoints — enables brute force and data harvesting",
+            "Returning entire database records instead of only needed fields — excessive data exposure"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cloud-and-containerization",
+      "title": "Cloud and Containerization Fundamentals",
+      "difficulty": "intermediate",
+      "prerequisites": ["networking-foundations", "linux-fundamentals"],
+      "objective": "Explain cloud service models, the shared responsibility model, and containerization basics (Docker/Kubernetes).",
+      "topics": [
+        {
+          "id": "cloud-service-models",
+          "title": "Cloud Service Models (IaaS, PaaS, SaaS) and Shared Responsibility",
+          "concepts": [
+            "IaaS (Infrastructure as a Service): VMs, storage, networking (AWS EC2, Azure VM, GCP Compute Engine)",
+            "PaaS (Platform as a Service): managed runtime, databases, app hosting (Heroku, AWS Elastic Beanstalk)",
+            "SaaS (Software as a Service): ready-to-use applications (Microsoft 365, Salesforce, Google Workspace)",
+            "FaaS (Functions as a Service): serverless computing (AWS Lambda, Azure Functions)",
+            "Shared Responsibility Model: cloud provider vs customer security responsibilities differ by service model",
+            "On-premises: customer responsible for everything",
+            "IaaS: provider secures infrastructure; customer secures OS, apps, data",
+            "SaaS: provider secures most; customer secures data and access"
+          ],
+          "key_facts": [
+            "IaaS customer responsibilities: OS patching, application security, data, identity/access, network config",
+            "SaaS customer responsibilities: data, access management, configuration, compliance",
+            "PaaS falls between IaaS and SaaS — provider manages OS and runtime",
+            "Misconfiguration is the #1 cloud security risk (human error, not provider failure)",
+            "Cloud provider NEVER takes responsibility for: your data, your access (IAM), your compliance",
+            "Common cloud misconfigurations: public S3 buckets, overly permissive IAM roles, exposed security groups, default credentials",
+            "Cloud Security Posture Management (CSPM): tools to detect cloud misconfigurations"
+          ],
+          "attack_techniques": ["T1530", "T1078", "T1213"],
+          "killchain_stage": "initial-access",
+          "offense_application": "Attackers exploit cloud misconfigurations: public storage buckets (open S3), overly permissive IAM, exposed management interfaces, leaked cloud credentials in code/GitHub, and unencrypted data stores.",
+          "defense_application": "Defenders implement least-privilege IAM, enable cloud logging (CloudTrail, Activity Log), use CSPM tools, encrypt all data, enable MFA on all cloud accounts, and conduct regular configuration audits.",
+          "drills": [
+            "Map the shared responsibility model for IaaS vs PaaS vs SaaS — identify what you're responsible for in each",
+            "Audit an AWS/Azure account for common misconfigurations (public buckets, IAM policies, security groups)",
+            "Identify cloud credentials that might be accidentally leaked in code repositories"
+          ],
+          "common_mistakes": [
+            "Assuming the cloud provider secures everything — shared responsibility means YOU own significant security",
+            "Leaving storage buckets public by default — one of the most common and damaging misconfigurations",
+            "Using root/admin cloud accounts for day-to-day operations — use IAM roles with least privilege"
+          ]
+        },
+        {
+          "id": "docker-basics",
+          "title": "Containerization with Docker",
+          "concepts": [
+            "Container: lightweight, portable, self-contained application + dependencies package",
+            "Docker image: read-only template with instructions for creating a container (layers)",
+            "Dockerfile: text file of instructions to build an image (FROM, RUN, COPY, CMD, etc.)",
+            "Container vs VM: containers share the host OS kernel; VMs have full guest OS",
+            "Docker daemon: background service managing containers, images, volumes, networks",
+            "Docker registry: stores and distributes images (Docker Hub, private registries, ECR/ACR/GCR)",
+            "Container orchestration: Docker Swarm (simpler), Kubernetes (industry standard)"
+          ],
+          "key_facts": [
+            "Containers share the host kernel — isolated via namespaces and cgroups, not full virtualization",
+            "Namespaces isolate: PID, network, mount, UTS, IPC, user",
+            "cgroups limit: CPU, memory, disk I/O, network bandwidth",
+            "By default, containers run as root (UID 0) — security risk",
+            "Docker socket (/var/run/docker.sock) = root access to host — never expose it",
+            "Common security issues: running as root, no resource limits, exposed Docker daemon (port 2375 unencrypted), vulnerable base images, no image scanning",
+            "Image scanning tools: Trivy, Clair, Snyk, Aqua — detect vulnerabilities in image layers",
+            "Distroless images: contain only application runtime, no shell/package manager — smaller attack surface"
+          ],
+          "attack_techniques": ["T1610", "T1611", "T1525"],
+          "killchain_stage": "execution",
+          "offense_application": "Attackers exploit containers: container escape to host (run as root + privileged), compromise vulnerable images, access exposed Docker daemon API (port 2375/2376), poison images in registry (supply chain), and mine cryptocurrency using container resources.",
+          "defense_application": "Defenders run containers as non-root user, use read-only filesystems, enable seccomp/AppArmor profiles, scan images for vulnerabilities, use distroless/minimal base images, never expose Docker daemon without TLS/auth, and use private registries with image signing.",
+          "drills": [
+            "Write a Dockerfile that follows security best practices (non-root user, minimal base, no secrets)",
+            "Scan a Docker image with Trivy and identify vulnerabilities",
+            "Explain how a container escape works when running in privileged mode"
+          ],
+          "common_mistakes": [
+            "Running containers as root — the default but most dangerous configuration",
+            "Using --privileged flag — gives container near-host-level access, almost always unnecessary",
+            "Not scanning images — vulnerable base images propagate CVEs into production"
+          ]
+        },
+        {
+          "id": "kubernetes-basics",
+          "title": "Kubernetes Fundamentals",
+          "concepts": [
+            "Kubernetes (K8s): container orchestration platform for deploying, scaling, and managing containers",
+            "Cluster architecture: control plane (API server, etcd, scheduler, controller manager) + worker nodes",
+            "Core objects: Pod (smallest deployable unit), Deployment, Service, ConfigMap, Secret, Namespace",
+            "etcd: distributed key-value store holding all cluster state — critical to secure",
+            "K8s API server: central management API (usually port 6443, HTTPS) — all operations go through it",
+            "RBAC: Role-Based Access Control for K8s API — Roles, ClusterRoles, RoleBindings, ClusterRoleBindings",
+            "Pod security: security contexts, Pod Security Standards (privileged, baseline, restricted)"
+          ],
+          "key_facts": [
+            "K8s API server listens on port 6443 (HTTPS) or 8080 (insecure, deprecated, should be disabled)",
+            "etcd stores ALL cluster data including Secrets — must be encrypted at rest",
+            "kubelet port: 10250 (HTTPS), 10255 (read-only HTTP, should be disabled)",
+            "K8s Secrets: base64-encoded (NOT encrypted by default) — enable encryption at rest",
+            "ServiceAccount tokens: auto-mounted into pods by default — can be abused for cluster API access",
+            "Common K8s attacks: exposed API server, etcd without auth, RBAC misconfiguration, container escape, compromised ServiceAccount token",
+            "K8s network policies: restrict pod-to-pod communication (default: all pods can communicate)",
+            "Tools: kubectl (CLI), Helm (package manager), kube-bench (CIS benchmark), kube-hunter (pentest)"
+          ],
+          "attack_techniques": ["T1611", "T1610", "T1525"],
+          "killchain_stage": "execution",
+          "offense_application": "Attackers exploit exposed K8s API servers, steal ServiceAccount tokens from compromised pods, access unencrypted etcd for Secrets, exploit RBAC misconfigurations for privilege escalation, and perform container escapes to node access.",
+          "defense_application": "Defenders secure the API server (RBAC, network policies, audit logging), encrypt etcd at rest, restrict pod-to-pod communication with network policies, use Pod Security Standards (restricted), disable auto-mounted ServiceAccount tokens, and scan with kube-bench.",
+          "drills": [
+            "Use kubectl to enumerate cluster resources and identify potential misconfigurations",
+            "Explain why K8s Secrets being base64-encoded is NOT encryption",
+            "Design network policies to restrict pod-to-pod communication to only necessary connections"
+          ],
+          "common_mistakes": [
+            "Believing K8s Secrets are encrypted — they are only base64-encoded by default, enable encryption at rest",
+            "Leaving the API server exposed without authentication — catastrophic",
+            "Using default ServiceAccount tokens that auto-mount into every pod — abuse vector for cluster access"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scripting-and-automation",
+      "title": "Scripting and Automation for Security",
+      "difficulty": "beginner",
+      "prerequisites": ["linux-fundamentals"],
+      "objective": "Use Bash, PowerShell, and Python for common security tasks including reconnaissance, log analysis, and automation.",
+      "topics": [
+        {
+          "id": "bash-scripting",
+          "title": "Bash Scripting for Security",
+          "concepts": [
+            "Bash: default shell on most Linux systems, powerful scripting language",
+            "Variables: VAR=value, $VAR, ${VAR}, command substitution $(command)",
+            "Pipes and redirects: | (pipe), > (redirect output), >> (append), < (input)",
+            "Text processing: grep (search), awk (column processing), sed (stream editing), cut, sort, uniq",
+            "Conditionals: if/elif/else, test [ ], case statements",
+            "Loops: for, while, until",
+            "Security-focused one-liners: log parsing, network scanning, file enumeration"
+          ],
+          "key_facts": [
+            "Shebang: #!/bin/bash (first line of script)",
+            "grep -r: recursive search, -i: case-insensitive, -E: extended regex",
+            "awk '{print $1}': print first column, -F',' sets delimiter",
+            "sed 's/old/new/g': global substitution",
+            "sort | uniq -c | sort -rn: count and sort occurrences (frequency analysis)",
+            "Common security commands: find / -perm -4000 (SUID), ps aux (processes), netstat -tulpn (listening ports), ss -tulpn (modern replacement)",
+            "xargs: build and execute commands from standard input",
+            "Bash scripts should start with set -euo pipefail (fail fast on errors)"
+          ],
+          "attack_techniques": ["T1059", "T1083", "T1046"],
+          "killchain_stage": "discovery",
+          "offense_application": "Attackers use Bash for enumeration and automation: finding SUID binaries, searching for passwords in config files, pivoting through systems, parsing /etc/passwd and /etc/shadow, and automating exploitation.",
+          "defense_application": "Defenders use Bash for log analysis (grep auth.log for failed logins), system auditing (find world-writable files), incident response triage, and automating security checks across many systems.",
+          "drills": [
+            "Write a script to find all SUID/SGID binaries and output to a file",
+            "Parse auth.log to count failed SSH login attempts per IP address",
+            "Create a script that enumerates open ports, running processes, and scheduled tasks"
+          ],
+          "common_mistakes": [
+            "Not quoting variables — unquoted $VAR with spaces causes word splitting and globbing",
+            "Using eval carelessly — can lead to command injection in scripts",
+            "Not using set -euo pipefail — scripts continue after errors, masking failures"
+          ]
+        },
+        {
+          "id": "powershell-scripting",
+          "title": "PowerShell for Security",
+          "concepts": [
+            "PowerShell: Windows task automation and configuration management framework (.NET-based)",
+            "Cmdlets: Verb-Noun naming (Get-Process, Set-Item, Invoke-WebRequest)",
+            "Pipeline: output objects (not text) between cmdlets",
+            "Aliases: ls → Get-ChildItem, cat → Get-Content, curl → Invoke-WebRequest",
+            "Security-relevant modules: ActiveDirectory, NetTCPIP, Defender, EventLog",
+            "PowerShell remoting: Enter-PSSession, Invoke-Command — remote management",
+            "Execution Policy: controls script execution (Restricted, RemoteSigned, Unrestricted)"
+          ],
+          "key_facts": [
+            "PowerShell cmdlet naming: Verb-Noun (e.g., Get-ADUser, Set-ExecutionPolicy)",
+            "Get-Help <cmdlet>: documentation; Get-Command: find cmdlets; Get-Member: inspect object properties",
+            "Execution Policy can be bypassed: -ExecutionPolicy Bypass flag",
+            "PowerShell version 5+ has enhanced logging (ScriptBlock logging, Transcription)",
+            "Common security cmdlets: Get-EventLog/Get-WinEvent, Get-Process, Get-Service, Get-NetTCPConnection, Get-LocalUser",
+            "AMSI (Anti-Malware Scan Interface): scans PowerShell scripts before execution",
+            "Invoke-Mimikatz, PowerSploit, PowerView: offensive PowerShell frameworks",
+            "PowerShell Core (7.x) is cross-platform (.NET Core); Windows PowerShell (5.1) is Windows-only"
+          ],
+          "attack_techniques": ["T1059", "T1086", "T1003"],
+          "killchain_stage": "execution",
+          "offense_application": "Attackers use PowerShell extensively: living-off-the-land (blend with admin activity), memory injection, credential dumping (Mimikatz via PowerShell), lateral movement (Invoke-Command), and downloading/executing payloads (Invoke-WebRequest + Invoke-Expression).",
+          "defense_application": "Defenders enable PowerShell logging (ScriptBlock logging Event ID 4104, Module logging, Transcription), use Constrained Language Mode, deploy AMSI, monitor for suspicious patterns (encoded commands, Invoke-Expression, downloads), and use PowerShell for incident response.",
+          "drills": [
+            "Write a PowerShell script to enumerate all running processes and their network connections",
+            "Query Windows Event Logs for all failed logon attempts in the last 24 hours",
+            "Analyze a malicious PowerShell one-liner — decode base64, identify the payload, and explain AMSI's role"
+          ],
+          "common_mistakes": [
+            "Disabling PowerShell entirely 'for security' — it removes a critical defender tool; secure it with logging instead",
+            "Forgetting that Execution Policy is not a security boundary — trivially bypassed",
+            "Ignoring PowerShell ScriptBlock logging — it's the most valuable detection source for malicious PowerShell"
+          ]
+        },
+        {
+          "id": "python-for-security",
+          "title": "Python for Security",
+          "concepts": [
+            "Python: versatile language widely used in security tools and automation",
+            "Key libraries: socket (networking), requests (HTTP), scapy (packet manipulation), paramiko (SSH)",
+            "Security tooling libraries: hashlib, cryptography, ssl, subprocess",
+            "Offensive libraries: pwntools (exploit dev), requests/scapy (recon), pycryptodome (crypto)",
+            "Defensive libraries: psutil (process monitoring), dpkt/pyshark (pcap analysis), yara-python (malware signatures)",
+            "Python scripts for: port scanning, log analysis, password cracking, exploit development, malware analysis"
+          ],
+          "key_facts": [
+            "Python 3 is the standard (Python 2 EOL was January 2020)",
+            "socket library: raw TCP/UDP networking — socket(AF_INET, SOCK_STREAM)",
+            "requests library: simplified HTTP — requests.get(), requests.post()",
+            "scapy: packet crafting/sniffing — can forge, decode, send, capture packets",
+            "Python is the primary language for: exploit development, security tooling, automation scripts, ML/AI security",
+            "virtualenv / pip: package management for isolated environments",
+            "Common security tools written in Python: Scapy, Nmap (has Python bindings), Volatility (memory forensics), sqlmap"
+          ],
+          "attack_techniques": ["T1059", "T1046", "T1110"],
+          "killchain_stage": "discovery",
+          "offense_application": "Attackers use Python for custom exploit development, automation of reconnaissance, writing C2 implants, packet sniffing/injection (scapy), and rapid prototyping of attack tools.",
+          "defense_application": "Defenders use Python for log analysis at scale, automating incident response, building detection rules, network traffic analysis, malware analysis (Volatility framework), and security tooling integration.",
+          "drills": [
+            "Write a Python port scanner using the socket library",
+            "Use scapy to capture and analyze DNS queries on your network",
+            "Write a script to parse a web server access log and identify potential SQL injection attempts"
+          ],
+          "common_mistakes": [
+            "Using Python 2 syntax (print without parentheses) — Python 3 is required",
+            "Not handling socket timeouts in network scripts — can hang indefinitely",
+            "Using subprocess with shell=True and unsanitized input — command injection vulnerability"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "malware-fundamentals",
+      "title": "Malware Fundamentals",
+      "difficulty": "intermediate",
+      "prerequisites": ["linux-fundamentals", "windows-internals", "scripting-and-automation"],
+      "objective": "Classify malware types, explain propagation and persistence mechanisms, and compare static vs dynamic analysis approaches.",
+      "topics": [
+        {
+          "id": "malware-types",
+          "title": "Types of Malware",
+          "concepts": [
+            "Virus: self-replicating code that attaches to host files, requires user execution to spread",
+            "Worm: self-replicating malware that spreads automatically across networks without user action",
+            "Trojan: disguised as legitimate software, creates backdoor access",
+            "Ransomware: encrypts victim's data and demands payment for decryption key",
+            "Rootkit: maintains persistent privileged access while hiding its presence",
+            "Spyware: covertly collects user information and activity",
+            "Botnet: network of compromised machines controlled by a central C2 (zombie/bot)",
+            "Adware: displays unwanted advertisements, may collect data",
+            "Wiper: destroys data irreversibly (intent is destruction, not extortion)",
+            "Cryptominer: hijacks system resources to mine cryptocurrency",
+            "Logic bomb: executes malicious action when triggered by specific condition/date"
+          ],
+          "key_facts": [
+            "Virus requires a host file and user action; Worm spreads autonomously over networks",
+            "Ransomware variants: crypto (encrypts files), locker (locks screen/system), double-extortion (encrypt + threaten to leak)",
+            "Notable ransomware: WannaCry (2017, EternalBlue exploit), NotPetya (2017, wiper disguised as ransomware), Ryuk, Conti, LockBit",
+            "Rootkit types: user-mode (ring 3), kernel-mode (ring 0), bootkit (MBR/UEFI), firmware/hardware",
+            "Botnet C2 architectures: centralized (IRC, HTTP) vs decentralized (P2P)",
+            "Polymorphic malware: changes its code signature each infection to evade AV",
+            "Metamorphic malware: rewrites its own code completely each infection",
+            "Fileless malware: resides in memory (RAM) only — no files on disk, evades traditional AV"
+          ],
+          "attack_techniques": ["T1486", "T1547", "T1071", "T1496"],
+          "killchain_stage": "impact",
+          "offense_application": "Attackers deploy specific malware types for their objectives: ransomware for extortion, worms for rapid spread (WannaCry), rootkits for persistent stealth, fileless malware to evade AV, and cryptominers for passive income.",
+          "defense_application": "Defenders deploy EDR/AV (signature + behavior-based), implement application whitelisting, use network segmentation to contain worm propagation, maintain offline backups against ransomware, and hunt for fileless malware in memory.",
+          "drills": [
+            "Create a malware classification chart: given 10 malware samples, categorize each type",
+            "Research WannaCry and trace its propagation method (EternalBlue, SMB port 445)",
+            "Explain the difference between polymorphic and metamorphic malware evasion"
+          ],
+          "common_mistakes": [
+            "Confusing virus (needs host + user action) with worm (self-propagating)",
+            "Thinking AV signatures catch all malware — polymorphic, metamorphic, and fileless malware evade signatures",
+            "Believing paying ransomware ransom guarantees data recovery — no guarantee, and funds future attacks"
+          ]
+        },
+        {
+          "id": "malware-analysis",
+          "title": "Malware Analysis Approaches",
+          "concepts": [
+            "Static analysis: examining malware without executing it",
+            "Dynamic analysis: executing malware in a controlled environment and observing behavior",
+            "Static techniques: file hashing, string extraction, disassembly (IDA, Ghidra), PE header analysis, unpacking",
+            "Dynamic techniques: sandbox execution, API call monitoring, network traffic capture, memory dump analysis",
+            "Hybrid analysis: combining static and dynamic for comprehensive understanding",
+            "Reverse engineering: disassembly/decompilation to understand malware logic and capabilities",
+            "Malware analysis environments: isolated VMs, sandboxes (Cuckoo, Any.Run), FLARE-VM"
+          ],
+          "key_facts": [
+            "Static analysis first step: hash the file (SHA-256) and check against VirusTotal",
+            "String extraction (strings command) reveals URLs, API names, error messages, embedded text",
+            "PE header analysis: imports (IAT), sections, compile timestamp, entropy (packed sections have high entropy)",
+            "Packing: malware compressed/encrypted to evade static analysis — must unpack first",
+            "Common packers: UPX, Themida, VMProtect, custom packers",
+            "Dynamic analysis tools: Process Monitor, Process Explorer, Wireshark, API Monitor, FakeNet",
+            "Sandbox tools: Cuckoo Sandbox, Any.Run, Joe Sandbox, FireEye AX",
+            "Disassemblers/Decompilers: IDA Pro, Ghidra (free, NSA), Radare2, Binary Ninja",
+            "Indicators of Compromise (IOCs): file hashes, IP addresses, domains, mutex names, registry keys"
+          ],
+          "attack_techniques": ["T1027", "T1497"],
+          "killchain_stage": "defense-evasion",
+          "offense_application": "Malware authors evade analysis: packing/encryption (anti-static), sandbox detection and anti-debugging (anti-dynamic), timing delays, environment checks (VM detection, debuggers), and obfuscated code.",
+          "defense_application": "Defenders analyze malware to extract IOCs for detection, understand capabilities for incident response, develop signatures/YARA rules, attribute to threat actors, and assess the scope and impact of an infection.",
+          "drills": [
+            "Run 'strings' on a malware sample and identify indicators (URLs, IPs, API calls)",
+            "Submit a malware hash to VirusTotal and analyze the detection results",
+            "Set up a Cuckoo sandbox or use Any.Run to perform dynamic analysis on a sample — document observed behaviors"
+          ],
+          "common_mistakes": [
+            "Executing malware on a production/host machine — always use isolated VMs with snapshots",
+            "Relying only on static OR dynamic analysis — both are needed for complete understanding",
+            "Forgetting to check if malware is packed — static analysis of packed malware reveals nothing useful"
+          ]
+        },
+        {
+          "id": "malware-lifecycle-iocs",
+          "title": "Malware Lifecycle, Persistence, and IOCs",
+          "concepts": [
+            "Malware kill chain: delivery, execution, persistence, C2, lateral movement, actions on objectives",
+            "Persistence mechanisms: registry Run keys, scheduled tasks, services, startup folders, WMI, DLL hijacking",
+            "C2 (Command and Control): communication channel for attacker to send commands to compromised host",
+            "Common C2 protocols: HTTP(S), DNS tunneling, ICMP, custom protocols",
+            "Indicators of Compromise (IOCs): artifacts that indicate a system was compromised",
+            "IOC types: file hashes, file names, registry keys, mutexes, network indicators (IPs, domains, URLs), behavioral patterns",
+            "MITRE ATT&CK mapping: relate observed malware behaviors to known tactics and techniques",
+            "Threat intelligence: sharing IOCs and analysis across organizations (MISP, STIX/TAXII)"
+          ],
+          "key_facts": [
+            "Mutex names are reliable IOCs — malware creates named mutexes to prevent multiple infections",
+            "Common C2 frameworks: Cobalt Strike (commercial/leaked), Metasploit, Sliver, Mythic, Brute Ratel",
+            "Beaconing: C2 traffic with regular intervals (jitter makes detection harder)",
+            "YARA rules: pattern-matching tool for identifying malware by textual/binary patterns",
+            "STIX (Structured Threat Information Expression) and TAXII (Trusted Automated Exchange) are IOC sharing standards",
+            "Diamond Model of Intrusion Analysis: adversary, infrastructure, capability, victim",
+            "Pyramid of Pain: hash > IP > domain > network artifact > host artifact > tools > TTPs — higher = more painful for attacker to change"
+          ],
+          "attack_techniques": ["T1547", "T1071", "T1543"],
+          "killchain_stage": "persistence",
+          "offense_application": "Attackers establish persistence through multiple independent mechanisms (if one is found, others remain), use stealthy C2 with jitter and legitimate-looking protocols, and employ living-off-the-land techniques to blend with normal activity.",
+          "defense_application": "Defenders hunt for IOCs across endpoints and networks, map detections to MITRE ATT&CK, implement threat intelligence feeds, detect C2 beaconing patterns, use YARA for file scanning, and share IOCs via MISP/STIX for community defense.",
+          "drills": [
+            "Given a set of IOCs from an incident, categorize each by type (file, network, host, behavioral) and map to MITRE ATT&CK techniques",
+            "Write a simple YARA rule to detect a known malware string pattern",
+            "Explain the Pyramid of Pain and why detecting TTPs is more valuable than detecting IP addresses"
+          ],
+          "common_mistakes": [
+            "Removing malware without finding ALL persistence mechanisms — it returns after reboot",
+            "Blocking a C2 IP without understanding the full infrastructure — attackers rotate IPs quickly",
+            "Focusing on file hashes as IOCs — trivially changed by attackers; TTPs are more durable"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social-engineering",
+      "title": "Social Engineering Fundamentals",
+      "difficulty": "beginner",
+      "prerequisites": ["security-principles"],
+      "objective": "Identify social engineering attack types including phishing, pretexting, and business email compromise, and explain human-layer defenses.",
+      "topics": [
+        {
+          "id": "phishing-types",
+          "title": "Phishing and Variants",
+          "concepts": [
+            "Phishing: fraudulent communications impersonating a trusted entity to steal credentials/data",
+            "Spear phishing: targeted phishing aimed at specific individuals (personalized, researched)",
+            "Whaling: phishing targeting high-profile individuals (executives, C-suite)",
+            "Smishing: phishing via SMS/text messages",
+            "Vishing: phishing via voice/phone calls",
+            "Clone phishing: duplicating a legitimate email and replacing links/attachments with malicious ones",
+            "Phishing kits: pre-built packages for creating phishing pages (often sold on dark web)",
+            "Adversary-in-the-Middle (AiTM): reverse proxy that intercepts credentials AND MFA tokens"
+          ],
+          "key_facts": [
+            "Phishing is the #1 initial access vector in breaches (per Verizon DBIR)",
+            "Spear phishing uses OSINT (LinkedIn, social media) to personalize attacks",
+            "Common phishing indicators: urgent language, generic greetings, mismatched URLs, unexpected attachments, requests for credentials/payment",
+            "Phishing URLs often use typosquatted domains (amazom.com instead of amazon.com)",
+            "SPF, DKIM, and DMARC are email authentication protocols to combat phishing/spoofing",
+            "AiTM phishing kits (Evilginx, Modlishka) intercept both credentials and MFA tokens in real-time",
+            "FIDO2/WebAuthn is resistant to AiTM phishing because of origin binding",
+            "Report phishing to: your security team, anti-phishing working group (reportphishing@apwg.org)"
+          ],
+          "attack_techniques": ["T1566", "T1534"],
+          "killchain_stage": "initial-access",
+          "offense_application": "Attackers use phishing as the primary initial access method: credential phishing (fake login pages), malware delivery (malicious attachments), MFA bypass (AiTM proxies), and lateral phishing (compromised account sends phishing to contacts).",
+          "defense_application": "Defenders implement email security (SPF, DKIM, DMARC), deploy secure email gateways, conduct phishing simulation training, enforce FIDO2 MFA (phishing-resistant), use URL rewriting and click-time analysis, and maintain clear reporting procedures.",
+          "drills": [
+            "Analyze a phishing email: identify red flags, check headers, trace the sender's actual domain",
+            "Compare SPF, DKIM, and DMARC — explain how each combats email spoofing",
+            "Explain why FIDO2/WebAuthn is phishing-resistant but SMS and TOTP are not"
+          ],
+          "common_mistakes": [
+            "Relying on users to spot all phishing — technical controls (DMARC, secure email gateway) are essential",
+            "Punishing users who click phishing simulations — creates fear and underreporting; use positive reinforcement",
+            "Believing MFA stops phishing — AiTM phishing kits intercept MFA tokens; use phishing-resistant FIDO2"
+          ]
+        },
+        {
+          "id": "pretexting-bec",
+          "title": "Pretexting and Business Email Compromise (BEC)",
+          "concepts": [
+            "Pretexting: creating a fabricated scenario (pretext) to obtain information or action from the target",
+            "Baiting: offering something enticing (free USB drive, download) to trick the victim",
+            "Quid pro quo: offering a benefit (tech support) in exchange for information/access",
+            "Tailgating/Piggybacking: following someone through a secure door without authorization",
+            "Business Email Compromise (BEC): compromising or impersonating business email to defraud the organization",
+            "BEC variants: CEO fraud, attorney impersonation, fake invoice, payroll diversion, W-2 theft",
+            "Watering hole attack: compromising a website the target group frequently visits"
+          ],
+          "key_facts": [
+            "BEC is the most financially damaging cybercrime category — FBI reports billions in losses annually",
+            "BEC commonly involves: compromised executive email accounts, lookalike domains, wire transfer fraud",
+            "CEO fraud: impersonating a CEO/executive to pressure employees into urgent wire transfers",
+            "Pretexting often combines OSINT research with social engineering techniques",
+            "Kevin Mitnick popularized social engineering in cybersecurity; his book 'The Art of Deception' is foundational",
+            "Watering hole attacks target industry-specific sites (e.g., a security conference website)",
+            "USB drop attacks: leaving infected USB drives in parking lots — human curiosity leads to insertion"
+          ],
+          "attack_techniques": ["T1566", "T1534", "T1567"],
+          "killchain_stage": "initial-access",
+          "offense_application": "Attackers use pretexting to build trust before exploitation, BEC to steal money directly (bypassing technical controls entirely by exploiting trust), watering hole attacks to compromise many targets at once, and USB drops for physical access.",
+          "defense_application": "Defenders implement financial transaction verification procedures (call-back verification for wire transfers), security awareness training, email authentication (DMARC), domain monitoring for lookalike domains, and physical security (badge access, mantraps).",
+          "drills": [
+            "Analyze a BEC scenario: identify the red flags and what controls would have prevented it",
+            "Design a security awareness training module covering pretexting and BEC",
+            "Explain why BEC succeeds even when no technical vulnerability exists — it exploits human trust"
+          ],
+          "common_mistakes": [
+            "Thinking social engineering only targets technical staff — BEC targets finance and HR",
+            "Implementing only technical controls for BEC — process controls (call-back verification) are essential",
+            "Underestimating the financial impact of BEC — it exceeds ransomware in total reported losses"
+          ]
+        },
+        {
+          "id": "physical-social-engineering",
+          "title": "Physical Security and Social Engineering Defense",
+          "concepts": [
+            "Physical access = logical access: an attacker with physical access to a machine can often own it",
+            "Physical social engineering: tailgating, shoulder surfing, dumpster diving, badge cloning",
+            "USB drop attacks: malicious USB devices left in target areas (Rubber Ducky, Bash Bunny)",
+            "Security awareness training: educating employees to recognize and report social engineering",
+            "Security culture: embedding security mindset into organizational culture, not just annual training",
+            "Defense in depth for humans: technical controls + process controls + training + reporting",
+            "Red team social engineering: authorized simulations to test organizational resilience"
+          ],
+          "key_facts": [
+            "Physical attack tools: USB Rubber Ducky (keystroke injection), Bash Bunny, Hak5 gear, Proxmark3 (RFID cloning)",
+            "Evil twin / Rogue AP: setting up a fake Wi-Fi access point to capture credentials",
+            "Shoulder surfing: observing passwords/PINs being entered — mitigated by privacy screens",
+            "Dumpster diving: searching trash for documents with sensitive info — mitigated by shredding",
+            "Effective awareness training: short, frequent, relevant, scenario-based; not annual compliance videos",
+            "Positive reporting culture: reward employees for reporting suspicious activity, don't punish for falling for simulations",
+            "NIST SP 800-50: guidelines for building an IT security awareness and training program"
+          ],
+          "attack_techniques": ["T1091", "T1200", "T1192"],
+          "killchain_stage": "initial-access",
+          "offense_application": "Attackers exploit physical access (USB drops, rogue USB charging stations, Evil Twin Wi-Fi), use shoulder surfing and badge cloning for facility access, and exploit weak security culture to socially engineer their way past guards and receptionists.",
+          "defense_application": "Defenders implement physical security (badge access, mantraps, visitor logs), deploy endpoint controls (disable USB AutoRun, BitLocker, device control), build security awareness programs with frequent training, create easy reporting channels, and conduct authorized social engineering assessments.",
+          "drills": [
+            "Design a security awareness program: list topics, frequency, format, and metrics for each audience",
+            "Identify physical security vulnerabilities in a sample office layout (badge access, visitor management, desk security)",
+            "Explain the difference between punitive and positive reporting cultures and why positive is more effective"
+          ],
+          "common_mistakes": [
+            "Treating security awareness as a compliance checkbox (annual video) rather than ongoing culture-building",
+            "Punishing employees who report clicking a suspicious link — discourages reporting of real incidents",
+            "Focusing only on digital social engineering — physical vectors (USB drops, badge cloning) are equally dangerous"
+          ]
+        }
+      ]
+    }
+  ]
+}

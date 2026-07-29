@@ -7,9 +7,11 @@ recognize. With both sides pinned, the diff breaks the suite first.
 
 from pathlib import Path
 
+from salient_tutor import resource_paths
+
 _ROOT = Path(__file__).resolve().parent.parent
-_PROMPT = (_ROOT / "prompts" / "tutor.md").read_text()
-_FRONTEND = (_ROOT / "web" / "static" / "js" / "tutor.js").read_text()
+_PROMPT = (resource_paths.PROMPTS / "tutor.md").read_text()
+_FRONTEND = (resource_paths.WEB_STATIC / "js" / "tutor.js").read_text()
 
 
 class TestExportTokenSync:
