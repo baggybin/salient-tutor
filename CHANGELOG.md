@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-12
+
+Third public snapshot. New curricula, a codex policy gate, a provider-agnostic
+coach, server-owned assessment scoring, and security hardening of the daemon.
+
+### Added
+- **Curricula**: AI Foundations, Neuroscience Fundamentals, Modern Red & Purple
+  Team, and Memory Craft (classical Chinese mnemonic techniques).
+- **Server-owned assessment loop**: CHECK / ANCHOR / DRILL items are authored
+  and scored server-side (free-text scoring via the judge), so the coach cannot
+  advance a gate by declaring a pass; a failed CHECK re-teaches MODEL instead of
+  trapping the learner in a same-item drill.
+
+### Changed
+- **Kernel-port items 1-6**: effort dial fixed on Claude (`med` -> `medium`,
+  plus `xhigh`/`max`) with operator-aligned thinking budgets; the coach is now
+  provider-agnostic (Anthropic server tools stripped on every non-Claude
+  provider; lookups go through `ask_agent("websearch")`); the bus is
+  dual-registered on both MCP namespaces; the librarian read-containment fence
+  is wired as a PreToolUse hook; `kg_neighbors(entity=...)` in the prompt; codex
+  model map moved to `gpt-5.6-sol/terra/luna`.
+- **Codex policy gate**: the kernel policy gate now applies to codex tool calls.
+- Runtime resources are included and resolved from the installed package.
+
+### Security
+- **Loopback by default**: the web server binds `127.0.0.1` (was `0.0.0.0`) --
+  the API is unauthenticated and fully mutating; pass `--host 0.0.0.0` to expose
+  it deliberately.
+- **No credential forwarding**: inherited `ANTHROPIC_API_KEY` /
+  `ANTHROPIC_AUTH_TOKEN` are stripped before a subprocess is pointed at a
+  third-party endpoint (the request 401s instead of leaking the operator's key);
+  `CLAUDE_CODE_OAUTH_TOKEN` is always dropped off-Anthropic.
+- **Study workspace alignment**: the daemon exports its resolved work_root so
+  study documents cannot split from the KG/lesson DBs by launch cwd.
+
 ## [0.1.0] - 2026-07-12
 
 Second public snapshot, consolidating the `0.0.x` line into a first
