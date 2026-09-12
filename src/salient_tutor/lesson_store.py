@@ -340,7 +340,12 @@ class LessonStore:
             row = db.execute(
                 "SELECT * FROM sessions WHERE status IN ('active','paused') ORDER BY updated_at DESC LIMIT 1"
             ).fetchone()
-            return self._row(row)
+            if row is None:
+                return None
+            session_id = row["session_id"]
+        # Reuse get_session so mastery_stage is derived the same way as a
+        # lookup by id (current_session used to omit it).
+        return self.get_session(session_id)
 
     def events(self, session_id: str) -> list[dict]:
         with self._connect() as db:
@@ -486,6 +491,23 @@ class LessonStore:
                 db.execute("SELECT * FROM attempts WHERE attempt_id=?", (attempt_id,)).fetchone()
             )
 
+    def session_has_apply_pass(self, session_id: str) -> bool:
+        """True when this session has a scored Apply-level pass (mastery gate)."""
+        with self._connect() as db:
+            row = db.execute(
+                """
+                SELECT 1 FROM attempts a
+                JOIN assessment_items i
+                  ON i.item_id = a.item_id AND i.version = a.item_version
+                WHERE a.session_id = ?
+                  AND a.scoring_status = 'pass'
+                  AND (i.kind = 'apply' OR i.bloom = 'apply')
+                LIMIT 1
+                """,
+                (session_id,),
+            ).fetchone()
+            return row is not None
+
     def record_attempt_and_transition(
         self,
         attempt: dict,
@@ -554,14 +576,19 @@ class LessonStore:
             # Compare-and-swap: the WHERE re-checks phase_version so two
             # concurrent writers serialize — the loser's UPDATE matches zero
             # rows and raises instead of a silent lost update.
+            # Leaving the gate (pass or fail) drops the item so the next
+            # CHECK/ANCHOR/DRILL issues a fresh one. Holding (unscored) keeps it.
+            keep_item = next_phase == "awaiting_attempt"
+            active_item_id = current["active_item_id"] if keep_item else None
             cursor = db.execute(
-                "UPDATE sessions SET phase=?, status=?, phase_version=?, updated_at=? "
-                "WHERE session_id=? AND phase_version=?",
+                "UPDATE sessions SET phase=?, status=?, phase_version=?, updated_at=?, "
+                "active_item_id=? WHERE session_id=? AND phase_version=?",
                 (
                     next_phase,
                     current["status"],
                     new_version,
                     now,
+                    active_item_id,
                     attempt["session_id"],
                     base_version,
                 ),

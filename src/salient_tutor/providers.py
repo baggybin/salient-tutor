@@ -14,9 +14,10 @@ at all — it runs salient-core's CodexProvider backend (the OpenAI Codex
 runtime) behind the same AgentRunner seam. So a tutor on Opus, a librarian
 on a local LM Studio model, and a judge on Codex can all run in one daemon.
 
-Effort dial: a low/med/high selector that maps to the SDK ``effort`` + the
+Effort dial: a low/med/high/xhigh/max selector that maps to the SDK ``effort``
+(via ``sdk_effort`` — the SDK spells the middle rung ``medium``) + the
 ``thinking`` block. ``low`` is cheaper/faster (small or no thinking budget),
-``high`` deeper reasoning. Local providers can't stream thinking blocks, so they
+``max`` deepest reasoning. Local providers can't stream thinking blocks, so they
 ignore effort and force ``{type: disabled}``.
 """
 
@@ -26,16 +27,27 @@ from dataclasses import dataclass
 from typing import Any
 
 # Valid effort wire-values (the UI sends these; validated in web.py).
-EFFORTS = ("low", "med", "high")
+EFFORTS = ("low", "med", "high", "xhigh", "max")
+
+# Tutor effort dial → Claude SDK EffortLevel (low|medium|high|xhigh|max).
+# The SDK has no "med"; passing it through made the dial a no-op on Claude.
+_SDK_EFFORT = {"low": "low", "med": "medium", "high": "high", "xhigh": "xhigh", "max": "max"}
+
+
+def sdk_effort(effort: str | None) -> str | None:
+    """Map the tutor's effort dial to the Claude SDK wire value (or None to
+    omit the field when the dial value is unknown)."""
+    return _SDK_EFFORT.get((effort or "").strip().lower())
+
 
 # Valid study-project subjects. Drives advisory model suggestions only — a
 # per-agent config override always wins.
 SUBJECTS = ("cyber", "biology", "other")
 
 # Effort → max thinking tokens (for the SDK's thinking budget on providers that
-# support native extended thinking). Conservative budgets; the SDK also accepts
-# an `effort` hint and some models cap lower than these.
-_EFFORT_BUDGET = {"low": 2048, "med": 8192, "high": 24576}
+# support native extended thinking). Aligned with salient's operator table
+# (salient/minimax.py EFFORT_BUDGET); some models cap lower than these.
+_EFFORT_BUDGET = {"low": 1024, "med": 4096, "high": 8192, "xhigh": 16384, "max": 24576}
 
 
 @dataclass
@@ -92,6 +104,7 @@ PROVIDERS: dict[str, ProviderSpec] = {
         default_base_url="https://api.minimax.io/anthropic",
         auth_style="bearer",
         supports_thinking=True,  # coupled: M3 adaptive, M2.x always-on
+        disable_builtin_tools=("WebSearch", "WebFetch"),  # Anthropic-side server tools
         default_key_env="MINIMAX_API_KEY",  # same credential the minimax_* agents use
     ),
     "local": ProviderSpec(
@@ -100,6 +113,7 @@ PROVIDERS: dict[str, ProviderSpec] = {
         default_base_url="http://ai.home:1234",
         auth_style="api_key",
         supports_thinking=False,
+        disable_builtin_tools=("WebSearch", "WebFetch"),  # Anthropic-side server tools
     ),
     "codex": ProviderSpec(
         label="OpenAI Codex",
@@ -115,15 +129,16 @@ PROVIDERS: dict[str, ProviderSpec] = {
 
 # ── Codex model/effort mapping (kept in lockstep with salient) ─────────────
 # Claude tier substring → codex model, for agents swept to codex without an
-# explicit model. Codex model ids are CLI-version-gated; update alongside the
-# openai-codex-cli-bin pin and salient's copy of this table.
+# explicit model. Codex model ids are CLI-version-gated: the 5.6 ids need a
+# >=0.144 codex — the bundled openai-codex-cli-bin 0.137.0a4 rejects them, so
+# point SALIENT_CODEX_BIN at a newer CLI (or bump the pin) when using these.
 CODEX_MODEL_BY_TIER: tuple[tuple[str, str], ...] = (
-    ("opus", "gpt-5.5"),
-    ("fable", "gpt-5.5"),
-    ("sonnet", "gpt-5.4"),
-    ("haiku", "gpt-5.3-codex-spark"),
+    ("opus", "gpt-5.6-sol"),  # top reasoning
+    ("fable", "gpt-5.6-sol"),  # flagship-tier, same rung as opus
+    ("sonnet", "gpt-5.6-terra"),  # mid / everyday
+    ("haiku", "gpt-5.6-luna"),  # fast / cheap
 )
-CODEX_DEFAULT_MODEL = "gpt-5.4"
+CODEX_DEFAULT_MODEL = "gpt-5.6-terra"  # unknown/absent tier → balanced fallback
 
 # Tutor effort dial → codex model_reasoning_effort wire value.
 _CODEX_EFFORT = {"low": "low", "med": "medium", "high": "high"}

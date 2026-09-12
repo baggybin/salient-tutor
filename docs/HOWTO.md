@@ -114,7 +114,7 @@ python -m salient_tutor.web --port 8000
 # → open http://localhost:8000
 ```
 
-Flags: `--host` (default `127.0.0.1`), `--port` (default `8000`), `--work-root` (workspace dir; overrides `$TUTOR_WORK_ROOT`). A plain launch **autoloads the last-used workspace**.
+Flags: `--host` (default `127.0.0.1`, loopback only — the API is unauthenticated and fully mutating; pass `--host 0.0.0.0` deliberately to expose it), `--port` (default `8000`), `--work-root` (workspace dir; overrides `$TUTOR_WORK_ROOT`). A plain launch **autoloads the last-used workspace**.
 
 ### CLI (one-shot)
 

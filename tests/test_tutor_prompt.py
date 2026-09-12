@@ -119,7 +119,7 @@ class TestBloomLadder:
 
 
 class TestHardNo:
-    """The five rules the tutor cannot break."""
+    """The rules the tutor cannot break."""
 
     def test_hard_no_section(self):
         assert "HARD NO" in PROMPT
@@ -138,6 +138,10 @@ class TestHardNo:
 
     def test_no_drifting(self):
         assert "Drifting" in PROMPT or "tangent" in PROMPT.lower()
+
+    def test_no_skipping_gates(self):
+        assert "scored attempt" in PROMPT.lower()
+        assert "SERVER SESSION STATE" in PROMPT
 
 
 class TestBannedAbsolutistWords:

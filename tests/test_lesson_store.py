@@ -48,9 +48,9 @@ def test_mastery_stage_is_derived_not_stored(tmp_path) -> None:
 
     controller = LessonController(store)
     session = controller.create_session("custom:m", session_kind="delayed_retrieval")
-    controller.advance(session["session_id"])
-    controller.advance(session["session_id"])
-    issued = controller.issue_item(session["session_id"])
+    # Delayed retrieval starts at drill; continue issues the apply item.
+    assert session["phase"] == "drill"
+    issued = controller.advance(session["session_id"])
     # No attempt yet → unstarted.
     assert store.get_session(session["session_id"])["mastery_stage"] == "unstarted"
     controller.record_attempt(session["session_id"], issued["item"]["item_id"], 1, "custom:m", "k1")
@@ -212,10 +212,10 @@ def test_review_application_is_idempotent(tmp_path) -> None:
 
 
 def test_failed_attempt_can_be_retried_and_passed(tmp_path) -> None:
-    # Regression: the attempts UNIQUE(session,item,version) constraint used to
-    # return the stale failed row on retry, trapping the learner in an unwinnable
-    # drill loop. A correct resubmit (new key) after a fail must record a fresh
-    # passing attempt and advance to anchor.
+    # CHECK fail re-teaches MODEL (not a same-item drill trap). Continue from
+    # model issues a fresh CHECK; a correct resubmit (new key) must pass and
+    # advance to anchor. Also a regression: attempts are append-only so the
+    # second submit cannot collide with the failed row.
     controller = LessonController(LessonStore(tmp_path / "lessons.db"))
     session = controller.create_session("custom:x")
     controller.advance(session["session_id"])
@@ -223,9 +223,12 @@ def test_failed_attempt_can_be_retried_and_passed(tmp_path) -> None:
     item_id = controller.issue_item(session["session_id"])["item"]["item_id"]
     failed = controller.record_attempt(session["session_id"], item_id, 1, "wrong", "attempt-1")
     assert failed["attempt"]["scoring_status"] == "fail"
-    assert failed["session"]["phase"] == "drill"
-    controller.advance(session["session_id"])  # drill -> awaiting_attempt, same item
-    passed = controller.record_attempt(session["session_id"], item_id, 1, "custom:x", "attempt-2")
+    assert failed["session"]["phase"] == "model"
+    reissued = controller.advance(session["session_id"])  # model -> new CHECK
+    new_item_id = reissued["item"]["item_id"]
+    passed = controller.record_attempt(
+        session["session_id"], new_item_id, 1, "custom:x", "attempt-2"
+    )
     assert passed["attempt"]["scoring_status"] == "pass"
     assert passed["attempt"]["attempt_id"] != failed["attempt"]["attempt_id"]
     assert passed["session"]["phase"] == "anchor"
@@ -302,6 +305,8 @@ def test_free_text_requires_confident_judge_result(tmp_path) -> None:
     )
     assert result["attempt"]["scoring_status"] == "unscored"
     assert result["session"]["mastery_stage"] == "unstarted"
+    # Unscored holds the gate — do not pretend it was a fail and skip MODEL.
+    assert result["session"]["phase"] == "awaiting_attempt"
 
 
 def test_card_versions_and_retirement_preserve_history(tmp_path) -> None:

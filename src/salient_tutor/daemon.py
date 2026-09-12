@@ -22,7 +22,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any
 
-from claude_agent_sdk import ClaudeAgentOptions
+from claude_agent_sdk import ClaudeAgentOptions, HookMatcher, create_sdk_mcp_server
 from salient_core import (
     ActionLedger,
     AgentRunner,
@@ -36,10 +36,11 @@ from salient_core import (
 )
 
 from salient_tutor import resource_paths
-from salient_tutor.lesson import LessonController
+from salient_tutor.lesson import LessonController, assessment_kind_for
 from salient_tutor.lesson_store import LessonStore
 from salient_tutor.pedagogy import import_bundle
-from salient_tutor.providers import PROVIDERS, resolve_thinking
+from salient_tutor.providers import PROVIDERS, resolve_thinking, sdk_effort
+from salient_tutor.read_containment import make_read_containment_hook
 
 _log = logging.getLogger(__name__)
 
@@ -154,6 +155,56 @@ _QUIZ_GRADE_PROMPT = (
     "LEARNER'S ANSWER:\n{learner_answer}"
 )
 
+# Durable-lesson items: tutor-authored free_text CHECK / ANCHOR / APPLY questions.
+# Fallback (no live model) is the controller's deterministic cloze on the topic id.
+_ITEM_AUTHOR_PROMPTS: dict[str, str] = {
+    "check": (
+        "ASSESSMENT AUTHOR. Write ONE Socratic question that tests whether the "
+        "learner understands WHY '{topic}' works — not the name, not a definition "
+        "to recite. A near-miss should be possible. Also write a concise reference "
+        "answer the scorer will use (never shown to the learner).\n\n"
+        "Respond with STRICT JSON only, no prose, no code fences:\n"
+        '{{"question": "<the question>", "answer": "<concise reference answer>"}}\n\n'
+        "TOPIC:\n{topic}"
+    ),
+    "retrieval": (
+        "ASSESSMENT AUTHOR. Write ONE focused retrieval question that tests unaided "
+        "recall of '{topic}' (not recognition, not multiple choice). Also write a "
+        "concise reference answer the scorer will use (never shown to the learner).\n\n"
+        "Respond with STRICT JSON only, no prose, no code fences:\n"
+        '{{"question": "<the question>", "answer": "<concise reference answer>"}}\n\n'
+        "TOPIC:\n{topic}"
+    ),
+    "apply": (
+        "ASSESSMENT AUTHOR. Write ONE short problem that requires APPLYING '{topic}' "
+        "to a FRESH case — not the example just taught, not 'what is the topic id'. "
+        "Also write a concise worked reference answer the scorer will use (never "
+        "shown to the learner).\n\n"
+        "Respond with STRICT JSON only, no prose, no code fences:\n"
+        '{{"question": "<the problem>", "answer": "<concise worked answer>"}}\n\n'
+        "TOPIC:\n{topic}"
+    ),
+}
+_ITEM_SCORE_PROMPT = (
+    "ASSESSMENT SCORE. Grade whether the learner demonstrated the target for "
+    "this item.\n"
+    "  kind={kind} bloom={bloom} — check=WHY/understanding; retrieval=unaided "
+    "recall; apply=used it in a fresh case.\n"
+    "status:\n"
+    "  pass    — demonstrated the target\n"
+    "  partial — right idea, incomplete or messy\n"
+    "  fail    — missed it\n"
+    "confidence is how sure YOU are of that grade (use >= 0.85 unless unreadable), "
+    "not how sure the learner was. Feedback: one or two warm sentences; do NOT "
+    "paste the full worked answer.\n\n"
+    "Respond with STRICT JSON only, no prose, no code fences:\n"
+    '{{"status": "<pass|partial|fail>", "confidence": <0-1>, "feedback": "<text>"}}\n\n'
+    "TOPIC:\n{topic}\n\n"
+    "QUESTION:\n{question}\n\n"
+    "REFERENCE ANSWER:\n{answer}\n\n"
+    "LEARNER'S ANSWER:\n{learner_answer}"
+)
+
 # Prerequisite-DAG skill map: tutor-inferred prereq edges persisted under the
 # curriculum: KG namespace (subject/object both prefixed), predicate prereq_of.
 _CURRICULUM_PREFIX = "curriculum:inferred:"
@@ -173,9 +224,10 @@ _AGENT_CONFIGS: dict[str, dict[str, Any]] = {
     "tutor": {
         "system_prompt_file": "tutor.md",
         "model": os.environ.get("TUTOR_MODEL", "claude-opus-4-8[1m]"),
-        "builtin_tools": []
-        if os.environ.get("TUTOR_PROVIDER") == "deepseek"
-        else ["WebSearch", "WebFetch"],
+        # Lookups go through ask_agent("websearch") (tutor.md step 5) — mounting
+        # Anthropic server tools on the coach breaks on every non-Claude
+        # provider the Agents tab can switch it to.
+        "builtin_tools": [],
         "max_turns": 30,
         "family": "tutor",
         "label": "tutor",
@@ -250,20 +302,14 @@ def _build_agent_configs(
     def _runtime_model(agent: str) -> str:
         return ((runtime.get(agent) or {}).get("model") or "").strip()
 
-    def _runtime_provider(agent: str) -> str:
-        return ((runtime.get(agent) or {}).get("provider") or "").strip()
-
     variant_model = (os.environ.get("TUTOR_VARIANT_MODEL", "") or "").strip() or _runtime_model(
         "tutor_alt"
     )
     if variant_model:
-        variant_provider = (
-            os.environ.get("TUTOR_VARIANT_PROVIDER") or _runtime_provider("tutor_alt") or ""
-        )
         configs["tutor_alt"] = {
             "system_prompt_file": "tutor.md",
             "model": variant_model,
-            "builtin_tools": [] if variant_provider == "deepseek" else ["WebSearch", "WebFetch"],
+            "builtin_tools": [],  # same as the primary tutor — ask_agent("websearch")
             "max_turns": 30,
             "family": "tutor",
             "label": os.environ.get("TUTOR_VARIANT_LABEL", "").strip() or variant_model,
@@ -292,6 +338,11 @@ class TutorDaemon:
     def __init__(self, work_root: str | Path | None = None) -> None:
         self.work_root = Path(work_root or Path.cwd() / "work")
         self.work_root.mkdir(parents=True, exist_ok=True)
+        # Align the study tree with the RESOLVED workspace: study_root() keys
+        # off this env var, and without the export it falls back to ./work
+        # under the launch cwd — splitting study documents from the KG/lesson
+        # DBs above.
+        os.environ["SALIENT_TUTOR_WORK_ROOT"] = str(self.work_root)
 
         self.profile: dict[str, Any] = {}
         self.engagement_path: Path | None = None
@@ -1036,6 +1087,12 @@ class TutorDaemon:
             "allowed_tools": list(builtin),
             "model": cfg["model"],
             "max_turns": cfg.get("max_turns", 30),
+            # Headless: do not inherit ~/.claude MCP servers (mountain, etc.)
+            # or settings. The tutor's kg_query is the in-process bus, and a
+            # user-MCP permission prompt has nobody to click it — it surfaces
+            # as "Claude requested permissions to use mcp__mountain__kg_query".
+            "strict_mcp_config": True,
+            "setting_sources": [],
         }
 
         # The bus MCP server (context/delegation/kg tools) is optional per
@@ -1045,8 +1102,36 @@ class TutorDaemon:
         # context windows local models are often loaded with.
         if cfg.get("bus_tools", True):
             bus_server, server_name, wire_names = make_bus(self, agent)
-            opt_kwargs["mcp_servers"] = {server_name: bus_server}
-            opt_kwargs["allowed_tools"] = list(wire_names) + builtin
+            # Mirror the same closures on a short-namespace server too — Claude
+            # sometimes drops the `bus__` segment when guessing a tool's server
+            # (mcp__<alias>__kg_query instead of mcp__bus__<alias>__kg_query),
+            # and an unregistered name is a tool_use_error. Dual registration
+            # turns the confusion into a no-op. Ported from the operator daemon.
+            from salient_core.bus import make_bus_tools
+
+            mirror_tools, mirror_bare = make_bus_tools(self, agent)
+            mirror_name = server_name.removeprefix("bus__")
+            mirror_server = create_sdk_mcp_server(
+                name=mirror_name, version="0.1.0", tools=list(mirror_tools)
+            )
+            opt_kwargs["mcp_servers"] = {server_name: bus_server, mirror_name: mirror_server}
+            opt_kwargs["allowed_tools"] = (
+                list(wire_names) + [f"mcp__{mirror_name}__{t}" for t in mirror_bare] + builtin
+            )
+
+        # The read-containment fence (librarian: confine_reads_to_study) must be
+        # wired as a PreToolUse hook — built-in Read/Grep/Glob bypass every other
+        # gate. The flag alone was advertised but never hooked, leaving Read
+        # ungated on the Claude path.
+        if cfg.get("confine_reads_to_study"):
+            opt_kwargs["hooks"] = {
+                "PreToolUse": [
+                    HookMatcher(
+                        matcher="Read|Grep|Glob",
+                        hooks=[make_read_containment_hook(self, agent)],
+                    )
+                ]
+            }
 
         # Per-agent endpoint override — any agent whose runtime provider isn't
         # anthropic gets rerouted at its configured endpoint. Ported from
@@ -1066,6 +1151,16 @@ class TutorDaemon:
                 else:
                     sub_env["ANTHROPIC_API_KEY"] = api_key
                     sub_env.pop("ANTHROPIC_AUTH_TOKEN", None)
+            else:
+                # No key for this provider: fail closed. Strip the inherited
+                # Anthropic credentials rather than forwarding them to a
+                # third-party endpoint (the request then 401s instead of
+                # leaking the operator's key).
+                sub_env.pop("ANTHROPIC_API_KEY", None)
+                sub_env.pop("ANTHROPIC_AUTH_TOKEN", None)
+            # OAuth-session deployments carry this too; a non-Anthropic
+            # endpoint must never see it, with or without a per-agent key.
+            sub_env.pop("CLAUDE_CODE_OAUTH_TOKEN", None)
             opt_kwargs["env"] = sub_env
             if model:
                 opt_kwargs["model"] = model  # the configured model, not the roster default
@@ -1076,7 +1171,7 @@ class TutorDaemon:
             # Thinking policy comes from the provider registry (local/deepseek
             # → disabled; minimax → coupled; anthropic never reaches here).
             opt_kwargs["thinking"] = resolve_thinking(provider, effort, model)
-            opt_kwargs["effort"] = effort
+            opt_kwargs["effort"] = sdk_effort(effort)
             # Non-Anthropic backends can't run Anthropic-side server tools.
             spec_disable = (
                 PROVIDERS.get(provider).disable_builtin_tools if PROVIDERS.get(provider) else ()
@@ -1099,7 +1194,7 @@ class TutorDaemon:
             model = _expand_envvars(rt.get("model", "")) or cfg["model"]
             opt_kwargs["model"] = model
             effort = rt.get("effort", "med")
-            opt_kwargs["effort"] = effort
+            opt_kwargs["effort"] = sdk_effort(effort)
             opt_kwargs["thinking"] = resolve_thinking("anthropic", effort, model)
 
         return ClaudeAgentOptions(**opt_kwargs)
@@ -1130,8 +1225,8 @@ class TutorDaemon:
         if not api_key and provider != "local":
             _log.warning(
                 "agent %s routed to %s but no key resolved (set %s or a per-agent "
-                "key); it will fall back to the inherited Anthropic credentials "
-                "(API key or OAuth) and likely fail auth against %s",
+                "key); the request will fail auth against %s — inherited "
+                "Anthropic credentials are stripped, never forwarded",
                 agent,
                 provider,
                 spec.default_key_env or "<none>",
@@ -1360,9 +1455,17 @@ class TutorDaemon:
         """The SERVER SESSION STATE prefix that constrains a turn to the active
         lesson phase. Shared by the CLI and WS submit paths so the wording can't
         drift between them (the web handler previously carried a divergent copy)."""
+        item = session.get("active_item") or {}
+        item_bit = ""
+        if session.get("phase") == "awaiting_attempt" and item.get("prompt"):
+            item_bit = (
+                f" assessment_kind={item.get('kind') or 'check'};"
+                " the learner is answering a structured item — do not reveal the answer."
+            )
         return (
-            f"SERVER SESSION STATE: phase={session['phase']}; skill_id={session['skill_id']}; "
-            "Only structured assessment actions advance the lesson."
+            f"SERVER SESSION STATE: phase={session['phase']}; skill_id={session['skill_id']};"
+            f"{item_bit} Only structured assessment actions advance CHECK/ANCHOR/DRILL."
+            " Do not claim the learner passed. Do only the current phase."
         )
 
     async def _submit_turn(
@@ -1572,7 +1675,7 @@ class TutorDaemon:
 
     # ── Retrieval micro-quiz (SM-2 review from a due tile) ──────────
 
-    def record_review(self, topic: str, grade: str) -> dict[str, Any]:
+    def record_review(self, topic: str, grade: str, *, agent: str = "quiz") -> dict[str, Any]:
         """Record a graded retrieval review under ``learner:op`` and reschedule.
 
         Deterministic (no LLM) — mirrors the kernel ``record_review`` bus tool:
@@ -1605,7 +1708,7 @@ class TutorDaemon:
             predicate=predicate,
             mastery=mastery,
             review_due=review_due,
-            agent="quiz",
+            agent=agent,
             now=now,
         )
         # Append-only telemetry (Phase 0): the KG upsert above OVERWRITES the
@@ -1663,18 +1766,135 @@ class TutorDaemon:
     ) -> dict[str, Any]:
         return self.lessons.abandon(session_id, expected_version)
 
-    def advance_phase(self, session_id: str, expected_version: int | None = None) -> dict[str, Any]:
-        return self.lessons.advance(session_id, expected_version)
+    def _prompt_is_native(self) -> bool:
+        impl = getattr(self.prompt, "__func__", self.prompt)
+        return impl is TutorDaemon.prompt
 
-    def issue_assessment_item(
+    def _agent_is_live(self, name: str) -> bool:
+        runner = self.runners.get(name)
+        return bool(runner and getattr(runner, "status", "") in ("running", "idle"))
+
+    def _can_prompt(self, agent: str = "tutor") -> bool:
+        """True when a model call will not try to boot a runner on a test daemon.
+
+        Production: runners are started in ``start()``. Tests: either the
+        runner is live or ``prompt`` has been monkeypatched.
+        """
+        return self._agent_is_live(agent) or not self._prompt_is_native()
+
+    async def _author_item(self, session: dict[str, Any]) -> dict[str, Any] | None:
+        """Tutor-authored free_text item for the current teaching phase, or None."""
+        kind = assessment_kind_for(session["phase"])
+        if kind is None or not self._can_prompt("tutor"):
+            return None
+        template = _ITEM_AUTHOR_PROMPTS.get(kind)
+        if not template:
+            return None
+        topic = session.get("srs_topic") or session["skill_id"]
+        try:
+            reply = await self.prompt("tutor", template.format(topic=topic), timeout=120.0)
+            parsed = _parse_json_reply(reply)
+        except Exception:  # noqa: BLE001 — authoring is best-effort; fall back to cloze
+            return None
+        question = str(parsed.get("question") or "").strip()
+        answer = str(parsed.get("answer") or "").strip()
+        if not question or not answer:
+            return None
+        bloom = {"check": "understand", "retrieval": "remember", "apply": "apply"}[kind]
+        return {
+            "item_id": f"item-{uuid.uuid4().hex}",
+            "version": 1,
+            "skill_id": session["skill_id"],
+            "kind": kind,
+            "bloom": bloom,
+            "response_type": "free_text",
+            "prompt": question,
+            "options": [],
+            "rubric": {
+                "criteria": [
+                    {"id": "core", "description": "addresses the question", "required": True}
+                ]
+            },
+            "reference_evidence": "tutor-authored assessment",
+            "reference_answer": answer,
+            "provenance": [],
+            "generator_version": "tutor-author-v1",
+            "scorer_version": "judge-v1",
+        }
+
+    async def _score_free_text(
+        self, item: dict[str, Any], response: str, hints_used: int
+    ) -> tuple[dict[str, Any] | None, int]:
+        """Server-side grade for a tutor-authored item. Never uses a client verdict."""
+        if not str(response or "").strip():
+            return (
+                {
+                    "status": "fail",
+                    "confidence": 1.0,
+                    "feedback": "No answer yet — try a real attempt.",
+                    "criteria": [{"id": "core", "score": 0.0}],
+                    "next_action": "remediate",
+                },
+                hints_used,
+            )
+        if not self._can_prompt("tutor"):
+            return None, hints_used
+        prompt = _ITEM_SCORE_PROMPT.format(
+            kind=item.get("kind") or "check",
+            bloom=item.get("bloom") or "understand",
+            topic=item.get("skill_id") or "",
+            question=item.get("prompt") or "",
+            answer=item.get("reference_answer") or "",
+            learner_answer=response,
+        )
+        try:
+            reply = await self.prompt("tutor", prompt, timeout=120.0)
+            parsed = _parse_json_reply(reply)
+        except Exception:  # noqa: BLE001 — hold the gate rather than guess a pass
+            return None, hints_used
+        status = str(parsed.get("status") or "").strip().lower()
+        extra_hints = 0
+        if status == "partial":
+            status = "pass"
+            extra_hints = 1
+        if status not in {"pass", "fail"}:
+            return None, hints_used
+        try:
+            confidence = float(parsed.get("confidence"))
+        except (TypeError, ValueError):
+            confidence = 0.0
+        return (
+            {
+                "status": status,
+                "confidence": confidence,
+                "feedback": str(parsed.get("feedback") or ""),
+                "criteria": [{"id": "core", "score": 1.0 if status == "pass" else 0.0}],
+                "next_action": "advance" if status == "pass" else "remediate",
+            },
+            hints_used + extra_hints,
+        )
+
+    async def advance_phase(
+        self, session_id: str, expected_version: int | None = None
+    ) -> dict[str, Any]:
+        session = self.get_session(session_id)
+        if assessment_kind_for(session["phase"]):
+            return await self.issue_assessment_item(session_id, expected_version=expected_version)
+        snapshot = self.lessons.advance(session_id, expected_version)
+        return {"session": snapshot}
+
+    async def issue_assessment_item(
         self,
         session_id: str,
         item: dict[str, Any] | None = None,
         expected_version: int | None = None,
     ) -> dict[str, Any]:
+        session = self.get_session(session_id)
+        if item is None and not session.get("active_item_id"):
+            item = await self._author_item(session)
         return self.lessons.issue_item(session_id, item=item, expected_version=expected_version)
 
-    def record_attempt(
+    async def record_attempt(
         self,
         session_id: str,
         item_id: str,
@@ -1684,7 +1904,10 @@ class TutorDaemon:
         hints_used: int = 0,
         judge_result: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        return self.lessons.record_attempt(
+        stored = self.lesson_store.get_item(item_id, item_version)
+        if stored and stored.get("response_type") == "free_text" and judge_result is None:
+            judge_result, hints_used = await self._score_free_text(stored, response, hints_used)
+        result = self.lessons.record_attempt(
             session_id,
             item_id,
             item_version,
@@ -1693,6 +1916,15 @@ class TutorDaemon:
             hints_used=hints_used,
             judge_result=judge_result,
         )
+        # Close the gradebook in the same turn as the score — callers used to
+        # need a second POST /reviews which the Coach UI never made.
+        attempt = result.get("attempt") or {}
+        grade = self.lessons.grade_for_attempt(attempt) if attempt else None
+        if grade and attempt.get("attempt_id"):
+            result["review"] = self.apply_attempt_review(
+                session_id, attempt["attempt_id"], f"review:{attempt['attempt_id']}"
+            )
+        return result
 
     def apply_attempt_review(
         self, session_id: str, attempt_id: str, idempotency_key: str
@@ -1717,7 +1949,7 @@ class TutorDaemon:
                     "error": "assessment was not confidently scored",
                 }
             )
-        result = self.record_review(session["srs_topic"], grade)
+        result = self.record_review(session["srs_topic"], grade, agent="lesson")
         return self.lesson_store.save_review_application(
             {
                 "idempotency_key": idempotency_key,

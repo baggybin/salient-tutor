@@ -53,6 +53,22 @@ def _shell_with_project(tmp_path, monkeypatch, pid="p1"):
 
 
 class TestStudyUploadSeam:
+    def test_daemon_exports_work_root_for_study_tree(self, tmp_path, monkeypatch):
+        # Regression (bug-hunt #1): study_root() must follow the daemon's
+        # resolved workspace, not the launch cwd — the daemon exports its
+        # work_root to the env var study_root() reads.
+        import os
+
+        from salient_tutor.study import study_root
+
+        monkeypatch.delenv("SALIENT_TUTOR_WORK_ROOT", raising=False)
+        monkeypatch.setattr("salient_tutor.web._resolve_work_root", lambda: tmp_path / "ws")
+        from salient_tutor.daemon import TutorDaemon
+
+        TutorDaemon(work_root=tmp_path / "ws")
+        assert os.environ["SALIENT_TUTOR_WORK_ROOT"] == str(tmp_path / "ws")
+        assert study_root() == tmp_path / "ws" / "study"
+
     def test_upload_roundtrip(self, tmp_path, monkeypatch):
         shell = _shell_with_project(tmp_path, monkeypatch)
         res = shell.study_upload("p1", "notes.md", b"# Kerberos\n\nThe KDC issues tickets.\n")

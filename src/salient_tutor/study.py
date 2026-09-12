@@ -56,7 +56,13 @@ DOC_STATUSES = ("uploaded", "ocr", "extracting", "extracted", "failed")
 
 
 def study_root() -> Path:
-    """`<work_root>/study/` — created on demand, gitignored."""
+    """`<work_root>/study/` — created on demand, gitignored.
+
+    The root comes from ``$SALIENT_TUTOR_WORK_ROOT``, which TutorDaemon exports
+    from its RESOLVED workspace at construction — without that export the study
+    tree falls back to ``./work`` under the launch cwd and silently splits study
+    documents from the KG/lesson DBs (bug-hunt finding #1).
+    """
     import os
 
     root = Path(os.environ.get("SALIENT_TUTOR_WORK_ROOT", Path.cwd() / "work"))

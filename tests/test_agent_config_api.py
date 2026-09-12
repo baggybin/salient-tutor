@@ -82,10 +82,10 @@ class TestProviderRegistry:
         # An explicit config model always wins.
         assert codex_model_for(" gpt-5.5 ", "claude-opus-4-8[1m]") == "gpt-5.5"
         # Roster Claude tier maps to its codex counterpart.
-        assert codex_model_for("", "claude-opus-4-8[1m]") == "gpt-5.5"
-        assert codex_model_for("", "claude-fable-5[1m]") == "gpt-5.5"
-        assert codex_model_for("", "claude-sonnet-5[1m]") == "gpt-5.4"
-        assert codex_model_for("", "claude-haiku-4-5") == "gpt-5.3-codex-spark"
+        assert codex_model_for("", "claude-opus-4-8[1m]") == "gpt-5.6-sol"
+        assert codex_model_for("", "claude-fable-5[1m]") == "gpt-5.6-sol"
+        assert codex_model_for("", "claude-sonnet-5[1m]") == "gpt-5.6-terra"
+        assert codex_model_for("", "claude-haiku-4-5") == "gpt-5.6-luna"
         # Unknown roster model → the default.
         assert codex_model_for("", "mystery-model") == CODEX_DEFAULT_MODEL
         assert codex_model_for("", "") == CODEX_DEFAULT_MODEL
@@ -267,8 +267,9 @@ class TestDefaultKeyEnv:
         assert api_key == "explicit"
 
     def test_deepseek_without_any_key_stays_inherited(self, tmp_path, monkeypatch):
-        # No per-agent key and no DEEPSEEK_API_KEY → api_key stays "" (subprocess
-        # inherits ANTHROPIC_API_KEY, the pre-existing fallback). Backward-compat.
+        # No per-agent key and no DEEPSEEK_API_KEY → api_key stays "" here; the
+        # inherited-Anthropic-credentials strip happens at spawn in
+        # _make_options (fail-closed — the key is never forwarded).
         monkeypatch.setenv("TUTOR_JUDGE_PROVIDER", "deepseek")
         monkeypatch.delenv("TUTOR_JUDGE_PROVIDER_KEY", raising=False)
         monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
@@ -439,10 +440,66 @@ class TestAgentConfigRoundTrip:
 
 # ── Endpoint override per provider ─────────────────────────────────────────
 class TestEndpointOverridePerProvider:
+    def test_bus_dual_registered_on_short_namespace(self, tmp_path, monkeypatch):
+        # Claude sometimes drops the `bus__` segment when guessing a tool's
+        # server; both namespaces must be registered so that's a no-op.
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        monkeypatch.setattr(
+            "salient_tutor.daemon.make_bus",
+            lambda d, a: ("srv", "bus__tutor", ["mcp__bus__tutor__kg_query"]),
+        )
+        monkeypatch.setattr("salient_core.bus.make_bus_tools", lambda d, a: (["fn"], ["kg_query"]))
+        monkeypatch.setattr(
+            "salient_tutor.daemon.create_sdk_mcp_server",
+            lambda name, version, tools: ("mirror", name),
+        )
+        shell._load_prompt = lambda a: "prompt"
+        opts = shell._make_options("tutor")
+        assert set(opts.mcp_servers) == {"bus__tutor", "tutor"}
+        assert "mcp__bus__tutor__kg_query" in opts.allowed_tools
+        assert "mcp__tutor__kg_query" in opts.allowed_tools
+
     def _options(self, shell, agent, monkeypatch):
         monkeypatch.setattr("salient_tutor.daemon.make_bus", lambda d, a: (None, "bus", []))
         shell._load_prompt = lambda a: "prompt"
         return shell._make_options(agent)
+
+    def test_librarian_read_containment_hook_wired(self, tmp_path, monkeypatch):
+        # Regression: confine_reads_to_study was set but hooks= was never
+        # passed, leaving the librarian's Read ungated on the Claude path.
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        shell.agent_configs["librarian"]["confine_reads_to_study"] = True
+        opts = self._options(shell, "librarian", monkeypatch)
+        matchers = (opts.hooks or {}).get("PreToolUse") or []
+        assert matchers and matchers[0].matcher == "Read|Grep|Glob"
+        assert matchers[0].hooks  # the containment callback is attached
+
+    def test_agents_without_confine_flag_get_no_hooks(self, tmp_path, monkeypatch):
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        opts = self._options(shell, "tutor", monkeypatch)
+        assert not (opts.hooks or {}).get("PreToolUse")
+
+    def test_endpoint_without_key_strips_inherited_anthropic_creds(self, tmp_path, monkeypatch):
+        # Regression (bug-hunt #3): an endpoint agent with no resolvable key
+        # must NOT forward the operator's Anthropic credentials to the
+        # third-party base_url; CLAUDE_CODE_OAUTH_TOKEN is stripped even when
+        # a per-agent key IS set.
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-real")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "tok-ant-real")
+        monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "oauth-real")
+        shell = _DaemonShell(tmp_path, monkeypatch)
+        shell.set_agent_config("tutor", provider="deepseek", base_url="http://ds", model="m")
+        opts = self._options(shell, "tutor", monkeypatch)
+        for var in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
+            assert var not in opts.env, var
+        # With a per-agent key set, only that key crosses — OAuth still stripped.
+        shell.set_agent_config(
+            "tutor", provider="deepseek", base_url="http://ds", model="m", api_key="sk-ds"
+        )
+        opts2 = self._options(shell, "tutor", monkeypatch)
+        assert opts2.env["ANTHROPIC_API_KEY"] == "sk-ds"
+        assert "CLAUDE_CODE_OAUTH_TOKEN" not in opts2.env
+        assert "ANTHROPIC_AUTH_TOKEN" not in opts2.env
 
     def test_minimax_bearer_auth_and_thinking(self, tmp_path, monkeypatch):
         shell = _DaemonShell(tmp_path, monkeypatch)
@@ -495,7 +552,12 @@ class TestEndpointOverridePerProvider:
         shell.set_agent_config("tutor", provider="anthropic", effort="high")
         opts = self._options(shell, "tutor", monkeypatch)
         assert opts.effort == "high"
-        assert opts.thinking == {"type": "enabled", "budget_tokens": 24576}
+        assert opts.thinking == {"type": "enabled", "budget_tokens": 8192}
+        # 'med' maps to the SDK's 'medium' spelling (the SDK has no 'med').
+        shell.set_agent_config("tutor", provider="anthropic", effort="med")
+        opts_med = self._options(shell, "tutor", monkeypatch)
+        assert opts_med.effort == "medium"
+        assert opts_med.thinking == {"type": "enabled", "budget_tokens": 4096}
         # 'low' turns extended thinking off entirely.
         shell.set_agent_config("tutor", provider="anthropic", effort="low")
         opts_low = self._options(shell, "tutor", monkeypatch)

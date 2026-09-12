@@ -1634,9 +1634,9 @@
             <option value="MiniMax-Text-01">Text-01</option>
           </datalist>
           <datalist id="ag-codex-models">
-            <option value="gpt-5.5">gpt-5.5 — flagship (≈ Opus tier)</option>
-            <option value="gpt-5.4">gpt-5.4 — balanced (≈ Sonnet tier)</option>
-            <option value="gpt-5.3-codex-spark">gpt-5.3-codex-spark — fast/cheap (≈ Haiku tier)</option>
+            <option value="gpt-5.6-sol">gpt-5.6-sol — top reasoning (≈ Opus tier)</option>
+            <option value="gpt-5.6-terra">gpt-5.6-terra — balanced (≈ Sonnet tier)</option>
+            <option value="gpt-5.6-luna">gpt-5.6-luna — fast/cheap (≈ Haiku tier)</option>
           </datalist>
           <datalist id="ag-deepseek-models">
             <option value="deepseek-v4-pro">V4 Pro — reasoning/coding</option>
@@ -1814,7 +1814,7 @@
     // codex defaults by Claude-tier mapping, anthropic falls to the roster.
     const modelPlaceholder = (spec) =>
       spec.needs_endpoint ? "model id"
-      : spec.kind === "backend" ? "default by tier (e.g. gpt-5.5)"
+      : spec.kind === "backend" ? "default by tier (e.g. gpt-5.6-terra)"
       : "default (e.g. claude-opus-4-8[1m])";
     // Backend providers (codex) fail at the NEXT TURN if the runtime is
     // missing/unauthenticated — probe up front so the row hints before the
@@ -1847,7 +1847,7 @@
         const r = await (await fetch("/api/agents/config")).json();
         if (r.error) { agentsList.innerHTML = `<p class="empty-state">${esc(r.error)}</p>`; return; }
         AGENT_PROVIDERS = r.providers || {};
-        AGENT_EFFORTS = r.efforts || ["low", "med", "high"];
+        AGENT_EFFORTS = r.efforts || ["low", "med", "high", "xhigh", "max"];
         agentsData = r.agents || {};
         // Optional agents (judge/tutor_alt) not live yet get an addable row,
         // defaulting to anthropic — give them a model + Save to bring them up.

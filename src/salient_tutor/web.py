@@ -27,6 +27,7 @@ import logging
 import os
 import re
 import time
+import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
 from pathlib import Path
@@ -92,7 +93,7 @@ def _resolve_work_root() -> Path:
 
 # Machine-turn markers (contract with prompts/tutor.md + web/static/js/tutor.js).
 # These bypass the judge leakage filter — they aren't learner problem-answers.
-_SENTINELS = ("__EXPORT_LESSON__", "__FIX_DIAGRAM__", "__DRILL__", "__STUDY__")
+_SENTINELS = ("__EXPORT_LESSON__", "__FIX_DIAGRAM__", "__STUDY__")
 # Pedagogy-filter strictness dial values the WS layer accepts (default socratic).
 _STRICTNESS_LEVELS = ("explain", "socratic", "bare")
 # Diagram-engine preference the WS layer accepts. "auto" (default) lets the tutor
@@ -206,9 +207,8 @@ class AttemptRequest(BaseModel):
     response: str
     idempotency_key: str
     hints_used: int = 0
-    # Structured judge verdict for free_text items (status/confidence/criteria).
-    # Deterministic item types ignore it; free_text stays "unscored" until a
-    # confident judge result arrives, so the field must be forwardable.
+    # Ignored on the HTTP path (scoring is server-owned). Kept so old clients
+    # that still send it do not 422.
     judge_result: dict | None = None
 
 
@@ -268,6 +268,15 @@ def _lesson_error(error: Exception) -> NoReturn:
     if isinstance(error, LessonStoreError):
         raise HTTPException(status_code=400, detail=str(error)) from error
     raise error
+
+
+def _session_snapshot(session_id: str | None) -> dict | None:
+    if not session_id or daemon is None:
+        return None
+    try:
+        return daemon.get_session(session_id)
+    except Exception:  # noqa: BLE001 — snapshot is advisory; never fail the turn
+        return None
 
 
 @app.get("/")
@@ -332,7 +341,10 @@ async def ws_tutor(ws: WebSocket) -> None:
                 continue  # runner's per-turn diagnostic; wait_done sends the
                 # authoritative terminal `done` with the reply text
             jid = evt.get("job_id")
-            if state["job"] is not None and jid is not None and jid != state["job"]:
+            # Only the in-flight Coach turn is forwarded. When idle (job is
+            # None) this also drops background jobs — quiz gen, item authoring,
+            # scoring — so their JSON never lands in the transcript.
+            if jid is not None and jid != state["job"]:
                 continue
             # Reviewed turn: suppress the raw draft's content events so the leak
             # never reaches the learner — only the judge-cleared final is shown.
@@ -410,6 +422,9 @@ async def ws_tutor(ws: WebSocket) -> None:
                 "hinted": hinted,
                 "awaiting": awaiting,
                 "session_id": state["session_id"],
+                "session": _session_snapshot(
+                    state["session_id"] if isinstance(state["session_id"], str) else None
+                ),
             }
         except asyncio.CancelledError:
             # Socket closed mid-turn: CancelledError is a BaseException, so the
@@ -472,7 +487,6 @@ async def ws_tutor(ws: WebSocket) -> None:
             if not text:
                 continue
             agent = msg.get("agent") if msg.get("agent") in tutor_names else state["agent"]
-            await ensure(agent)  # pre-warm; _submit_turn re-fetches the cached runner
             state["agent"] = agent
             # Reviewed turn: gate a real (non-sentinel) tutor turn through the
             # judge leakage filter when a judge is configured.
@@ -505,6 +519,67 @@ async def ws_tutor(ws: WebSocket) -> None:
             ]
             submit_text = "\n\n".join([*parts, text]) if parts else text
             attached_session = msg.get("session_id") or state["session_id"]
+            # CHECK / ANCHOR / DRILL gate: the learner's message IS the attempt.
+            # Score it here so the tutor cannot answer the item in their place.
+            if attached_session and not sentinel:
+                try:
+                    live = await asyncio.to_thread(daemon.get_session, attached_session)
+                except (SessionConflict, LessonStoreError) as error:
+                    await ws.send_json(
+                        {"kind": "conflict", "session_id": attached_session, "text": str(error)}
+                    )
+                    continue
+                if live.get("phase") == "awaiting_attempt":
+                    item = live.get("active_item") or {}
+                    item_id = item.get("item_id") or live.get("active_item_id")
+                    try:
+                        item_version = int(item.get("version") or 1)
+                    except (TypeError, ValueError):
+                        item_version = 1
+                    key = (msg.get("idempotency_key") or "").strip() or f"ws:{uuid.uuid4().hex}"
+                    try:
+                        scored = await daemon.record_attempt(
+                            attached_session,
+                            item_id,
+                            item_version,
+                            text,
+                            key,
+                            0,
+                            None,
+                        )
+                    except (SessionConflict, LessonStoreError) as error:
+                        await ws.send_json(
+                            {"kind": "conflict", "session_id": attached_session, "text": str(error)}
+                        )
+                        continue
+                    state["session_id"] = attached_session
+                    attempt = scored.get("attempt") or {}
+                    nxt = (scored.get("session") or {}).get("phase") or ""
+                    if nxt == "awaiting_attempt":
+                        # Held (unscored / still the same item) — do not let the
+                        # tutor generate an answer in the learner's place.
+                        await ws.send_json(
+                            {
+                                "kind": "done",
+                                "agent": agent,
+                                "text": attempt.get("feedback") or "Could not score that yet.",
+                                "session_id": attached_session,
+                                "session": scored.get("session"),
+                                "attempt": attempt,
+                            }
+                        )
+                        continue
+                    submit_text = (
+                        f"ASSESSMENT RESULT: status={attempt.get('scoring_status')}; "
+                        f"feedback={attempt.get('feedback') or ''}\n"
+                        f"Learner answer:\n{text}\n\n"
+                        f"You are now in phase {nxt}. Teach that phase only. "
+                        "Do not reveal a worked solution the learner should derive."
+                    )
+                    # The structured item was the gate — don't re-run attempt-first
+                    # on the follow-up teaching turn.
+                    gated = False
+            await ensure(agent)  # pre-warm; _submit_turn re-fetches the cached runner
             # Shared submit path: builds the session preamble, starts the
             # agent_runs telemetry row, and submits — identical to the CLI path
             # (daemon.prompt). A bad session id raises here, before any telemetry
@@ -655,9 +730,12 @@ def abandon_session(session_id: str, req: SessionWriteRequest) -> dict:
 
 
 @app.post("/api/sessions/{session_id}/advance")
-def advance_session(session_id: str, req: SessionWriteRequest) -> dict:
+async def advance_session(session_id: str, req: SessionWriteRequest) -> dict:
     try:
-        return {"session": _require_daemon().advance_phase(session_id, req.expected_version)}
+        # Teaching phases return {session}; CHECK/ANCHOR/DRILL issue an item
+        # and return {item, session}. Pass through so the Coach can render
+        # the question without a second round-trip.
+        return await _require_daemon().advance_phase(session_id, req.expected_version)
     except Exception as error:
         _lesson_error(error)
 
@@ -673,26 +751,30 @@ def session_events(session_id: str) -> dict:
 
 
 @app.post("/api/sessions/{session_id}/items")
-def issue_item(session_id: str, req: AssessmentItemRequest) -> dict:
+async def issue_item(session_id: str, req: AssessmentItemRequest) -> dict:
     try:
         if req.item and "reference_answer" in req.item:
             raise HTTPException(status_code=422, detail="reference answers are server-owned")
-        return _require_daemon().issue_assessment_item(session_id, req.item, req.expected_version)
+        return await _require_daemon().issue_assessment_item(
+            session_id, req.item, req.expected_version
+        )
     except Exception as error:
         _lesson_error(error)
 
 
 @app.post("/api/sessions/{session_id}/attempts")
-def record_attempt(session_id: str, req: AttemptRequest) -> dict:
+async def record_attempt(session_id: str, req: AttemptRequest) -> dict:
     try:
-        return _require_daemon().record_attempt(
+        return await _require_daemon().record_attempt(
             session_id,
             req.item_id,
             req.item_version,
             req.response,
             req.idempotency_key,
             req.hints_used,
-            judge_result=req.judge_result,
+            # Scoring is server-owned. A client-supplied judge_result used to
+            # let anyone POST a confident pass; ignore it on the HTTP path.
+            judge_result=None,
         )
     except Exception as error:
         _lesson_error(error)
@@ -1441,7 +1523,7 @@ async def agents_config() -> dict:
     if not daemon:
         return {"error": "daemon not started"}
     from salient_tutor.daemon import _OPTIONAL_AGENTS
-    from salient_tutor.providers import PROVIDERS
+    from salient_tutor.providers import EFFORTS, PROVIDERS
 
     return {
         "agents": daemon.all_agent_configs(),
@@ -1461,7 +1543,7 @@ async def agents_config() -> dict:
             }
             for name, spec in PROVIDERS.items()
         },
-        "efforts": ["low", "med", "high"],
+        "efforts": list(EFFORTS),
     }
 
 
@@ -1746,13 +1828,18 @@ app.mount("/assets", StaticFiles(directory=_STATIC_DIR / "assets"), name="assets
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="salient-tutor-web")
+    # Loopback default: the API is unauthenticated and fully mutating (agent
+    # rerouting incl. base_url/api_key, study deletes, LLM spend) — binding
+    # 0.0.0.0 by default exposes all of it to the LAN. Pass --host explicitly
+    # to widen.
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument(
         "--work-root",
         default=None,
-        help="workspace directory (chats/KG/gradebook/images). Default <repo>/work; "
-        "point at another dir for an isolated profile. Overrides $TUTOR_WORK_ROOT.",
+        help="workspace directory (chats/KG/gradebook/images). Default: the "
+        "platformdirs state root's work/ dir; point at another dir for an "
+        "isolated profile. Overrides $TUTOR_WORK_ROOT.",
     )
     args = parser.parse_args()
     if args.work_root:

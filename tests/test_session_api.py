@@ -38,7 +38,10 @@ def test_session_api_is_resumable_and_server_owned(tmp_path, monkeypatch) -> Non
         },
     )
     assert attempt.status_code == 200
-    assert attempt.json()["attempt"]["scoring_status"] == "pass"
+    body = attempt.json()
+    assert body["attempt"]["scoring_status"] == "pass"
+    assert body["session"]["phase"] == "anchor"
+    assert body["review"]["application_status"] == "applied"
     duplicate = client.post(
         f"/api/sessions/{session_id}/attempts",
         json={

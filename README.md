@@ -79,7 +79,7 @@ truth.
 
 ```bash
 # Install the kernel + tutor
-pip install "git+https://github.com/baggybin/salient-core-public.git"
+pip install "git+https://github.com/baggybin/salient-core.git"
 pip install -e .
 
 # Set your API key

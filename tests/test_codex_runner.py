@@ -104,6 +104,9 @@ class TestClaudeBackendFactory:
         (options,) = runner.backend_factory.args
         assert isinstance(options, ClaudeAgentOptions)
         assert options.model == "claude-sonnet-5[1m]"
+        # Isolated from the operator's Claude Code MCP (mountain, etc.).
+        assert options.strict_mcp_config is True
+        assert options.setting_sources == []
         # The factory is zero-arg — the runner can call it as-is.
         backend = runner.backend_factory()
         assert isinstance(backend, LocalClaudeBackend)
@@ -136,7 +139,7 @@ class TestCodexBackendFactory:
         # The same assembled system prompt the claude path would use.
         assert config["instructions"] == shell._load_prompt("librarian")
         # Roster tier (sonnet) maps to the codex counterpart; med → medium.
-        assert config["model"] == "gpt-5.4"
+        assert config["model"] == "gpt-5.6-terra"
         assert config["effort"] == "medium"
         assert call["approval_handler"] is not None
         # librarian has bus_tools=False → empty bundle handed to the gateway.
