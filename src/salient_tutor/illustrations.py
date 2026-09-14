@@ -107,7 +107,7 @@ _MAX_LABELS = 5  # backstop for the text-precision gate (council rule 2)
 # imagegen.MODELS; validated at call time so an unknown/uninstalled model
 # degrades to an error rather than a 500. flux-schnell (4-step, fastest) is
 # preferred when installed; flux-dev is the reliable default (quality).
-_MODELS = ("flux-schnell", "flux-dev", "qwen")
+_MODELS = ("flux2-klein", "flux-schnell", "flux-dev", "qwen")
 _DEFAULT_MODEL = "flux-dev"  # installed + verified on the box; safe default
 
 _MAX_SRC = 2_000  # a scene description, not a document
